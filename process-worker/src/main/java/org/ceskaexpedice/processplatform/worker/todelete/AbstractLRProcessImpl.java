@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.todelete;
 
 import cz.incad.kramerius.processes.*;
 import cz.incad.kramerius.processes.starter.ProcessStarter;

@@ -14,27 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager;
+package org.ceskaexpedice.processplatform.manager.config;
 
-package org.ceskaexpedice.processplatform.manager.service;
+import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
+import org.ceskaexpedice.processplatform.manager.tasks.TaskQueue;
+import org.ceskaexpedice.processplatform.manager.tasks.TaskRepository;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Optional;
+public class ManagerModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        //bind(TaskRepository.class).to(JdbcTaskRepository.class).in(Singleton.class); // example
 
-public class TaskQueueService {
-
-    private final Queue<Task> queue = new ConcurrentLinkedQueue<>();
-
-    public void addTask(Task task) {
-        queue.offer(task);
-    }
-
-    public Optional<Task> getNextTask() {
-        return Optional.ofNullable(queue.poll());
-    }
-
-    public boolean hasPendingTasks() {
-        return !queue.isEmpty();
+        bind(TaskQueue.class).asEagerSingleton();
+        bind(TaskRepository.class).asEagerSingleton();
+        bind(TasksPlanning.class).asEagerSingleton();
     }
 }

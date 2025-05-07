@@ -16,14 +16,24 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-@Singleton
-public class TaskExecutor {
+import org.ceskaexpedice.processplatform.worker.config.WorkerModule;
+import org.ceskaexpedice.processplatform.worker.tasks.TasksLoader;
 
-    public void executeTask(TaskDto task) {
-        try {
-            ProcessStarter.startProcess(task.type, task.payload);
-        } catch (Exception e) {
-            // log error
+public class WorkerMain {
+
+    public static void main(String[] args) {
+        Injector injector = Guice.createInjector(new WorkerModule());
+        TasksLoader loop = injector.getInstance(TasksLoader.class);
+        loop.start();
+
+        // Keep alive
+        while (true) {
+            try {
+                Thread.sleep(60_000);
+            } catch (InterruptedException e) {
+                break;
+            }
         }
+
     }
 }

@@ -14,13 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.runprocess;
 
-public class WorkerModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(TaskFetcher.class).in(Singleton.class);
-        bind(TaskExecutor.class).in(Singleton.class);
-        bind(WorkerLoop.class).asEagerSingleton();
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+public class PluginLoader {
+    public static URLClassLoader loadPlugin(String processName) throws Exception {
+        File jar = new File("plugins/" + processName + ".jar");
+        if (!jar.exists()) {
+            throw new IllegalArgumentException("Missing JAR for process: " + processName);
+        }
+        return new URLClassLoader(new URL[] { jar.toURI().toURL() }, PluginLoader.class.getClassLoader());
     }
 }

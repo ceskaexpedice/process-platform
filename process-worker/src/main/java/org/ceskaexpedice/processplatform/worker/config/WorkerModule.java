@@ -14,13 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager;
+package org.ceskaexpedice.processplatform.worker.config;
 
-public class ManagerModule extends AbstractModule {
+import org.ceskaexpedice.processplatform.worker.tasks.ManagerClient;
+import org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarterLauncher;
+import org.ceskaexpedice.processplatform.worker.tasks.TasksLoader;
+
+public class WorkerModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(TaskQueueService.class).in(Singleton.class);
-        bind(TaskRepository.class).to(JdbcTaskRepository.class).in(Singleton.class); // example
-        bind(TaskPollingLoop.class).asEagerSingleton();
+        bind(TaskFetcher.class).in(Singleton.class);
+        bind(TaskExecutor.class).in(Singleton.class);
+        bind(TasksLoader.class).asEagerSingleton();
+
+        bind(ManagerClient.class).toInstance(new ManagerClient()); // or use provider
+        bind(ProcessStarterLauncher.class).toInstance(new ProcessStarterLauncher());
+
     }
 }

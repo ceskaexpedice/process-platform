@@ -14,12 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common;
+package org.ceskaexpedice.processplatform.manager.tasks;
 
-// org.ceskaexpedice.processplatform.common.TaskDto
-public class TaskDto {
-    public String id;
-    public String type;
-    public String payload;
-    public String status;
+import java.util.List;
+import java.util.ArrayList;
+
+public class TaskRepository {
+
+    public List<Task> findPendingTasks() {
+        // Simulate DB read
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task("import", "{ \"file\": \"data.csv\" }"));
+        return tasks;
+    }
 }

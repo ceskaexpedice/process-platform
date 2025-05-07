@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.ceskaexpedice.processplatform.manager.guice;
+package org.ceskaexpedice.processplatform.manager.todelete;
 
 import com.google.inject.Injector;
 

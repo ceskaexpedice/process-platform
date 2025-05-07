@@ -16,15 +16,23 @@
  */
 package org.ceskaexpedice.processplatform.manager;
 
-@Singleton
-public class TaskQueue {
-    private final Queue<TaskDto> queue = new ConcurrentLinkedQueue<>();
 
-    public void addTask(TaskDto task) {
-        queue.offer(task);
+import org.ceskaexpedice.processplatform.manager.config.ManagerModule;
+import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
+
+public class ManagerStartup implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        Injector injector = Guice.createInjector(new ManagerModule());
+        TasksPlanning poller = injector.getInstance(TasksPlanning.class);
+        poller.start(); // background DB polling
+        sce.getServletContext().setAttribute("injector", injector);
     }
 
-    public TaskDto getNextTask() {
-        return queue.poll();
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        // Cleanup if needed
     }
+
 }

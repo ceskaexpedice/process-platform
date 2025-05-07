@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager;
+package org.ceskaexpedice.processplatform.manager.todelete;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -35,16 +35,15 @@ import cz.incad.kramerius.utils.DatabaseUtils;
 import cz.incad.kramerius.workmode.WorkModeDbInitializer;
 import cz.inovatika.cdk.cache.CDKCacheInitializer;
 import cz.inovatika.folders.db.FolderDatabaseInitializer;
+import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import java.sql.Connection;
-import java.util.logging.Level;
 
 public class StartupServlet extends HttpServlet {
 
     @Inject
-    TaskPollingLoop pollingLoop;
+    TasksPlanning pollingLoop;
 
     private Thread pollingThread;
 

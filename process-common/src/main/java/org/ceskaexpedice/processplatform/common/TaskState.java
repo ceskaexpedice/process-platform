@@ -16,7 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
-// org.ceskaexpedice.processplatform.common.TaskStatus
-public enum TaskStatus {
-    PENDING, IN_PROGRESS, COMPLETED, ERROR
+public enum TaskState {
+    PENDING,
+    QUEUED,
+    RUNNING,
+    DONE,
+    ERROR
 }

@@ -14,7 +14,7 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.manager.api;
+package org.ceskaexpedice.processplatform.manager.todelete;
 
 import com.accenture.aspire.connector.services.batching.WorkerBatch;
 import com.accenture.aspire.connector.services.utilities.APIRestUtilities;

@@ -14,27 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api;
+package org.ceskaexpedice.processplatform.manager.tasks;
 
-import org.ceskaexpedice.processplatform.manager.tasks.TaskQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TaskQueue {
+    private final Queue<Task> queue = new ConcurrentLinkedQueue<>();
 
-@Path("/tasks")
-public class TaskResource {
+    public void add(Task task) {
+        queue.add(task);
+    }
 
-    @Inject
-    private TaskQueue taskQueue;
+    public Task poll() {
+        return queue.poll();
+    }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Task> getTasks() {
-        List<Task> available = new ArrayList<>();
-        Task task;
-        while ((task = taskQueue.poll()) != null) {
-            available.add(task);
-        }
-        return available;
+    public boolean isEmpty() {
+        return queue.isEmpty();
     }
 }

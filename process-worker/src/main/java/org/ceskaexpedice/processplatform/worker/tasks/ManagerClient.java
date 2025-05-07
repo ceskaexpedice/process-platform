@@ -14,10 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.tasks;
 
-@Singleton
-public class TaskFetcher {
+import java.util.List;
+import java.util.ArrayList;
+
+public class ManagerClient {
+
+    public List<Task> fetchTasks() {
+        // Fake for demo. Replace with HTTP client call to manager REST endpoint.
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task("import", "{ \"file\": \"data.csv\" }"));
+        return tasks;
+    }
 
     public Optional<TaskDto> fetchTask() {
         try {
@@ -36,4 +45,5 @@ public class TaskFetcher {
         }
         return Optional.empty();
     }
+
 }
