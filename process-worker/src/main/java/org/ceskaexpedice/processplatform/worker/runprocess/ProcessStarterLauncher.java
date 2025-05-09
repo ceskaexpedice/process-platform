@@ -16,26 +16,32 @@
  */
 package org.ceskaexpedice.processplatform.worker.runprocess;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class ProcessStarterLauncher {
 
-    public void launchProcess(String processName, String taskPayload) {
-        try {
-            // Ensure plugin is available (optional load check)
-            PluginLoader.loadPlugin(processName); // This throws if plugin JAR missing
-
-            // Start new JVM with ProcessStarter
-            ProcessBuilder pb = new ProcessBuilder(
-                    "java",
-                    "-cp", "worker-service.jar:plugins/" + processName + ".jar",
-                    "org.ceskaexpedice.processplatform.worker.executor.ProcessStarter",
-                    processName,
-                    taskPayload
-            );
-            pb.inheritIO(); // Or redirect output if needed
-            pb.start();
-
-        } catch (Exception e) {
-            System.err.println("Failed to launch process: " + e.getMessage());
+    public void launchProcess(String processName, String payload) throws IOException {
+        File pluginDir = new File("plugins/" + processName);
+        if (!pluginDir.exists() || !pluginDir.isDirectory()) {
+            throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
+
+        String classpath = Arrays.stream(pluginDir.listFiles((dir, name) -> name.endsWith(".jar")))
+                .map(File::getAbsolutePath)
+                .collect(Collectors.joining(File.pathSeparator));
+
+        ProcessBuilder pb = new ProcessBuilder(
+                "java",
+                "-cp", classpath,
+                "org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarter",
+                processName,
+                payload
+        );
+
+        pb.inheritIO(); // pipe stdout/stderr to current console
+        pb.start();
     }
 }

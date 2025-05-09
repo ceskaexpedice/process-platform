@@ -52,3 +52,4 @@ deploy
 
 
 /time
+process-worker/plugins/

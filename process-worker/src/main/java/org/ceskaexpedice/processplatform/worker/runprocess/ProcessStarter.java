@@ -17,25 +17,34 @@
 package org.ceskaexpedice.processplatform.worker.runprocess;
 
 import java.lang.reflect.Method;
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 public class ProcessStarter {
 
-    public static void main(String[] args) throws Exception {
-        String processType = args[0];
-        String payload = args[1];
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.err.println("Usage: ProcessStarter <processName> <payload>");
+            System.exit(1);
+        }
 
-        File jar = new File("plugins/" + processType + ".jar");
-        URLClassLoader cl = new URLClassLoader(new URL[]{ jar.toURI().toURL() });
+        String processName = args[0];  // e.g., "import"
+        String payload = args[1];      // JSON or command string
 
-        Class<?> clazz = cl.loadClass("org.ceskaexpedice.processplatform.processes." + processType + "." + capitalize(processType) + "Main");
-        Method main = clazz.getMethod("main", String[].class);
-        main.invoke(null, (Object) new String[]{ payload });
+        try {
+            ClassLoader loader = PluginLoader.loadProcessClassLoader(processName);
+            String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
+
+            Class<?> mainClass = loader.loadClass(mainClassName);
+            Method mainMethod = mainClass.getMethod("main", String[].class);
+
+            mainMethod.invoke(null, (Object) new String[]{ payload });
+
+        } catch (Exception e) {
+            System.err.println("Failed to start process: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    private static String capitalize(String s) {
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    private static String capitalize(String name) {
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 }

@@ -21,11 +21,23 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 public class PluginLoader {
-    public static URLClassLoader loadPlugin(String processName) throws Exception {
-        File jar = new File("plugins/" + processName + ".jar");
-        if (!jar.exists()) {
-            throw new IllegalArgumentException("Missing JAR for process: " + processName);
+
+    public static ClassLoader loadProcessClassLoader(String processName) throws Exception {
+        File pluginDir = new File("plugins/" + processName);
+        if (!pluginDir.exists() || !pluginDir.isDirectory()) {
+            throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
-        return new URLClassLoader(new URL[] { jar.toURI().toURL() }, PluginLoader.class.getClassLoader());
+
+        File[] jars = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
+        if (jars == null || jars.length == 0) {
+            throw new IllegalStateException("No JAR files found in: " + pluginDir.getAbsolutePath());
+        }
+
+        URL[] urls = new URL[jars.length];
+        for (int i = 0; i < jars.length; i++) {
+            urls[i] = jars[i].toURI().toURL();
+        }
+
+        return new URLClassLoader(urls, PluginLoader.class.getClassLoader());
     }
 }

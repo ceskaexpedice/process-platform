@@ -15,3 +15,14 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+/* TODO is for Kramerius build
+tasks.register<Copy>("bundleProcess") {
+    val outDir = layout.buildDirectory.dir("plugin-bundle")
+    into(outDir)
+
+    from(configurations.runtimeClasspath)
+    from(tasks.named("jar"))
+}
+
+ */
