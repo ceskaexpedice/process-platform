@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 repositories {
@@ -8,8 +8,37 @@ repositories {
 }
 
 dependencies {
+    api project(':process-common')
+
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
+    implementation "javax.inject:javax.inject:1"
+
+    implementation 'org.glassfish.jersey.containers:jersey-container-servlet:2.39'
+    implementation 'org.glassfish.jersey.containers:jersey-container-servlet-core:2.39'
+    implementation 'org.glassfish.jersey.core:jersey-server:2.39'
+    implementation 'org.glassfish.jersey.core:jersey-client:2.39'
+    implementation 'org.glassfish.jersey.media:jersey-media-jaxb:2.39'
+    implementation 'org.glassfish.jersey.media:jersey-media-multipart:2.39'
+    implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:2.39'
+    implementation 'org.glassfish.jersey.ext:jersey-entity-filtering:2.39'
+    implementation 'org.glassfish.jersey.core:jersey-common:2.39'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:2.39'
+
+    implementation 'org.glassfish.hk2:hk2-api:2.6.1'
+    implementation 'org.glassfish.hk2.external:jakarta.inject:2.6.1'
+    implementation 'org.glassfish.hk2:osgi-resource-locator:1.0.3'
+    implementation 'org.glassfish.hk2:hk2-locator:2.6.1'
+    implementation 'org.glassfish.hk2.external:aopalliance-repackaged:2.6.1'
+    implementation 'org.glassfish.hk2:hk2-utils:2.6.1'
+
+    implementation 'org.json:json:20140107'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.39'
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'javax.activation:activation:1.1.1'
 }
 
 test {

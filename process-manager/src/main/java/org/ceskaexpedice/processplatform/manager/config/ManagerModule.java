@@ -20,6 +20,9 @@ import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
 import org.ceskaexpedice.processplatform.manager.tasks.TaskQueue;
 import org.ceskaexpedice.processplatform.manager.tasks.TaskRepository;
 
+public class ManagerModule  {
+}
+/*
 public class ManagerModule extends AbstractModule {
     @Override
     protected void configure() {
@@ -30,3 +33,5 @@ public class ManagerModule extends AbstractModule {
         bind(TasksPlanning.class).asEagerSingleton();
     }
 }
+
+ */

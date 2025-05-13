@@ -14,11 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.runprocess;
+package org.ceskaexpedice.processplatform.worker.startprocess;
+
+import org.ceskaexpedice.processplatform.api.PluginContext;
+import org.ceskaexpedice.processplatform.api.PluginContextHolder;
 
 import java.lang.reflect.Method;
 
-public class ProcessStarter {
+public class ProcessStarter implements PluginContext {
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -30,6 +33,7 @@ public class ProcessStarter {
         String payload = args[1];      // JSON or command string
 
         try {
+            PluginContextHolder.setContext(new ProcessStarter());
             ClassLoader loader = PluginLoader.loadProcessClassLoader(processName);
             String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
 
@@ -46,5 +50,11 @@ public class ProcessStarter {
 
     private static String capitalize(String name) {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    }
+
+    @Override
+    public String callRestApi(String endpoint, String payload) {
+        // call manager ProcessTaskResource
+        return "";
     }
 }

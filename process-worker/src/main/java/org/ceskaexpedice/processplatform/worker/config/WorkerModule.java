@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.config;
 
 import org.ceskaexpedice.processplatform.worker.tasks.ManagerClient;
-import org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarterLauncher;
+import org.ceskaexpedice.processplatform.worker.launchprocess.ProcessStarterLauncher;
 import org.ceskaexpedice.processplatform.worker.tasks.TasksLoader;
 
 public class WorkerModule extends AbstractModule {

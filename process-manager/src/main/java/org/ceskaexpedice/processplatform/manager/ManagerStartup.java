@@ -20,6 +20,11 @@ package org.ceskaexpedice.processplatform.manager;
 import org.ceskaexpedice.processplatform.manager.config.ManagerModule;
 import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
 
+public class ManagerStartup {
+
+
+}
+/*
 public class ManagerStartup implements ServletContextListener {
 
     @Override
@@ -35,4 +40,4 @@ public class ManagerStartup implements ServletContextListener {
         // Cleanup if needed
     }
 
-}
+}*/

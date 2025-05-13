@@ -14,27 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api;
+package org.ceskaexpedice.processplatform.api;
 
-import org.ceskaexpedice.processplatform.manager.tasks.TaskQueue;
+public class PluginContextHolder {
+    private static PluginContext context;
 
-import java.util.ArrayList;
-import java.util.List;
+    public static void setContext(PluginContext ctx) {
+        context = ctx;
+    }
 
-@Path("/tasks")
-public class TaskResource {
-
-    @Inject
-    private TaskQueue taskQueue;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Task> getTasks() {
-        List<Task> available = new ArrayList<>();
-        Task task;
-        while ((task = taskQueue.poll()) != null) {
-            available.add(task);
-        }
-        return available;
+    public static PluginContext getContext() {
+        return context;
     }
 }

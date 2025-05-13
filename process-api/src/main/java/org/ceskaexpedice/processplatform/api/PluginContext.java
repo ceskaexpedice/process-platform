@@ -14,19 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.tasks;
+package org.ceskaexpedice.processplatform.api;
 
-import org.ceskaexpedice.processplatform.common.Task;
+public interface PluginContext {
 
-import java.util.List;
-import java.util.ArrayList;
+    String callRestApi(String endpoint, String payload);
 
-public class TaskRepository {
-
-    public List<Task> findPendingTasks() {
-        // Simulate DB read
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
-        return tasks;
-    }
 }

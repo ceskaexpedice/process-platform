@@ -16,8 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.manager.tasks;
 
-import com.google.inject.Inject;
 
+import org.ceskaexpedice.processplatform.common.Task;
+
+import javax.inject.Inject;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;

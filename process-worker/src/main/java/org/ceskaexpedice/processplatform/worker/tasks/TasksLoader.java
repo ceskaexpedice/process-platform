@@ -16,8 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.tasks;
 
-import com.google.inject.Inject;
-import org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarterLauncher;
+
+import org.ceskaexpedice.processplatform.worker.launchprocess.ProcessStarterLauncher;
 
 import java.util.List;
 import java.util.Timer;

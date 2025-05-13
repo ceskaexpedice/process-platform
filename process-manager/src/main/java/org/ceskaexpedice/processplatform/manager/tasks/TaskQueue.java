@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.tasks;
 
+import org.ceskaexpedice.processplatform.common.Task;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
