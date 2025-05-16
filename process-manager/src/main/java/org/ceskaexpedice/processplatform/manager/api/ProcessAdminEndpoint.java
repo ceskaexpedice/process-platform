@@ -22,24 +22,34 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/process-tasks")
-public class ProcessTaskResource {
+@Path("/process")
+public class ProcessAdminEndpoint {
 
     //@Inject
 //    private TaskQueue taskQueue;
 
     @GET
-    @Path("next")
+    @Path("owners")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response nextTask(String[] supportedTasks) {
+    public Response getOwners() {
         return Response.ok().entity("result Owners".toString()).build();
     }
 
-    @PUT
-    @Path("/{id}/status")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateTaskStatus(@PathParam("id") String taskId, String status) {
-        return Response.ok().entity("result Owners".toString()).build();
+    @GET
+    @Path("by_process_id/{process_id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getProcessByProcessId(@PathParam("process_id") String processId) {
+        return Response.ok().entity("byProcessId:" + processId).build();
     }
+
+    @POST
+    @Path("")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response scheduleProcess(String processDefinition) {
+        JSONObject jsonObject = new JSONObject(processDefinition);
+        return Response.ok().entity("scheduleProcess:" + jsonObject).build();
+    }
+
 
 }

@@ -14,17 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.api;
+package org.ceskaexpedice.processplatform.worker.config;
 
-public interface PluginContext {
+@ApplicationPath("/api")
+public class JerseyConfig extends ResourceConfig {
 
-    void updateTaskState(String taskId, String taskState);
-
-    void updateTaskPid(String taskId, String pid);
-
-    void updateTaskName(String taskId, String name);
-
-    void scheduleProcess(String processDefinition);
-
+    public JerseyConfig() {
+        packages("org.ceskaexpedice.processplatform.worker.rest");
+    }
 
 }

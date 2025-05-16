@@ -18,30 +18,57 @@ package org.ceskaexpedice.processplatform.worker.launchprocess;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class ProcessStarterLauncher {
 
     public void launchProcess(String processName, String payload) throws IOException {
+        // TODO payload must be pars to be passed to the plugin through main method args
+        /*
         File pluginDir = new File("plugins/" + processName);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
             throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
+        }*/
+        try {
+
+            String classpath = getOwnJarPath();
+            List<String> command = List.of(
+                    "java",
+                    "-cp", classpath,
+                    "org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarter",
+                    processName,
+                    payload
+            );
+            ProcessBuilder pb = new ProcessBuilder(command);
+
+            pb.inheritIO(); // pipe stdout/stderr to current console
+            Process process = pb.start();
+            // pokracuje dal.. rozhoduje se, jestli pocka na vysledek procesu
+            if (wait) {
+                int val = process.waitFor();
+                if (val != 0) {
+                    InputStream errorStream = process.getErrorStream();
+                    String s = IOUtils.toString(errorStream, "UTF-8");
+                    LOGGER.info(s);
+                }
+                LOGGER.info("return value exiting process '" + val + "'");
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
 
-        String classpath = Arrays.stream(pluginDir.listFiles((dir, name) -> name.endsWith(".jar")))
-                .map(File::getAbsolutePath)
-                .collect(Collectors.joining(File.pathSeparator));
-
-        ProcessBuilder pb = new ProcessBuilder(
-                "java",
-                "-cp", classpath,
-                "org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarter",
-                processName,
-                payload
-        );
-
-        pb.inheritIO(); // pipe stdout/stderr to current console
-        pb.start();
+    public String getOwnJarPath() {
+        return ProcessStarterLauncher.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath();
     }
 }

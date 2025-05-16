@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.tasks;
+package org.ceskaexpedice.processplatform.worker.loader;
 
 
 import org.ceskaexpedice.processplatform.worker.launchprocess.ProcessStarterLauncher;
@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TasksLoader {
+public class ProcessLoader {
 
     private final ManagerClient managerClient;
     private final ProcessStarterLauncher launcher;
 
     @Inject
-    public TasksLoader(ManagerClient managerClient, ProcessStarterLauncher launcher) {
+    public ProcessLoader(ManagerClient managerClient, ProcessStarterLauncher launcher) {
         this.managerClient = managerClient;
         this.launcher = launcher;
     }

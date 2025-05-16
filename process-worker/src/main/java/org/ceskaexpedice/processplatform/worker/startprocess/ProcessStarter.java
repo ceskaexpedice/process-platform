@@ -30,31 +30,97 @@ public class ProcessStarter implements PluginContext {
         }
 
         String processName = args[0];  // e.g., "import"
-        String payload = args[1];      // JSON or command string
+        String mainClassName = args[1];  // e.g., "import"
+        String payload = args[2];      // JSON or command string
 
         try {
             PluginContextHolder.setContext(new ProcessStarter());
             ClassLoader loader = PluginLoader.loadProcessClassLoader(processName);
-            String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
-
-            Class<?> mainClass = loader.loadClass(mainClassName);
-            Method mainMethod = mainClass.getMethod("main", String[].class);
-
-            mainMethod.invoke(null, (Object) new String[]{ payload });
-
+            //String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
+            Class<?> clz = loader.loadClass(mainClassName);
+            MethodType processMethod = mainMethodType(clz);
+            Object[] objs = new Object[1];
+            objs[0] = args;
+            processMethod.getMethod().invoke(null, objs);
+            //String pid = getPID();
+            //updatePID(pid);
         } catch (Exception e) {
             System.err.println("Failed to start process: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static String capitalize(String name) {
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    private static MethodType mainMethodType(Class clz) throws SecurityException, NoSuchMethodException {
+        Method mainMethod = mainMethod(clz);
+        return mainMethod != null ? new MethodType(mainMethod, MethodType.Type.MAIN) : null;
+    }
+
+    private static Method mainMethod(Class clz) throws NoSuchMethodException {
+        Method mainMethod = clz.getMethod("main", (new String[0]).getClass());
+        return mainMethod;
     }
 
     @Override
-    public String callRestApi(String endpoint, String payload) {
-        // call manager ProcessTaskResource
-        return "";
+    public void updateTaskState(String taskId, String taskState) {
+
     }
+
+    @Override
+    public void updateTaskPid(String taskId, String pid) {
+
+    }
+
+    @Override
+    public void updateTaskName(String taskId, String name) {
+
+    }
+
+    @Override
+    public void scheduleProcess(String processDefinition) {
+
+    }
+
+    /**
+     * Wrapper which represents found method
+     *
+     * @author pavels
+     */
+    static class MethodType {
+
+        /**
+         * enum for type of method
+         */
+        static enum Type {MAIN, ANNOTATED}
+
+        ;
+
+        private Method method;
+        private Type type;
+
+        public MethodType(Method method, Type type) {
+            super();
+            this.method = method;
+            this.type = type;
+        }
+
+
+        /**
+         * Returns type of method
+         *
+         * @return
+         */
+        public Type getType() {
+            return type;
+        }
+
+        /**
+         * Returns method
+         *
+         * @return
+         */
+        public Method getMethod() {
+            return method;
+        }
+    }
+
 }

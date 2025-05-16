@@ -14,8 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.tasks;
+package org.ceskaexpedice.processplatform.worker.loader;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -46,4 +52,19 @@ public class ManagerClient {
         return Optional.empty();
     }
 
+    public org.ceskaexpedice.processplatform.common.Process fetchProcessFromManager(String uuid) throws IOException {
+        String url = "http://manager-host:8080/api/get-process/" + uuid;
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Accept", "application/json");
+
+        if (conn.getResponseCode() != 200) {
+            throw new IOException("Failed to get process: HTTP " + conn.getResponseCode());
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try (InputStream is = conn.getInputStream()) {
+            return mapper.readValue(is, org.ceskaexpedice.processplatform.common.Process.class);
+        }
+    }
 }

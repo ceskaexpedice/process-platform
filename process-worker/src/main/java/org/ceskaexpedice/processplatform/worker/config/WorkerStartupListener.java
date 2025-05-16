@@ -16,18 +16,26 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-public class WorkerModule {
-}
-/*
-public class WorkerModule extends AbstractModule {
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
+
+@WebListener
+public class WorkerStartupListener implements ServletContextListener {
+
     @Override
-    protected void configure() {
-        bind(TaskFetcher.class).in(Singleton.class);
-        bind(TaskExecutor.class).in(Singleton.class);
-        bind(TasksLoader.class).asEagerSingleton();
-
-        bind(ManagerClient.class).toInstance(new ManagerClient()); // or use provider
-        bind(ProcessStarterLauncher.class).toInstance(new ProcessStarterLauncher());
-
+    public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("Starting WorkerMain thread...");
+        new Thread(() -> {
+            WorkerMain worker = new WorkerMain();
+            worker.start(); // starts polling loop
+        }).start();
     }
-}*/
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        System.out.println("Stopping Worker...");
+        // Optionally shut down worker loop cleanly
+    }
+}

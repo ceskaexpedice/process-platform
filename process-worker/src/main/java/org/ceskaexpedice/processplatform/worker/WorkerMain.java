@@ -17,23 +17,17 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.worker.config.WorkerModule;
-import org.ceskaexpedice.processplatform.worker.tasks.TasksLoader;
+import org.ceskaexpedice.processplatform.worker.loader.ProcessLoader;
 
 public class WorkerMain {
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new WorkerModule());
-        TasksLoader loop = injector.getInstance(TasksLoader.class);
+    private final ProcessLoader loop;
+
+    public WorkerMain() {
+        this.loop = new ProcessLoader(new ManagerClient(), new ProcessStarterLauncher());
+    }
+
+    public void start() {
         loop.start();
-
-        // Keep alive
-        while (true) {
-            try {
-                Thread.sleep(60_000);
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
-
     }
 }

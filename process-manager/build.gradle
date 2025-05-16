@@ -33,6 +33,11 @@ dependencies {
 
     implementation 'org.json:json:20140107'
 
+    // jackson dependency
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.8.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.8.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.39'

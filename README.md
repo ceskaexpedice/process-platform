@@ -138,3 +138,16 @@ Pluginy skončí ve složce: build/install/<project>/plugins
 
 Z toho pak můžeš stavět image (např. pomocí Jib nebo Dockerfile).
 ----------------------------------------------------------------------------------
+manager bude mit prehled o vsem..  Takze bude schopen ridit workery, poda vsechny informace bez ohledu na to, kde se to spoustelo..
+worker - nekde zmizel- musim import preplanovat...
+
+
+
+worker bude - nemusel mit pristup do db
+to api bude primarne urceno pro manager..,
+bude poskytovat data o fyzicky bezicich proceses (ne z db),   java -cp  .....,
+bude poskytovat informace  vytizeni (casem) a bude mit endpoint ~/health (zjisteni zdravi),,
+bude mit endpoint pro logy
+
+jeste dalsi pozmnaka.. debug bude mozny pres zverejneni portu ven.  (Docker compose) jenom by me zajimalo, zda umoznuje zverejnit port i kdyz jeste v kontejneru otevreny...
+ale to by asi mel, to by nefungovalo spoustu veci

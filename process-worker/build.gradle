@@ -11,6 +11,12 @@ dependencies {
     api project(':process-api')
     api project(':process-common')
 
+    // jackson dependency
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.8.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.8.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
+
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }

@@ -20,10 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -34,7 +30,7 @@ import javax.ws.rs.core.Response;
  *
  * @author ppodsednik
  */
-public class TestProcessResource extends JerseyTest {
+public class TestProcessAdminEndpoint extends JerseyTest {
 
     public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -51,7 +47,7 @@ public class TestProcessResource extends JerseyTest {
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProcessResource());
+        resourceConfig.register(new ProcessAdminEndpoint());
         return resourceConfig;
     }
 
