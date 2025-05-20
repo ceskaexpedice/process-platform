@@ -1,0 +1,87 @@
+plugins {
+    id 'java'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+}
+
+configurations {
+    pluginImport
+    pluginIndexace
+    pluginLog
+}
+
+// Declare each plugin and their dependencies
+dependencies {
+    pluginImport 'org.krameirus:import:1.0'
+    pluginIndexace 'org.krameirus:indexace:1.0'
+    pluginLog 'org.krameirus:processlog:1.0'
+}
+
+// Where the WAR from process-platform is available (manually or from maven local)
+def processWorkerWar = file('../path-to-built/process-worker.war') // <- adjust this
+
+// Copies all plugin JARs to structure like plugins/import/, plugins/indexace/, ...
+task copyPlugins(type: Copy) {
+    dependsOn configurations.pluginImport, configurations.pluginIndexace, configurations.pluginLog
+    group = 'distribution'
+    description = 'Copies plugin JARs to install layout'
+
+    into "$buildDir/install/worker/plugins"
+
+    from(configurations.pluginImport) {
+        into 'import'
+    }
+    from(configurations.pluginIndexace) {
+        into 'indexace'
+    }
+    from(configurations.pluginLog) {
+        into 'processlog'
+    }
+}
+
+// Copies process-worker.war into build/install/worker
+task copyWorkerWar(type: Copy) {
+    from processWorkerWar
+    into "$buildDir/install/worker"
+    rename { 'process-worker.war' } // Optional if name already correct
+}
+
+// Full preparation
+task prepareWorker {
+    group = 'build'
+    description = 'Prepares full worker with plugins and WAR'
+    dependsOn copyWorkerWar, copyPlugins
+}
+
+jib {
+    from {
+        image = 'tomcat:9-jdk17'
+    }
+    to {
+        image = 'your-org/process-worker:latest'
+    }
+
+    container {
+        ports = ['8080']
+        extraDirectories {
+            paths {
+                // WAR goes into webapps
+                path {
+                    from = file("$buildDir/install/worker")
+                    into = '/usr/local/tomcat/webapps'
+                    includes = ['process-worker.war']
+                    rename = { 'ROOT.war' } // optional
+                }
+
+                // Plugins go into /usr/local/worker/plugins
+                path {
+                    from = file("$buildDir/install/worker/plugins")
+                    into = '/usr/local/worker/plugins'
+                }
+            }
+        }
+    }
+}
+
+./gradlew prepareWorker jibDockerBuild
+./gradlew prepareWorker jib
+

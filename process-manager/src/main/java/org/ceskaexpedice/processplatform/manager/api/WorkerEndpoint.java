@@ -25,11 +25,43 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-@Path("/manager")
+@Path("/worker")
 public class WorkerEndpoint {
 
     //@Inject
 //    private TaskQueue taskQueue;
+    // === Get Next Available Process ===
+    @POST
+    @Path("/next")
+    public Response getNextProcess(List<String> supportedProcessIds) {
+        // Return the next suitable process based on supported plugins
+        // Merges data from process_definition + processes
+        return Response.ok(/* Process */).build();
+    }
+
+    // === Update Process State (e.g., running, completed, failed) ===
+    @PUT
+    @Path("/state/{uuid}")
+    public Response updateProcessState(@PathParam("uuid") String uuid, @QueryParam("state") String newState) {
+        // Update status in the processes table
+        return Response.ok().build();
+    }
+
+    // === Update Worker PID ===
+    @PUT
+    @Path("/pid/{uuid}")
+    public Response updateProcessPID(@PathParam("uuid") String uuid, @QueryParam("pid") int pid) {
+        // Store OS process ID of the spawned JVM
+        return Response.ok().build();
+    }
+
+    // === Update Human-Readable Name ===
+    @PUT
+    @Path("/name/{uuid}")
+    public Response updateProcessName(@PathParam("uuid") String uuid, @QueryParam("name") String name) {
+        // Update name in the processes table for display
+        return Response.ok().build();
+    }
 
     @GET
     @Path("next")

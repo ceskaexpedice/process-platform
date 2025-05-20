@@ -21,35 +21,71 @@ import org.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
-@Path("/process")
+@Path("/admin")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ProcessAdminEndpoint {
 
-    //@Inject
-//    private TaskQueue taskQueue;
-
-    @GET
-    @Path("owners")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getOwners() {
-        return Response.ok().entity("result Owners".toString()).build();
-    }
-
-    @GET
-    @Path("by_process_id/{process_id}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getProcessByProcessId(@PathParam("process_id") String processId) {
-        return Response.ok().entity("byProcessId:" + processId).build();
-    }
+    // === Process Definitions ===
 
     @POST
-    @Path("")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response scheduleProcess(String processDefinition) {
-        JSONObject jsonObject = new JSONObject(processDefinition);
-        return Response.ok().entity("scheduleProcess:" + jsonObject).build();
+    @Path("/definitions")
+    public Response createOrUpdateProcessDefinition(JSONObject definition) {
+        // Insert or update process_definition table
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/definitions")
+    public Response getAllProcessDefinitions() {
+        // Return list of all process definitions
+        return Response.ok(/* List<ProcessDefinition> */).build();
+    }
+
+    @GET
+    @Path("/definitions/{id}")
+    public Response getProcessDefinition(@PathParam("id") String id) {
+        // Return specific process definition by ID
+        return Response.ok(/* ProcessDefinition */).build();
+    }
+
+    @DELETE
+    @Path("/definitions/{id}")
+    public Response deleteProcessDefinition(@PathParam("id") String id) {
+        // Remove definition from DB if needed
+        return Response.noContent().build();
     }
 
 
+    // === Scheduled Processes ===
+
+    @POST
+    @Path("/schedule")
+    public Response scheduleProcess(JSONObject processInstance) {
+        // Insert into PROCESSES table, link to definition by ID
+        return Response.ok(/* UUID or scheduled info */).build();
+    }
+
+    @GET
+    @Path("/processes")
+    public Response getAllScheduledProcesses() {
+        // Optional: return all scheduled processes
+        return Response.ok(/* List<ScheduledProcess> */).build();
+    }
+
+    @GET
+    @Path("/processes/{uuid}")
+    public Response getScheduledProcess(@PathParam("uuid") String uuid) {
+        // Return full JSON for worker (merged process_definition + scheduled params)
+        return Response.ok(/* Process */).build();
+    }
+
+    @DELETE
+    @Path("/processes/{uuid}")
+    public Response cancelScheduledProcess(@PathParam("uuid") String uuid) {
+        // Optional: mark a process as cancelled
+        return Response.noContent().build();
+    }
 }

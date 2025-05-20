@@ -27,13 +27,15 @@ import java.util.ArrayList;
 
 public class ManagerClient {
 
+    /*
     public List<Task> fetchTasks() {
         // Fake for demo. Replace with HTTP client call to manager REST endpoint.
         List<Task> tasks = new ArrayList<>();
         tasks.add(new Task("import", "{ \"file\": \"data.csv\" }"));
         return tasks;
-    }
+    }*/
 
+    /*
     public Optional<TaskDto> fetchTask() {
         try {
             URL url = new URL("http://manager-service:8080/tasks/next");
@@ -51,6 +53,8 @@ public class ManagerClient {
         }
         return Optional.empty();
     }
+
+     */
 
     public org.ceskaexpedice.processplatform.common.Process fetchProcessFromManager(String uuid) throws IOException {
         String url = "http://manager-host:8080/api/get-process/" + uuid;
