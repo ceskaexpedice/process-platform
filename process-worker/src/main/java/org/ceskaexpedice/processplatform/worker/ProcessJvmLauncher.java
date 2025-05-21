@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.launchprocess;
+package org.ceskaexpedice.processplatform.worker;
 
-import java.io.File;
+import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-public class ProcessStarterLauncher {
+public class ProcessJvmLauncher {
 
-    public void launchProcess(String processName, String payload) throws IOException {
+    public void launchJvm(ProcessTask processTask) {
         // TODO payload must be pars to be passed to the plugin through main method args
         /*
         File pluginDir = new File("plugins/" + processName);
@@ -39,33 +37,28 @@ public class ProcessStarterLauncher {
             List<String> command = List.of(
                     "java",
                     "-cp", classpath,
-                    "org.ceskaexpedice.processplatform.worker.runprocess.ProcessStarter",
-                    processName,
-                    payload
+                    "org.ceskaexpedice.processplatform.worker.startprocess.ProcessStarter",
+                    "processName",
+                    "payload"
             );
             ProcessBuilder pb = new ProcessBuilder(command);
 
             pb.inheritIO(); // pipe stdout/stderr to current console
-            Process process = pb.start();
-            // pokracuje dal.. rozhoduje se, jestli pocka na vysledek procesu
-            if (wait) {
-                int val = process.waitFor();
-                if (val != 0) {
-                    InputStream errorStream = process.getErrorStream();
-                    String s = IOUtils.toString(errorStream, "UTF-8");
-                    LOGGER.info(s);
-                }
-                LOGGER.info("return value exiting process '" + val + "'");
+            Process processR = pb.start();
+            int val = processR.waitFor();
+            if (val != 0) {
+                InputStream errorStream = processR.getErrorStream();
+                //String s = IOUtils.toString(errorStream, "UTF-8");
+                //LOGGER.info(s);
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            //LOGGER.info("return value exiting process '" + val + "'");
+        } catch (IOException | InterruptedException e) {
+            // LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
     public String getOwnJarPath() {
-        return ProcessStarterLauncher.class
+        return ProcessJvmLauncher.class
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()

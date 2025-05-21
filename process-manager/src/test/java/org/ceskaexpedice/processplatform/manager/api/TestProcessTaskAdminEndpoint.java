@@ -14,6 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.manager.api.service.AdminService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -25,12 +26,14 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * TestRest Description
  *
  * @author ppodsednik
  */
-public class TestProcessAdminEndpoint extends JerseyTest {
+public class TestProcessTaskAdminEndpoint extends JerseyTest {
 
     public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -46,8 +49,9 @@ public class TestProcessAdminEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
+        AdminService adminServiceMock = mock(AdminService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProcessAdminEndpoint());
+        resourceConfig.register(new ProcessAdminEndpoint(adminServiceMock));
         return resourceConfig;
     }
 
@@ -58,8 +62,8 @@ public class TestProcessAdminEndpoint extends JerseyTest {
   }*/
 
     @Test
-    public void testGetOwners() {
-        Response response = target("processes/owners")
+    public void testGetDefinitions() {
+        Response response = target("admin/definitions")
                 .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
         String entity = response.readEntity(String.class);

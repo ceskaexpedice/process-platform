@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common;
+package org.ceskaexpedice.processplatform.common.dto;
 
-public class Task {
-    private String id;
-    private String type; // e.g., "IMPORT"
-    private String payload; // JSON or config
-
-    // Getters/setters
+public class ProcessTask {
 }

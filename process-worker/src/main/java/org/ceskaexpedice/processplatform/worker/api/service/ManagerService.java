@@ -14,20 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.config;
+package org.ceskaexpedice.processplatform.worker.api.service;
 
-public class WorkerModule {
+public class ManagerService {
 }
-/*
-public class WorkerModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(TaskFetcher.class).in(Singleton.class);
-        bind(TaskExecutor.class).in(Singleton.class);
-        bind(TasksLoader.class).asEagerSingleton();
-
-        bind(ManagerClient.class).toInstance(new ManagerClient()); // or use provider
-        bind(ProcessStarterLauncher.class).toInstance(new ProcessStarterLauncher());
-
-    }
-}*/

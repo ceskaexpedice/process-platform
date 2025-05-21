@@ -14,27 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager;
+package org.ceskaexpedice.processplatform.manager.toDelete;
 
+import java.util.List;
+import java.util.ArrayList;
 
-public class ManagerStartup {
-
-
-}
+public class TaskRepository {
 /*
-public class ManagerStartup implements ServletContextListener {
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        Injector injector = Guice.createInjector(new ManagerModule());
-        TasksPlanning poller = injector.getInstance(TasksPlanning.class);
-        poller.start(); // background DB polling
-        sce.getServletContext().setAttribute("injector", injector);
+    public List<Task> findPendingTasks() {
+        // Simulate DB read
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(new Task());
+        return tasks;
     }
 
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // Cleanup if needed
-    }
-
-}*/
+ */
+}

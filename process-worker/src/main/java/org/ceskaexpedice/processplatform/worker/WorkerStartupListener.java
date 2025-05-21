@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.config;
+package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.manager.tasks.TasksPlanning;
-import org.ceskaexpedice.processplatform.manager.tasks.TaskQueue;
-import org.ceskaexpedice.processplatform.manager.tasks.TaskRepository;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
-public class ManagerModule  {
-}
-/*
-public class ManagerModule extends AbstractModule {
+//@WebListener
+public class WorkerStartupListener implements ServletContextListener {
+
     @Override
-    protected void configure() {
-        //bind(TaskRepository.class).to(JdbcTaskRepository.class).in(Singleton.class); // example
+    public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("Starting WorkerMain thread...");
+        WorkerMain workerMain = new WorkerMain();
+        workerMain.start(); // starts polling loop
+    }
 
-        bind(TaskQueue.class).asEagerSingleton();
-        bind(TaskRepository.class).asEagerSingleton();
-        bind(TasksPlanning.class).asEagerSingleton();
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        System.out.println("Stopping Worker...");
+        // Optionally shut down worker loop cleanly
     }
 }
-
- */

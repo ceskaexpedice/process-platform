@@ -16,7 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.TaskState;
+import org.ceskaexpedice.processplatform.common.dto.ProcessState;
+import org.ceskaexpedice.processplatform.manager.api.service.WorkerService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -27,6 +28,9 @@ import java.util.List;
 
 @Path("/worker")
 public class WorkerEndpoint {
+
+    public WorkerEndpoint(WorkerService workerService) {
+    }
 
     //@Inject
 //    private TaskQueue taskQueue;
@@ -73,17 +77,20 @@ public class WorkerEndpoint {
         return Response.ok().entity("result Owners".toString()).build();
     }
 
+    /*
     @GET
     @Path("/get-process/{uuid}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProcess(@PathParam("uuid") String uuid) {
         try (Connection conn = dataSource.getConnection()) {
-            org.ceskaexpedice.processplatform.common.Process proc = buildProcessFromDatabase(conn, uuid);
+            ProcessDefinition proc = buildProcessFromDatabase(conn, uuid);
             return Response.ok(proc).build(); // Jackson will serialize automatically
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
+
+     */
 
     @PUT
     @Path("/{id}/state")
@@ -91,7 +98,7 @@ public class WorkerEndpoint {
     public Response updateProcessState(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        TaskState taskState = TaskState.valueOf(taskStateS);
+        ProcessState processState = ProcessState.valueOf(taskStateS);
         /*
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
@@ -109,7 +116,7 @@ public class WorkerEndpoint {
     public Response updateProcessPid(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        TaskState taskState = TaskState.valueOf(taskStateS);
+        ProcessState processState = ProcessState.valueOf(taskStateS);
         /*
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
@@ -127,7 +134,7 @@ public class WorkerEndpoint {
     public Response updateProcessName(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        TaskState taskState = TaskState.valueOf(taskStateS);
+        ProcessState processState = ProcessState.valueOf(taskStateS);
         /*
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
@@ -138,9 +145,9 @@ public class WorkerEndpoint {
 
         return Response.ok().entity("result Owners".toString()).build();
     }
-
-    public org.ceskaexpedice.processplatform.common.Process buildProcessFromDatabase(Connection conn, String uuid) throws SQLException {
-        org.ceskaexpedice.processplatform.common.Process process = new org.ceskaexpedice.processplatform.common.Process();
+/*
+    public ProcessDefinition buildProcessFromDatabase(Connection conn, String uuid) throws SQLException {
+        ProcessDefinition processDefinition = new ProcessDefinition();
 
         // 1. Load runtime process instance
         String processSql = "SELECT * FROM processes WHERE uuid = ?";
@@ -148,16 +155,16 @@ public class WorkerEndpoint {
             ps.setString(1, uuid);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    process.setUuid(rs.getString("UUID"));
-                    process.setDefId(rs.getString("DEFID"));
-                    process.setName(rs.getString("NAME"));
-                    process.setParamsJson(rs.getString("PARAMS"));
-                    process.setPlannedTimestamp(rs.getTimestamp("PLANNED").getTime());
+                    processDefinition.setUuid(rs.getString("UUID"));
+                    processDefinition.setDefId(rs.getString("DEFID"));
+                    processDefinition.setName(rs.getString("NAME"));
+                    processDefinition.setParamsJson(rs.getString("PARAMS"));
+                    processDefinition.setPlannedTimestamp(rs.getTimestamp("PLANNED").getTime());
                     Timestamp started = rs.getTimestamp("STARTED");
                     if (started != null) {
-                        process.setStartedTimestamp(started.getTime());
+                        processDefinition.setStartedTimestamp(started.getTime());
                     }
-                    process.setStatus(rs.getInt("STATUS"));
+                    processDefinition.setStatus(rs.getInt("STATUS"));
                 } else {
                     throw new IllegalArgumentException("No process found with UUID: " + uuid);
                 }
@@ -167,17 +174,17 @@ public class WorkerEndpoint {
         // 2. Load static process definition
         String defSql = "SELECT * FROM process_definitions WHERE defid = ?";
         try (PreparedStatement ps = conn.prepareStatement(defSql)) {
-            ps.setString(1, process.getDefId());
+            ps.setString(1, processDefinition.getDefId());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    process.setDescription(rs.getString("DESCRIPTION"));
-                    process.setMainClass(rs.getString("MAINCLASS"));
-                    process.setJavaParameters(rs.getString("JAVAPROCESSPARAMETERS"));
-                    process.setStandardOs(rs.getString("STANDARDOS"));
-                    process.setErrOs(rs.getString("ERR_OS"));
-                    process.setSecuredAction(rs.getString("SECUREDACTION"));
+                    processDefinition.setDescription(rs.getString("DESCRIPTION"));
+                    processDefinition.setMainClass(rs.getString("MAINCLASS"));
+                    processDefinition.setJavaParameters(rs.getString("JAVAPROCESSPARAMETERS"));
+                    processDefinition.setStandardOs(rs.getString("STANDARDOS"));
+                    processDefinition.setErrOs(rs.getString("ERR_OS"));
+                    processDefinition.setSecuredAction(rs.getString("SECUREDACTION"));
                 } else {
-                    throw new IllegalArgumentException("No process definition found for defid: " + process.getDefId());
+                    throw new IllegalArgumentException("No process definition found for defid: " + processDefinition.getDefId());
                 }
             }
         }
@@ -185,6 +192,8 @@ public class WorkerEndpoint {
         // Optional: parse arguments from paramsJson
         // You can convert this to argument list if needed, or leave this to the Worker
 
-        return process;
+        return processDefinition;
     }
+
+ */
 }

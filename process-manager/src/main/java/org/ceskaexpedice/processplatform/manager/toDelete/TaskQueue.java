@@ -14,27 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager;
+package org.ceskaexpedice.processplatform.manager.toDelete;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ManagerStartup {
+public class TaskQueue {
+    /*
+    private final Queue<Task> queue = new ConcurrentLinkedQueue<>();
 
+    public void add(Task task) {
+        queue.add(task);
+    }
 
+    public Task poll() {
+        return queue.poll();
+    }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
+     */
 }
-/*
-public class ManagerStartup implements ServletContextListener {
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        Injector injector = Guice.createInjector(new ManagerModule());
-        TasksPlanning poller = injector.getInstance(TasksPlanning.class);
-        poller.start(); // background DB polling
-        sce.getServletContext().setAttribute("injector", injector);
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // Cleanup if needed
-    }
-
-}*/

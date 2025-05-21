@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common;
+package org.ceskaexpedice.processplatform.common.dto;
 
 import java.util.List;
 
-public class Process {
+public class ProcessDefinition {
 
     // From process_definitions table
     private String defId;
@@ -40,7 +40,7 @@ public class Process {
     // Convenience (optional): parsed params
     private List<String> argumentList;
 
-    public Process() {}
+    public ProcessDefinition() {}
 
     // Getters and Setters for all fields
 

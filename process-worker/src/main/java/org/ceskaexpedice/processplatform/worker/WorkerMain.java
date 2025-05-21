@@ -16,15 +16,12 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.worker.config.WorkerModule;
-import org.ceskaexpedice.processplatform.worker.loader.ProcessLoader;
-
 public class WorkerMain {
 
-    private final ProcessLoader loop;
+    private WorkerLoop loop;
 
     public WorkerMain() {
-        this.loop = new ProcessLoader(new ManagerClient(), new ProcessStarterLauncher());
+        this.loop = new WorkerLoop(new ManagerClient(), new ProcessJvmLauncher());
     }
 
     public void start() {

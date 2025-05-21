@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.tasks;
+package org.ceskaexpedice.processplatform.manager.toDelete;
 
-
-import org.ceskaexpedice.processplatform.common.Task;
 
 import javax.inject.Inject;
 import java.util.Timer;
@@ -25,7 +23,7 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class TasksPlanning {
-
+/*
     private final TaskQueue taskQueue;
     private final TaskRepository taskRepository;
 
@@ -46,4 +44,6 @@ public class TasksPlanning {
             }
         }, 0, 10_000);
     }
+
+ */
 }

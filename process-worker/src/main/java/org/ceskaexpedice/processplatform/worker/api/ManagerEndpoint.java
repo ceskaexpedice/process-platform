@@ -16,10 +16,19 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
+import org.ceskaexpedice.processplatform.worker.api.service.ManagerService;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 @Path("/manager")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ManagerEndpoint {
+
+    public ManagerEndpoint(ManagerService managerService) {
+    }
 
     // === Get Process Logs (stdout or stderr) ===
     @GET
@@ -29,7 +38,7 @@ public class ManagerEndpoint {
             @QueryParam("stream") @DefaultValue("stdout") String streamType) {
         // streamType can be "stdout" or "stderr"
         // You can return logs as plain text or application/octet-stream if binary
-        return Response.ok(/* logs as text or file */).build();
+        return Response.ok(/* logs as text or file */).entity("{\"uuid\":\"" + uuid + "\" }").build();
     }
 
     // === Check Process Status (alive, exit code) ===

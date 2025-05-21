@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common;
+package org.ceskaexpedice.processplatform.common.dto;
 
 import java.util.List;
 
-public enum TaskState {
+public enum ProcessState {
 
     /**
      * Not running process
@@ -86,8 +86,8 @@ public enum TaskState {
      * @param v Given value of state
      * @return
      */
-    public static TaskState load(int v) {
-        for (TaskState st : TaskState.values()) {
+    public static ProcessState load(int v) {
+        for (ProcessState st : ProcessState.values()) {
             if (st.getVal() == v)
                 return st;
         }
@@ -96,7 +96,7 @@ public enum TaskState {
 
     private int val;
 
-    private TaskState(int val) {
+    private ProcessState(int val) {
         this.val = val;
     }
 
@@ -127,8 +127,8 @@ public enum TaskState {
      * @param exp Expecting states
      * @return
      */
-    public static boolean one(List<TaskState> childStates, TaskState... exp) {
-        for (TaskState st : childStates) {
+    public static boolean one(List<ProcessState> childStates, ProcessState... exp) {
+        for (ProcessState st : childStates) {
             if (expect(st, exp))
                 return true;
         }
@@ -141,8 +141,8 @@ public enum TaskState {
      * @param exp Execting state
      * @return
      */
-    public static boolean all(List<TaskState> childStates, TaskState... exp) {
-        for (TaskState st : childStates) {
+    public static boolean all(List<ProcessState> childStates, ProcessState... exp) {
+        for (ProcessState st : childStates) {
             if (!expect(st, exp))
                 return false;
         }
@@ -155,8 +155,8 @@ public enum TaskState {
      * @param expected Expecting states
      * @return
      */
-    public static boolean expect(TaskState real, TaskState... expected) {
-        for (TaskState exp : expected) {
+    public static boolean expect(ProcessState real, ProcessState... expected) {
+        for (ProcessState exp : expected) {
             if (real.equals(exp))
                 return true;
         }
@@ -170,6 +170,6 @@ public enum TaskState {
      * @param realState
      * @return
      */
-    public static boolean notRunningState(TaskState realState) {
-        return expect(realState, TaskState.FAILED, TaskState.FINISHED, TaskState.KILLED, TaskState.NOT_RUNNING, TaskState.WARNING, TaskState.BATCH_FAILED, TaskState.BATCH_FINISHED, TaskState.BATCH_STARTED);
+    public static boolean notRunningState(ProcessState realState) {
+        return expect(realState, ProcessState.FAILED, ProcessState.FINISHED, ProcessState.KILLED, ProcessState.NOT_RUNNING, ProcessState.WARNING, ProcessState.BATCH_FAILED, ProcessState.BATCH_FINISHED, ProcessState.BATCH_STARTED);
     }}

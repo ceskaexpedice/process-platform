@@ -16,11 +16,15 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import org.glassfish.jersey.server.ResourceConfig;
+
+import javax.ws.rs.ApplicationPath;
+
 @ApplicationPath("/api")
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {
-        packages("org.ceskaexpedice.processplatform.worker.rest");
+        packages("org.ceskaexpedice.processplatform.worker.api");
     }
 
 }

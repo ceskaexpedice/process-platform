@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.manager.api.service.AdminService;
 import org.json.JSONObject;
 
 import javax.ws.rs.*;
@@ -28,20 +29,23 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProcessAdminEndpoint {
 
-    // === Process Definitions ===
+    public ProcessAdminEndpoint(AdminService adminService) {
+    }
+
+// === Process Definitions ===
 
     @POST
     @Path("/definitions")
     public Response createOrUpdateProcessDefinition(JSONObject definition) {
         // Insert or update process_definition table
-        return Response.ok().build();
+        return Response.ok().entity("{}").build();
     }
 
     @GET
     @Path("/definitions")
     public Response getAllProcessDefinitions() {
         // Return list of all process definitions
-        return Response.ok(/* List<ProcessDefinition> */).build();
+        return Response.ok().entity("{}").build();
     }
 
     @GET
