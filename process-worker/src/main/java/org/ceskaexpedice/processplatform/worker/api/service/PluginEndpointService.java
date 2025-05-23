@@ -14,24 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.api.service;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-//@WebListener
-public class WorkerStartupListener implements ServletContextListener {
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("Starting WorkerMain thread...");
-        WorkerMain workerMain = new WorkerMain();
-        workerMain.initialize(null); // TODO
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("Stopping Worker...");
-        // Optionally shut down worker loop cleanly
-    }
+public class PluginEndpointService {
 }

@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ManagerClient {
+class ManagerClient {
 
     /*
     public List<Task> fetchTasks() {
@@ -55,7 +55,7 @@ public class ManagerClient {
 
      */
 
-    public ProcessTask nextProcess() {
+    ProcessTask nextProcessTask() {
         try {
             String url = "http://manager-host:8080/api/get-process/" + "uuid";
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();

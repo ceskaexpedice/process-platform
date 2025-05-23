@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.plugin;
 
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class ProcessJvmLauncher {
+public class PluginJvmLauncher {
 
     public void launchJvm(ProcessTask processTask) {
         // TODO payload must be pars to be passed to the plugin through main method args
@@ -57,8 +57,8 @@ public class ProcessJvmLauncher {
         }
     }
 
-    public String getOwnJarPath() {
-        return ProcessJvmLauncher.class
+    String getOwnJarPath() {
+        return PluginJvmLauncher.class
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()

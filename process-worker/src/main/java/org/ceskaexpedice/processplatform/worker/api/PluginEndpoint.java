@@ -22,12 +22,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/manager")
+@Path("/plugin")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ManagerEndpoint {
+public class PluginEndpoint {
 
-    public ManagerEndpoint(ManagerEndpointService managerEndpointService) {
+    public PluginEndpoint(ManagerEndpointService managerEndpointService) {
     }
 
     // === Get Process Logs (stdout or stderr) ===
@@ -41,19 +41,4 @@ public class ManagerEndpoint {
         return Response.ok(/* logs as text or file */).entity("{\"uuid\":\"" + uuid + "\" }").build();
     }
 
-    // === Check Process Status (alive, exit code) ===
-    @GET
-    @Path("/status/{uuid}")
-    public Response getStatus(@PathParam("uuid") String uuid) {
-        // Return current status of the process (RUNNING, COMPLETED, EXIT_CODE, etc.)
-        return Response.ok(/* ProcessStatus */).build();
-    }
-
-    // === Kill Process ===
-    @POST
-    @Path("/kill/{uuid}")
-    public Response killProcess(@PathParam("uuid") String uuid) {
-        // Attempt to terminate the process (JVM)
-        return Response.ok().build();
-    }
 }

@@ -21,7 +21,7 @@ import org.ceskaexpedice.processplatform.api.PluginContextHolder;
 
 import java.lang.reflect.Method;
 
-public class ProcessStarter implements PluginContext {
+public class PluginStarter implements PluginContext {
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -34,7 +34,7 @@ public class ProcessStarter implements PluginContext {
         String payload = args[2];      // JSON or command string
 
         try {
-            PluginContextHolder.setContext(new ProcessStarter());
+            PluginContextHolder.setContext(new PluginStarter());
             ClassLoader loader = PluginLoader.loadProcessClassLoader(processName);
             //String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
             Class<?> clz = loader.loadClass(mainClassName);
@@ -62,7 +62,7 @@ public class ProcessStarter implements PluginContext {
 
     @Override
     public void updateTaskState(String taskId, String taskState) {
-
+        // TODO must be able to call worker's PluginEndpoint
     }
 
     @Override

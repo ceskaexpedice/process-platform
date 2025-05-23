@@ -16,9 +16,12 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin;
 
+import org.ceskaexpedice.processplatform.api.ProcessPlugin;
+
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.*;
 
 public class PluginLoader {
 
@@ -39,5 +42,33 @@ public class PluginLoader {
         }
 
         return new URLClassLoader(urls, PluginLoader.class.getClassLoader());
+    }
+
+    public static List<PluginInfo> scanPlugins(File pluginsDir) {
+        List<PluginInfo> result = new ArrayList<>();
+
+        File[] pluginDirs = pluginsDir.listFiles(File::isDirectory);
+        if (pluginDirs == null) return result;
+
+        for (File pluginDir : pluginDirs) {
+            URL[] jarUrls = Arrays.stream(Objects.requireNonNull(pluginDir.listFiles((dir, name) -> name.endsWith(".jar"))))
+                    .map(f -> {
+                        try {
+                            return f.toURI().toURL();
+                        } catch (Exception e) {
+                            throw new RuntimeException("Invalid JAR: " + f, e);
+                        }
+                    })
+                    .toArray(URL[]::new);
+
+            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginLoader.class.getClassLoader());
+
+            ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
+            for (ProcessPlugin plugin : loader) {
+                result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir, pluginClassLoader));
+            }
+        }
+
+        return result;
     }
 }

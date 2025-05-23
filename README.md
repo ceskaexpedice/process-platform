@@ -151,3 +151,97 @@ bude mit endpoint pro logy
 
 jeste dalsi pozmnaka.. debug bude mozny pres zverejneni portu ven.  (Docker compose) jenom by me zajimalo, zda umoznuje zverejnit port i kdyz jeste v kontejneru otevreny...
 ale to by asi mel, to by nefungovalo spoustu veci
+-------------------------------------------------------------------------------------
+Contejner c.1
+
+    /import.json 
+      [
+      {
+        "type":"import-cgi"
+        "mainClass":"Import",
+        "jvmparams":xxxxxx
+      },
+      {
+        "type":"import-cgi-nonsense"
+        "mainClass":"Import",
+        "jvmparams":xxxxxx
+      }
+
+      ]
+
+
+    Runner 
+
+/-----
+plugins
+import-- default.json //classpath{"type":"import","mainClass":"Import"},
+index-- default.json,
+neco -- default.json,
+,
+
+
+setlicense - plugin a on umi dva TYPY procesu
+-- default.json -- bude obsahovat dve definice-- prvni s konstatnim parametrem ADD - typ procesu se jmenuje add-license-- druha s konstatnim parametrem REMOVE  - typ procesu se jmenuje remove-license,
+
+                {
+                  [
+                    {
+                        "type":"add-license",
+                        "mainClass":"SetLicense",
+                        "params":["ADD"]
+                    },
+                    {
+                        "type":"remove-license",
+                        "mainClass":"SetLicense",
+                        "params":["REMOVE"]
+                    },
+                    {
+                        "type":"add-license-jvmparams",
+                        "mainClass":"SetLicense"
+                        "jvmparams":"-Duser.home=neco"
+
+                    }
+                  ]
+
+
+pluginbezdefinice
+-- runner mu priplacne default.json kde typ == pluginbezdefinice
+
+,
+
+        /next?types=import,neco,add-license,remove-license,pluginbezdefinice
+        /plan?type=import
+        ---------------------------------------------------------------------
+
+        /plan?type=import_cgi
+        /plan?type=add-license_cgi
+
+
+        /next?types=import_cgi
+
+
+
+        Contjner c.2 - musi byt v konfiguraci
+        Runner
+/-----
+plugins
+import-- default.json,
+,
+
+
+
+
+
+
+
+
+
+Runner probehne adresar plugins a snazi se najit vsechny pluginy/procesy,
+Po startu da vedet process-manageru jake pluginy ma k dispozici2.1a - posle pouze typ procesu, tedy import, index, neco 2.1b - posle celou definici - default definici.  Kde bude jvmparametrs a konstatni parametry,
+Manager si zaregistruje typ (pokud ho nema) a muzeme planovat. 3.1a  - zaregistruje si jenom typ3.1b - zaregistruje si celou default definici. - Umozni celou definici predelat,
+,
+
+
+
+Martin Duda a chce vlastni proces, ktery si bude spoustet sam ale ma difinici typu import
+4.

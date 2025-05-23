@@ -14,24 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.api;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+public interface ProcessPlugin {
 
-//@WebListener
-public class WorkerStartupListener implements ServletContextListener {
+    String getPluginId();        // e.g., "import"
 
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("Starting WorkerMain thread...");
-        WorkerMain workerMain = new WorkerMain();
-        workerMain.initialize(null); // TODO
-    }
+    String getDescription();     // e.g., "Imports FOXML into system"
 
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("Stopping Worker...");
-        // Optionally shut down worker loop cleanly
-    }
+    String getMainClass();       // e.g., "cz.kramerius.plugin.importer.Main"
+
 }

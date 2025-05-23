@@ -18,24 +18,22 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
 
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class WorkerLoop {
+class WorkerLoop {
 
     private final ManagerClient managerClient;
-    private final ProcessJvmLauncher processJvmLauncher;
+    private final PluginJvmLauncher pluginJvmLauncher;
     private volatile boolean running = true;
 
-    public WorkerLoop(ManagerClient managerClient, ProcessJvmLauncher processJvmLauncher) {
+    WorkerLoop(ManagerClient managerClient, PluginJvmLauncher pluginJvmLauncher) {
         this.managerClient = managerClient;
-        this.processJvmLauncher = processJvmLauncher;
+        this.pluginJvmLauncher = pluginJvmLauncher;
     }
 
-    public void start() {
+    void start() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutdown signal received. Stopping worker...");
             stop();
@@ -48,7 +46,7 @@ public class WorkerLoop {
 
                     if (taskOpt.isPresent()) {
                         ProcessTask processTask = taskOpt.get();
-                        processJvmLauncher.launchJvm(processTask);
+                        pluginJvmLauncher.launchJvm(processTask);
                        // int exitCode = process.waitFor();
                        // reportProcessResult(processTask, exitCode);
                     } else {
@@ -78,7 +76,7 @@ public class WorkerLoop {
 
     private Optional<ProcessTask> pollManagerForTask() {
         try {
-            ProcessTask processTask = managerClient.nextProcess();
+            ProcessTask processTask = managerClient.nextProcessTask();
             if(processTask != null){
                 return Optional.of(processTask);
             }else{

@@ -14,7 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.api.service;
+package org.ceskaexpedice.processplatform.worker.plugin;
 
-public class ManagerService {
+import java.io.File;
+
+public class PluginInfo {
+
+    public final String id;
+    public final String description;
+    public final String mainClass;
+    public final File pluginDir;
+    public final ClassLoader classLoader;
+
+    public PluginInfo(String id, String description, String mainClass, File pluginDir, ClassLoader classLoader) {
+        this.id = id;
+        this.description = description;
+        this.mainClass = mainClass;
+        this.pluginDir = pluginDir;
+        this.classLoader = classLoader;
+    }
+
+    @Override
+    public String toString() {
+        return id + " (" + description + ")";
+    }
+
 }

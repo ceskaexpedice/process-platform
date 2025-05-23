@@ -14,14 +14,12 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.api.service.ManagerService;
+import org.ceskaexpedice.processplatform.worker.api.service.ManagerEndpointService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -49,9 +47,9 @@ public class TestManagerEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        ManagerService managerServiceMock = mock(ManagerService.class);
+        ManagerEndpointService managerEndpointServiceMock = mock(ManagerEndpointService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ManagerEndpoint(managerServiceMock));
+        resourceConfig.register(new ManagerEndpoint(managerEndpointServiceMock));
         return resourceConfig;
     }
 

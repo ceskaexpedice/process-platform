@@ -16,15 +16,47 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginLoader;
+
+import java.io.File;
+import java.util.List;
+
 public class WorkerMain {
 
-    private WorkerLoop loop;
+    private WorkerLoop workerLoop;
+    private WorkerConfiguration workerConfiguration;
+    private List<PluginInfo> pluginsList;
 
     public WorkerMain() {
-        this.loop = new WorkerLoop(new ManagerClient(), new ProcessJvmLauncher());
     }
 
-    public void start() {
-        loop.start();
+    public void initialize(WorkerConfiguration workerConfiguration) {
+        this.workerConfiguration = workerConfiguration;
+        pluginsList = scanPlugins();
+        if(!pluginsList.isEmpty()){
+            registerPlugins();
+        }
+        this.workerLoop = new WorkerLoop(new ManagerClient(), new PluginJvmLauncher());
+        workerLoop.start();
+    }
+
+    private List<PluginInfo> scanPlugins() {
+        File pluginsDir = new File("plugins"); // TODO from config
+        List<PluginInfo> pluginsList = PluginLoader.scanPlugins(pluginsDir);
+        return pluginsList;
+    }
+
+    private void registerPlugins() {
+        File pluginsDir = new File("plugins");
+        List<PluginInfo> plugins = PluginLoader.scanPlugins(pluginsDir);
+
+        for (PluginInfo plugin : plugins) {
+            System.out.println("Discovered plugin: " + plugin);
+
+            // TODO: Register plugin with manager via REST
+        }
     }
 }
