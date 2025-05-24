@@ -25,12 +25,10 @@ import java.util.Optional;
 class WorkerLoop {
 
     private final ManagerClient managerClient;
-    private final PluginJvmLauncher pluginJvmLauncher;
     private volatile boolean running = true;
 
-    WorkerLoop(ManagerClient managerClient, PluginJvmLauncher pluginJvmLauncher) {
+    WorkerLoop(ManagerClient managerClient) {
         this.managerClient = managerClient;
-        this.pluginJvmLauncher = pluginJvmLauncher;
     }
 
     void start() {
@@ -46,7 +44,7 @@ class WorkerLoop {
 
                     if (taskOpt.isPresent()) {
                         ProcessTask processTask = taskOpt.get();
-                        pluginJvmLauncher.launchJvm(processTask);
+                        PluginJvmLauncher.launchJvm(processTask);
                        // int exitCode = process.waitFor();
                        // reportProcessResult(processTask, exitCode);
                     } else {

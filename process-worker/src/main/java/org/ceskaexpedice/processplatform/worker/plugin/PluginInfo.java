@@ -24,14 +24,12 @@ public class PluginInfo {
     public final String description;
     public final String mainClass;
     public final File pluginDir;
-    public final ClassLoader classLoader;
 
-    public PluginInfo(String id, String description, String mainClass, File pluginDir, ClassLoader classLoader) {
+    public PluginInfo(String id, String description, String mainClass, File pluginDir) {
         this.id = id;
         this.description = description;
         this.mainClass = mainClass;
         this.pluginDir = pluginDir;
-        this.classLoader = classLoader;
     }
 
     @Override

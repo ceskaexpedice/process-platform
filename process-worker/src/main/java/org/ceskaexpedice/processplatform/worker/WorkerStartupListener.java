@@ -22,16 +22,18 @@ import javax.servlet.ServletContextListener;
 //@WebListener
 public class WorkerStartupListener implements ServletContextListener {
 
+    private WorkerMain workerMain;
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("Starting WorkerMain thread...");
-        WorkerMain workerMain = new WorkerMain();
+        workerMain = new WorkerMain();
         workerMain.initialize(null); // TODO
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("Stopping Worker...");
-        // Optionally shut down worker loop cleanly
+        workerMain.shutdown();
     }
 }

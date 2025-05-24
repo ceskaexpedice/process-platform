@@ -14,8 +14,10 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginLoader;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginScanner;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -30,11 +32,19 @@ import static org.mockito.Mockito.mock;
  */
 public class TestWorkerMain {
 
-
     @Test
     public void testPlugin() {
         String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
-        List<PluginInfo> pluginInfos = PluginLoader.scanPlugins(new File(pluginPath));
+        List<PluginInfo> pluginInfos = PluginScanner.scanPlugins(new File(pluginPath));
+        System.out.println("pluginInfos: " + pluginInfos);
+    }
+
+    @Test
+    public void testUff() {
+        String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
+        List<PluginInfo> pluginInfos = PluginScanner.scanPlugins(new File(pluginPath));
+        ProcessTask processTask = new ProcessTask(); // this task comes from the manager
+        PluginJvmLauncher.launchJvm(processTask);
         System.out.println("pluginInfos: " + pluginInfos);
     }
 

@@ -19,14 +19,17 @@ package org.ceskaexpedice.processplatform.worker.plugin;
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-public class PluginLoader {
+public final class PluginScanner {
 
-    public static ClassLoader loadProcessClassLoader(String processName) throws Exception {
-        File pluginDir = new File("plugins/" + processName);
+    private PluginScanner() {}
+
+    public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
+        File pluginDir = new File(pluginsDir, pluginId);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
             throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
@@ -38,10 +41,14 @@ public class PluginLoader {
 
         URL[] urls = new URL[jars.length];
         for (int i = 0; i < jars.length; i++) {
-            urls[i] = jars[i].toURI().toURL();
+            try {
+                urls[i] = jars[i].toURI().toURL();
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        return new URLClassLoader(urls, PluginLoader.class.getClassLoader());
+        return new URLClassLoader(urls, PluginScanner.class.getClassLoader());
     }
 
     public static List<PluginInfo> scanPlugins(File pluginsDir) {
@@ -61,11 +68,11 @@ public class PluginLoader {
                     })
                     .toArray(URL[]::new);
 
-            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginLoader.class.getClassLoader());
+            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginScanner.class.getClassLoader());
 
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
-                result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir, pluginClassLoader));
+                result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir));
             }
         }
 

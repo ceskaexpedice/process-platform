@@ -19,6 +19,8 @@ package org.ceskaexpedice.processplatform.worker.plugin;
 import org.ceskaexpedice.processplatform.api.PluginContext;
 import org.ceskaexpedice.processplatform.api.PluginContextHolder;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class PluginStarter implements PluginContext {
@@ -29,19 +31,41 @@ public class PluginStarter implements PluginContext {
             System.exit(1);
         }
 
-        String processName = args[0];  // e.g., "import"
+        String pluginName = args[0];  // e.g., "import"
         String mainClassName = args[1];  // e.g., "import"
         String payload = args[2];      // JSON or command string
 
         try {
             PluginContextHolder.setContext(new PluginStarter());
-            ClassLoader loader = PluginLoader.loadProcessClassLoader(processName);
+            String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
+            ClassLoader loader = PluginScanner.createPluginClassLoader(new File(pluginPath), pluginName); // TODO
             //String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
+
+            /*
             Class<?> clz = loader.loadClass(mainClassName);
             MethodType processMethod = mainMethodType(clz);
             Object[] objs = new Object[1];
             objs[0] = args;
             processMethod.getMethod().invoke(null, objs);
+
+             */
+
+            ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(loader);
+
+                Class<?> clz = loader.loadClass(mainClassName);
+                MethodType processMethod = mainMethodType(clz); // Now uses correct loader internally
+                try {
+                    processMethod.getMethod().invoke(null, (Object) args);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(oldCl);
+            }
+
+
             //String pid = getPID();
             //updatePID(pid);
         } catch (Exception e) {
@@ -50,15 +74,40 @@ public class PluginStarter implements PluginContext {
         }
     }
 
+
     private static MethodType mainMethodType(Class clz) throws SecurityException, NoSuchMethodException {
         Method mainMethod = mainMethod(clz);
         return mainMethod != null ? new MethodType(mainMethod, MethodType.Type.MAIN) : null;
     }
 
+
     private static Method mainMethod(Class clz) throws NoSuchMethodException {
-        Method mainMethod = clz.getMethod("main", (new String[0]).getClass());
-        return mainMethod;
+        try {
+            Method mainMethod = clz.getMethod("main", (new String[0]).getClass());
+            return mainMethod;
+        }catch (Throwable e){
+            e.printStackTrace();
+            throw e;
+        }
     }
+
+    /*
+    private static MethodType mainMethodType(Class<?> clz, ClassLoader loader) {
+        Method mainMethod = mainMethod(clz, loader);
+        return mainMethod != null ? new MethodType(mainMethod, MethodType.Type.MAIN) : null;
+    }
+
+    private static Method mainMethod(Class<?> clz, ClassLoader loader) {
+        try {
+            // Use the same loader to resolve parameter type (String[]) explicitly
+            Class<?> stringArrayClass = loader.loadClass("[java.lang.String;");
+            Method mainMethod = clz.getMethod("main", stringArrayClass);
+            return mainMethod;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }*/
 
     @Override
     public void updateTaskState(String taskId, String taskState) {

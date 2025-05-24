@@ -16,30 +16,50 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin;
 
+import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class PluginJvmLauncher {
+public final class PluginJvmLauncher {
 
-    public void launchJvm(ProcessTask processTask) {
+    private PluginJvmLauncher() {}
+
+    public static void launchJvm(ProcessTask processTask) {
         // TODO payload must be pars to be passed to the plugin through main method args
         /*
         File pluginDir = new File("plugins/" + processName);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
             throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }*/
+        /*
+        <process>
+		<id>import</id>
+		<description>Import FOXML</description>
+		<mainClass>org.kramerius.Import</mainClass>
+		<standardOs>lrOut</standardOs>
+		<javaProcessParameters>-Xmx1024m -Xms256m -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001</javaProcessParameters>
+		<errOs>lrErr</errOs>
+		<securedaction>a_import</securedaction>
+	</process>
+
+         */
+
         try {
 
-            String classpath = getOwnJarPath();
+            String classpath = getOwnJarPath() + ";c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar";
             List<String> command = List.of(
                     "java",
+                    "-Xmx1024m",
+                    "-Xms256m",
+                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001",
                     "-cp", classpath,
-                    "org.ceskaexpedice.processplatform.worker.startprocess.ProcessStarter",
-                    "processName",
-                    "payload"
+                    "org.ceskaexpedice.processplatform.worker.plugin.PluginStarter",
+                    "import",
+                    "org.kramerius.Import",
+                    "importPayload"
             );
             ProcessBuilder pb = new ProcessBuilder(command);
 
@@ -48,7 +68,8 @@ public class PluginJvmLauncher {
             int val = processR.waitFor();
             if (val != 0) {
                 InputStream errorStream = processR.getErrorStream();
-                //String s = IOUtils.toString(errorStream, "UTF-8");
+                String s = IOUtils.toString(errorStream, "UTF-8");
+                System.out.println(s);
                 //LOGGER.info(s);
             }
             //LOGGER.info("return value exiting process '" + val + "'");
@@ -57,7 +78,7 @@ public class PluginJvmLauncher {
         }
     }
 
-    String getOwnJarPath() {
+    static String getOwnJarPath() {
         return PluginJvmLauncher.class
                 .getProtectionDomain()
                 .getCodeSource()
