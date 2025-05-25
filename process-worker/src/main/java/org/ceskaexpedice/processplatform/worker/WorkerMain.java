@@ -39,7 +39,7 @@ public class WorkerMain {
         if(!pluginsList.isEmpty()){
             registerPlugins();
         }
-        this.workerLoop = new WorkerLoop(new ManagerClient());
+        this.workerLoop = new WorkerLoop(workerConfiguration);
         workerLoop.start();
     }
 

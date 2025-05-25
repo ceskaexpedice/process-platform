@@ -20,18 +20,31 @@ import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-//@WebListener
 public class WorkerStartupListener implements ServletContextListener {
 
     private WorkerMain workerMain;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("Starting WorkerMain thread...");
-        workerMain = new WorkerMain();
-        workerMain.initialize(null); // TODO
+        Properties fileProps = new Properties();
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("worker.properties")) {
+            if (in != null) {
+                fileProps.load(in);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading properties file", e);
+        }
+
+        WorkerConfiguration config = new WorkerConfiguration(fileProps);
+        WorkerMain workerMain = new WorkerMain();
+        workerMain.initialize(config);
+
         sce.getServletContext().setAttribute("workerMain", workerMain);
+
     }
 
     @Override

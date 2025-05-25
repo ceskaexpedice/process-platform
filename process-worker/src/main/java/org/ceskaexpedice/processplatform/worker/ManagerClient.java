@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,28 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 class ManagerClient {
+
+    ManagerClient(WorkerConfiguration workerConfiguration) {
+        /*
+        services:
+  process-worker:
+    image: your-image-name
+    environment:
+      - MANAGER_BASE_URL=http://manager:8080/api
+      - WORKER_ID=worker-1
+      - MAX_TASKS=5
+         */
+        //String baseUrl = workerConfiguration.get("MANAGER_BASE_URL");
+        //int maxTasks = workerConfiguration.getInt("MAX_TASKS", 1);
+
+        /*
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+    String key = entry.getKey().toLowerCase().replace('_', '.'); // e.g. MANAGER_BASE_URL → manager.base.url
+    props.setProperty(key, entry.getValue());
+}
+config.get("manager.base.url")
+         */
+    }
 
     /*
     public List<Task> fetchTasks() {

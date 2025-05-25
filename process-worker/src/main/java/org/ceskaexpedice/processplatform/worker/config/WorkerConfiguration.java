@@ -16,5 +16,41 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import java.util.Map;
+import java.util.Properties;
+
 public class WorkerConfiguration {
+    private final Properties props = new Properties();
+
+    public WorkerConfiguration(Properties fileProps) {
+        // Load from environment first
+        Map<String, String> env = System.getenv();
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            props.setProperty(entry.getKey(), entry.getValue());
+        }
+
+        // Add properties from file (only if not already set by env)
+        for (String name : fileProps.stringPropertyNames()) {
+            props.putIfAbsent(name, fileProps.getProperty(name));
+        }
+    }
+
+    public String get(String key) {
+        return props.getProperty(key);
+    }
+
+    public String getOrDefault(String key, String defaultValue) {
+        return props.getProperty(key, defaultValue);
+    }
+
+    public int getInt(String key, int defaultVal) {
+        try {
+            return Integer.parseInt(props.getProperty(key));
+        } catch (Exception e) {
+            return defaultVal;
+        }
+    }
+
+    // ...other typed methods
 }
+

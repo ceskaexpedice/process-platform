@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
 
 import java.util.Optional;
@@ -27,8 +28,8 @@ class WorkerLoop {
     private final ManagerClient managerClient;
     private volatile boolean running = true;
 
-    WorkerLoop(ManagerClient managerClient) {
-        this.managerClient = managerClient;
+    WorkerLoop(WorkerConfiguration workerConfiguration) {
+        this.managerClient = new ManagerClient(workerConfiguration);
     }
 
     void start() {
