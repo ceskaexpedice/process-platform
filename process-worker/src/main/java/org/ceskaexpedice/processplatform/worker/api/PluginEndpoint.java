@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.api;
 
 import org.ceskaexpedice.processplatform.worker.api.service.ManagerEndpointService;
+import org.ceskaexpedice.processplatform.worker.api.service.PluginEndpointService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -27,7 +28,7 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PluginEndpoint {
 
-    public PluginEndpoint(ManagerEndpointService managerEndpointService) {
+    public PluginEndpoint(PluginEndpointService pluginEndpointService) {
     }
 
     // === Get Process Logs (stdout or stderr) ===

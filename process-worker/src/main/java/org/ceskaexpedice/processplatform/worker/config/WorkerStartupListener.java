@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.config;
+
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -29,11 +31,14 @@ public class WorkerStartupListener implements ServletContextListener {
         System.out.println("Starting WorkerMain thread...");
         workerMain = new WorkerMain();
         workerMain.initialize(null); // TODO
+        sce.getServletContext().setAttribute("workerMain", workerMain);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("Stopping Worker...");
-        workerMain.shutdown();
+        WorkerMain wm = (WorkerMain) sce.getServletContext().getAttribute("workerMain");
+        if (wm != null) {
+            wm.shutdown();
+        }
     }
 }

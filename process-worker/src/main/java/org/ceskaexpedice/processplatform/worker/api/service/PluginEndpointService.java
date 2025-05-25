@@ -16,5 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.worker.api.service;
 
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
+
 public class PluginEndpointService {
+    public PluginEndpointService(WorkerMain workerMain) {
+    }
 }

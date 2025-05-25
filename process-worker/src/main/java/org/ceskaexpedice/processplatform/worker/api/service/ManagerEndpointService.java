@@ -16,5 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.api.service;
 
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
+
 public class ManagerEndpointService {
+
+    public ManagerEndpointService(WorkerMain workerMain) {
+    }
 }

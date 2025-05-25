@@ -51,9 +51,20 @@ public class ManagerEndpoint {
 
     // === Kill Process ===
     @POST
-    @Path("/kill/{uuid}")
-    public Response killProcess(@PathParam("uuid") String uuid) {
-        // Attempt to terminate the process (JVM)
+    @Path("/kill-task")
+    public Response killTask() {
+        /*
+        if (currentProcess != null) {
+            currentProcess.destroyForcibly();
+            return Response.ok("Killed").build();
+        }*/
+        return Response.status(404).entity("No running task").build();
+    }
+
+    @POST
+    @Path("/kill")
+    public Response killPlugin() {
+        //service.killRunningProcess();
         return Response.ok().build();
     }
 }

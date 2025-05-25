@@ -16,15 +16,25 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import org.ceskaexpedice.processplatform.worker.api.ManagerEndpoint;
+import org.ceskaexpedice.processplatform.worker.api.PluginEndpoint;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
 
 @ApplicationPath("/api")
-public class JerseyConfig extends ResourceConfig {
+public class WorkerApplication extends ResourceConfig {
+    public WorkerApplication() {
+        register(ManagerEndpoint.class);
+        register(PluginEndpoint.class);
 
-    public JerseyConfig() {
-        packages("org.ceskaexpedice.processplatform.worker.api");
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(ManagerEndpointFactory.class).to(ManagerEndpoint.class);
+                bindFactory(PluginEndpointFactory.class).to(PluginEndpoint.class);
+            }
+        });
     }
-
 }
