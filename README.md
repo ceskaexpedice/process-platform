@@ -1,5 +1,37 @@
 # process-platform
 
+Worker Startup
+│
+├── Discover plugins via SPI
+├── For each plugin:
+│   ├── Load profiles from /import.json
+│   ├── For each profile, prepare registration info
+│   └── Send registration to Manager (REST)
+│
+Manager
+├── Stores plugin profiles (pluginId + profileType + config)
+├── Offers UI/API for users to:
+│   ├── View/edit profiles (e.g. jvmparams)
+│   └── Schedule Process based on selected profile
+│
+Worker
+└── Periodically polls manager for tasks
+├── Manager sends ProcessRequestDTO with:
+│   ├── pluginId
+│   ├── profileType
+│   ├── jvmParams
+│   └── user payload (e.g., input path)
+└── Worker starts PluginStarter with proper config
+{
+"type": "import-cgi",
+"mainClass": "org.example.Import",
+"jvmparams": "-Xmx1G",
+"payloadSpec": {
+"importRootDir": { "type": "string", "required": true },
+"addCollection": { "type": "boolean", "required": false }
+}
+}
+
 /worker
 |
 | > plugins/import/ a.jar., b.jar, c.jar
@@ -244,4 +276,64 @@ Manager si zaregistruje typ (pokud ho nema) a muzeme planovat. 3.1a  - zaregistr
 
 
 Martin Duda a chce vlastni proces, ktery si bude spoustet sam ale ma difinici typu import
-4.
+
+--------------------- build plugins
+/sdnnt
+worker:{
+id:"sdnnt",
+"definition":src/main/resources/neco.json
+}
+
+
+
+-------------------
+
+/import
+worker {
+"id":"curator"
+"definitions":src/main/resources/import.json
+}
+
+/indexace
+
+/sdnnt-sync
+
+
+worker {
+id:"curator"
+"definitions":src/main/resources/sdnnt-sync.json
+}
+
+
+public-pdf
+
+worker {
+id:"public"
+"definitions":src/main/resources/public-pdf.json
+}
+
+
+
+build/workers/curator
+
+import,
+
+build/workers/public
+
+public-pdf
+
+,
+
+// processes
+jib  {
+// plugins   z cesty build/workers
+// docker kramerius-curator-worker-verze
+// docker kramerius-public-worker-verze
+
+}
+
+
+
+gradlew clean build workers  jib
+
+core - docker,

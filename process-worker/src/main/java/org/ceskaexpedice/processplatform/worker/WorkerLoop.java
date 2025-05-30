@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.common.dto.ScheduledProcessDto;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
 
@@ -25,7 +26,7 @@ import java.util.Optional;
 
 class WorkerLoop {
 
-    private final ManagerClient managerClient;
+    private final ManagerClient_toDelete managerClient;
     private volatile boolean running = true;
 
     WorkerLoop(WorkerConfiguration workerConfiguration) {
@@ -75,7 +76,9 @@ class WorkerLoop {
 
     private Optional<ProcessTask> pollManagerForTask() {
         try {
-            ProcessTask processTask = managerClient.nextProcessTask();
+            // ProcessTask processTask = managerClient.nextProcessTask();
+            ScheduledProcessDto processTask = managerClient.getNextProcess();
+
             if(processTask != null){
                 return Optional.of(processTask);
             }else{

@@ -16,34 +16,21 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin;
 
+import org.ceskaexpedice.processplatform.api.ProcessPlugin;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-public class PluginInfo {
-    private final String pluginId;
-    private final String description;
-    private final String mainClass;
-    private final List<PluginProfile> profiles;
+public class PluginDiscovery {
 
-    public PluginInfo(String pluginId, String description, String mainClass, List<PluginProfile> profiles) {
-        this.pluginId = pluginId;
-        this.description = description;
-        this.mainClass = mainClass;
-        this.profiles = profiles;
-    }
+    public static PluginInfo discoverPlugin(ProcessPlugin pluginInstance, File pluginJar, File profilesDir, ClassLoader cl) throws IOException {
+        String pluginId = pluginInstance.getPluginId();
+        String description = pluginInstance.getDescription();
+        String mainClass = pluginInstance.getMainClass();
 
-    public String getPluginId() {
-        return pluginId;
-    }
+        List<PluginProfile> profiles = PluginProfileLoader.loadProfiles(pluginJar, profilesDir, pluginId);
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public List<PluginProfile> getProfiles() {
-        return profiles;
+        return new PluginInfo(pluginId, description, mainClass, profiles, cl);
     }
 }

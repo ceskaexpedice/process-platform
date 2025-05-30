@@ -37,23 +37,12 @@ public class PluginStarter implements PluginContext {
 
         try {
             PluginContextHolder.setContext(new PluginStarter());
+            // TODO use config
             String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
-            ClassLoader loader = PluginScanner.createPluginClassLoader(new File(pluginPath), pluginName); // TODO
-            //String mainClassName = "org.ceskaexpedice.processplatform.processes." + processName + "." + capitalize(processName) + "Main";
-
-            /*
-            Class<?> clz = loader.loadClass(mainClassName);
-            MethodType processMethod = mainMethodType(clz);
-            Object[] objs = new Object[1];
-            objs[0] = args;
-            processMethod.getMethod().invoke(null, objs);
-
-             */
-
+            ClassLoader loader = PluginScanner.createPluginClassLoader(new File(pluginPath), pluginName);
             ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(loader);
-
                 Class<?> clz = loader.loadClass(mainClassName);
                 MethodType processMethod = mainMethodType(clz); // Now uses correct loader internally
                 try {

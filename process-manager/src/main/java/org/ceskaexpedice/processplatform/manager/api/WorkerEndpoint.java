@@ -16,7 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.dto.PluginInfoDto;
 import org.ceskaexpedice.processplatform.common.dto.ProcessState;
+import org.ceskaexpedice.processplatform.common.dto.ScheduledProcessDto;
 import org.ceskaexpedice.processplatform.manager.api.service.WorkerService;
 
 import javax.ws.rs.*;
@@ -38,9 +40,47 @@ public class WorkerEndpoint {
     @POST
     @Path("/next")
     public Response getNextProcess(List<String> supportedProcessIds) {
+        /*
+        {
+  "processId": "uuid-1234-5678",
+  "pluginId": "import",
+  "profileId": "import-cgi",
+  "mainClass": "cz.kramerius.plugins.importer.Main",
+  "jvmArgs": ["-Xmx1G"],
+  "staticParams": {
+    "pars": "ADD"
+  },
+  "payload": {
+    "importDir": "/data/import",
+    "addCollection": true
+  }
+}
+
+         */
+
+
         // Return the next suitable process based on supported plugins
         // Merges data from process_definition + processes
         return Response.ok(/* Process */).build();
+    }
+
+    @GET
+    @Path("/next")
+    public Response getNextProcess() {
+        // Implementation: fetch next process from DB
+        ScheduledProcessDto dto = null; // TODO
+        if (dto != null) {
+            return Response.ok(dto).build();
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+    }
+
+    @POST
+    @Path("/register")
+    public Response registerPlugin(PluginInfoDto pluginInfoDto) {
+        // Implementation: persist to DB, validate, etc.
+        return Response.ok().build();
     }
 
     // === Update Process State (e.g., running, completed, failed) ===

@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.common.dto.PluginInfoDto;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
@@ -50,9 +51,10 @@ public class WorkerMain {
     }
 
     private void registerPlugins() {
-        for (PluginInfo plugin : pluginsList) {
+        for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + plugin);
-
+            PluginInfoDto pluginInfoDto = PluginInfoMapper.toDto(pluginInfo);
+            managerClient.registerPlugin(pluginInfoDto);
             // TODO: Register plugin with manager via REST
         }
     }

@@ -72,7 +72,11 @@ public final class PluginScanner {
 
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
-                result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir));
+                File pluginJar = new File(pluginDir, "plugin.jar"); // TODO
+                File profilesDir = new File(pluginDir, "profiles"); // TODO
+                PluginInfo pluginInfo = PluginDiscovery.discoverPlugin(plugin, pluginJar, profilesDir, pluginClassLoader);
+                result.add(pluginInfo);
+                //result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir));
             }
         }
 
