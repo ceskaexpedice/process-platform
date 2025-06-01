@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.entity;
 
 
-import org.ceskaexpedice.processplatform.common.dto.PluginInfoDto;
-import org.ceskaexpedice.processplatform.common.dto.PluginProfileDto;
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+/**
+ * PluginInfoMapper
+ * @author ppodsednik
+ */
 public class PluginInfoMapper {
 
-    public static PluginInfoDto toDto(PluginInfo pluginInfo) {
-        List<PluginProfileDto> profiles = pluginInfo.getProfiles().stream()
-                .map(profile -> new PluginProfileDto(
+    public static PluginInfoTO toTO(PluginInfo pluginInfo) {
+        /*
+        List<PluginProfileTO> profiles = pluginInfo.getProfiles().stream()
+                .map(profile -> new PluginProfileTO(
                         profile.getProfileId(),
                         pluginInfo.getPluginId(),
                         profile.getStaticParams(),
@@ -35,12 +36,14 @@ public class PluginInfoMapper {
                 ))
                 .collect(Collectors.toList());
 
-        return new PluginInfoDto(
+        return new PluginInfoTO(
                 pluginInfo.getPluginId(),
                 pluginInfo.getDescription(),
                 pluginInfo.getMainClass(),
                 profiles
         );
+
+         */ return null;
     }
 
     // Optionally: implement fromDto() if needed

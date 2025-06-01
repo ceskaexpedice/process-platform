@@ -23,8 +23,13 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
 
+/**
+ * WorkerApplication
+ * @author ppodsednik
+ */
 @ApplicationPath("/api")
 public class WorkerApplication extends ResourceConfig {
+
     public WorkerApplication() {
         register(ManagerEndpoint.class);
         register(PluginEndpoint.class);
@@ -37,4 +42,5 @@ public class WorkerApplication extends ResourceConfig {
             }
         });
     }
+
 }

@@ -25,6 +25,10 @@ import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
 
+/**
+ * PluginEndpointFactory
+ * @author ppodsednik
+ */
 public class PluginEndpointFactory implements Factory<PluginEndpoint> {
 
     @Inject

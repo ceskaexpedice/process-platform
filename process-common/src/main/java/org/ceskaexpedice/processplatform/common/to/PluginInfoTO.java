@@ -14,20 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.dto;
+package org.ceskaexpedice.processplatform.common.to;
 
 import java.util.List;
 
-public class PluginInfoDto {
+/**
+ * PluginInfoTO
+ * @author ppodsednik
+ */
+public class PluginInfoTO {
     private String pluginId;
     private String description;
     private String mainClass;
-    private List<PluginProfileDto> profiles;
+    private List<PluginProfileTO> profiles;
 
-    public PluginInfoDto() {
+    public PluginInfoTO() {
     }
 
-    public PluginInfoDto(String pluginId, String description, String mainClass, List<PluginProfileDto> profiles) {
+    public PluginInfoTO(String pluginId, String description, String mainClass, List<PluginProfileTO> profiles) {
         this.pluginId = pluginId;
         this.description = description;
         this.mainClass = mainClass;
@@ -58,11 +62,11 @@ public class PluginInfoDto {
         this.mainClass = mainClass;
     }
 
-    public List<PluginProfileDto> getProfiles() {
+    public List<PluginProfileTO> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(List<PluginProfileDto> profiles) {
+    public void setProfiles(List<PluginProfileTO> profiles) {
         this.profiles = profiles;
     }
 }

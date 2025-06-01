@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.manager.api.service.AdminService;
+import org.ceskaexpedice.processplatform.manager.api.service.AdminEndpointService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author ppodsednik
  */
-public class TestProcessTaskAdminEndpoint extends JerseyTest {
+public class TestAdminEndpoint extends JerseyTest {
 
     public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -49,9 +49,9 @@ public class TestProcessTaskAdminEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        AdminService adminServiceMock = mock(AdminService.class);
+        AdminEndpointService adminEndpointServiceMock = mock(AdminEndpointService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProcessAdminEndpoint(adminServiceMock));
+        resourceConfig.register(new AdminEndpoint(adminEndpointServiceMock));
         return resourceConfig;
     }
 

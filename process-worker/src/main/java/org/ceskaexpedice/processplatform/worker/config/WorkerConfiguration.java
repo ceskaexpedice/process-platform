@@ -19,6 +19,10 @@ package org.ceskaexpedice.processplatform.worker.config;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * WorkerConfiguration
+ * @author ppodsednik
+ */
 public class WorkerConfiguration {
     private final Properties props = new Properties();
 

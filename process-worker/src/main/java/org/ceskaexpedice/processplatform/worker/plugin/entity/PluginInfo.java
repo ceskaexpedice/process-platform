@@ -14,10 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.entity;
 
 import java.util.List;
 
+/**
+ * PluginInfo
+ * @author ppodsednik
+ */
 public class PluginInfo {
     private final String pluginId;
     private final String description;

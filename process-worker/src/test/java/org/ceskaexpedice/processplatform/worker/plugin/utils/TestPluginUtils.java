@@ -12,27 +12,35 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
 import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-
 /**
- * TestWorkerMain
+ * TestPluginUtils
  *
  * @author ppodsednik
  */
-public class TestWorkerMain {
+public class TestPluginUtils {
 
     @Test
-    public void testMain() {
+    public void testPluginsLoader() {
+        String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
+        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(pluginPath));
+        System.out.println("pluginInfos: " + pluginInfos);
+    }
+
+    @Test
+    public void testUff() {
+        String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
+        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(pluginPath));
+        //ProcessTask processTask = new ProcessTask(); // this task comes from the manager
+        PluginJvmLauncher.launchJvm(null);
+        System.out.println("pluginInfos: " + pluginInfos);
     }
 
 }

@@ -18,6 +18,10 @@ package org.ceskaexpedice.processplatform.worker.api.service;
 
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
+/**
+ * PluginEndpointService
+ * @author ppodsednik
+ */
 public class PluginEndpointService {
     public PluginEndpointService(WorkerMain workerMain) {
     }

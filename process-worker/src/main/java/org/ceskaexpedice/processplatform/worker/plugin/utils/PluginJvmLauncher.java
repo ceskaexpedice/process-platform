@@ -14,20 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * PluginJvmLauncher
+ * @author ppodsednik
+ */
 public final class PluginJvmLauncher {
 
     private PluginJvmLauncher() {}
 
-    public static void launchJvm(ProcessTask processTask) {
+    public static void launchJvm(ScheduledProcessTO scheduledProcessTO) {
         // TODO payload must be pars to be passed to the plugin through main method args
         /*
         File pluginDir = new File("plugins/" + processName);

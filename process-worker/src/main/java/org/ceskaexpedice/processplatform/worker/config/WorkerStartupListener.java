@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * WorkerStartupListener
+ * @author ppodsednik
+ */
 public class WorkerStartupListener implements ServletContextListener {
-
-    private WorkerMain workerMain;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

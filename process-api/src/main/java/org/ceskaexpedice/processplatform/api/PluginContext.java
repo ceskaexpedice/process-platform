@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.api;
 
+/**
+ * PluginContext
+ * @author ppodsednik
+ */
 public interface PluginContext {
 
     void updateTaskState(String taskId, String taskState);
@@ -25,6 +29,5 @@ public interface PluginContext {
     void updateTaskName(String taskId, String name);
 
     void scheduleProcess(String processDefinition);
-
 
 }

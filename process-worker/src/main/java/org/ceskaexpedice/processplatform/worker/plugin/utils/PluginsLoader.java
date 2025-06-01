@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginProfile;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -24,9 +26,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-public final class PluginScanner {
+/**
+ * PluginScanner
+ * @author ppodsednik
+ */
+public final class PluginsLoader {
 
-    private PluginScanner() {}
+    private PluginsLoader() {}
 
     public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
         File pluginDir = new File(pluginsDir, pluginId);
@@ -48,10 +54,10 @@ public final class PluginScanner {
             }
         }
 
-        return new URLClassLoader(urls, PluginScanner.class.getClassLoader());
+        return new URLClassLoader(urls, PluginsLoader.class.getClassLoader());
     }
 
-    public static List<PluginInfo> scanPlugins(File pluginsDir) {
+    public static List<PluginInfo> load(File pluginsDir) {
         List<PluginInfo> result = new ArrayList<>();
 
         File[] pluginDirs = pluginsDir.listFiles(File::isDirectory);
@@ -68,13 +74,13 @@ public final class PluginScanner {
                     })
                     .toArray(URL[]::new);
 
-            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginScanner.class.getClassLoader());
+            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginsLoader.class.getClassLoader());
 
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
                 File pluginJar = new File(pluginDir, "plugin.jar"); // TODO
                 File profilesDir = new File(pluginDir, "profiles"); // TODO
-                PluginInfo pluginInfo = PluginDiscovery.discoverPlugin(plugin, pluginJar, profilesDir, pluginClassLoader);
+                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, profilesDir);
                 result.add(pluginInfo);
                 //result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir));
             }
@@ -82,4 +88,15 @@ public final class PluginScanner {
 
         return result;
     }
+
+    private static PluginInfo resolvePlugin(ProcessPlugin pluginInstance, File pluginJar, File profilesDir) {
+        String pluginId = pluginInstance.getPluginId();
+        String description = pluginInstance.getDescription();
+        String mainClass = pluginInstance.getMainClass();
+
+        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, profilesDir, pluginId);
+
+        return new PluginInfo(pluginId, description, mainClass, profiles);
+    }
+
 }

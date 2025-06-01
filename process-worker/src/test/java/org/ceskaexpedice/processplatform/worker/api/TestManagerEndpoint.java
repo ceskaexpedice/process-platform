@@ -27,8 +27,7 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestRest Description
- *
+ * TestManagerEndpoint
  * @author ppodsednik
  */
 public class TestManagerEndpoint extends JerseyTest {

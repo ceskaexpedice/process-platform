@@ -16,5 +16,24 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-public class AdminService {
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
+
+/**
+ * WorkerService
+ * @author ppodsednik
+ */
+public class WorkerEndpointService {
+
+    public void registerPlugin(PluginInfoTO pluginInfoTO) {
+        // Save plugin to 'plugins' table
+        // For example:
+        // pluginRepository.save(new PluginEntity(pluginInfoDto.getPluginId(), pluginInfoDto.getDescription(), pluginInfoDto.getMainClass()));
+
+        // Save profiles to 'plugin_profiles' table
+        for (PluginProfileTO profile : pluginInfoTO.getProfiles()) {
+            // pluginProfilesRepository.save(new PluginProfileEntity(profile.getProfileId(), profile.getPluginId(), ...));
+        }
+    }
+
 }

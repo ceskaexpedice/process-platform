@@ -14,11 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.entity;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PluginProfile
+ * @author ppodsednik
+ */
 public class PluginProfile {
     private final String profileId;        // e.g. "import-cgi"
     //private final String pluginId;         // base plugin, e.g. "import"

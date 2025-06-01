@@ -18,11 +18,15 @@ package org.ceskaexpedice.processplatform.worker.plugin;
 
 import org.ceskaexpedice.processplatform.api.PluginContext;
 import org.ceskaexpedice.processplatform.api.PluginContextHolder;
+import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * PluginStarter
+ * @author ppodsednik
+ */
 public class PluginStarter implements PluginContext {
 
     public static void main(String[] args) {
@@ -39,7 +43,7 @@ public class PluginStarter implements PluginContext {
             PluginContextHolder.setContext(new PluginStarter());
             // TODO use config
             String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
-            ClassLoader loader = PluginScanner.createPluginClassLoader(new File(pluginPath), pluginName);
+            ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(pluginPath), pluginName);
             ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(loader);

@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.api;
 
+/**
+ * ProcessPlugin
+ * @author ppodsednik
+ */
 public interface ProcessPlugin {
 
     String getPluginId();        // e.g., "import"

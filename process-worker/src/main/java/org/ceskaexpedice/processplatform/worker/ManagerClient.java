@@ -17,17 +17,64 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class ManagerClient {
+/**
+ * ManagerClient
+ * @author ppodsednik
+ */
+public class ManagerClient {
+    private final WorkerConfiguration workerConfiguration;
+    private final Client client;
 
-    ManagerClient(WorkerConfiguration workerConfiguration) {
+    public ManagerClient(WorkerConfiguration workerConfiguration) {
+        this.workerConfiguration = workerConfiguration;
+        this.client = ClientBuilder.newClient();
+    }
+
+    public void registerPlugin(PluginInfoTO pluginInfoTO) {
+        /*
+        Response response = client
+                .target(managerBaseUrl)
+                .path("/plugins/register")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(pluginInfoTO));
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed to register plugin: " + response.getStatus());
+        }*/
+    }
+
+    public ScheduledProcessTO getNextProcess() {
+        /*
+        Response response = client
+                .target(managerBaseUrl)
+                .path("/processes/next")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+
+        if (response.getStatus() == 200) {
+            return response.readEntity(ScheduledProcessTO.class);
+        } else if (response.getStatus() == 204) {
+            return null;
+        } else {
+            throw new RuntimeException("Failed to get next process: " + response.getStatus());
+        }*/ return null;
+    }
+
+   // ManagerClient(WorkerConfiguration workerConfiguration) {
         /*
         services:
   process-worker:
@@ -47,7 +94,7 @@ class ManagerClient {
 }
 config.get("manager.base.url")
          */
-    }
+  //  }
 
     /*
     public List<Task> fetchTasks() {
@@ -78,6 +125,7 @@ config.get("manager.base.url")
 
      */
 
+    /*
     ProcessTask nextProcessTask() {
         try {
             String url = "http://manager-host:8080/api/get-process/" + "uuid";
@@ -96,5 +144,6 @@ config.get("manager.base.url")
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
+
 }

@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.api;
 
+/**
+ * PluginContextHolder
+ * @author ppodsednik
+ */
 public class PluginContextHolder {
     private static PluginContext context;
 

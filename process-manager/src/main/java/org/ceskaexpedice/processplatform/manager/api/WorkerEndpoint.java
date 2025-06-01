@@ -16,10 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.dto.PluginInfoDto;
-import org.ceskaexpedice.processplatform.common.dto.ProcessState;
-import org.ceskaexpedice.processplatform.common.dto.ScheduledProcessDto;
-import org.ceskaexpedice.processplatform.manager.api.service.WorkerService;
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.manager.api.service.WorkerEndpointService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -28,10 +27,40 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
+/**
+ * WorkerEndpoint
+ * @author ppodsednik
+ */
 @Path("/worker")
 public class WorkerEndpoint {
 
-    public WorkerEndpoint(WorkerService workerService) {
+    private final WorkerEndpointService workerEndpointService;
+
+    public WorkerEndpoint(WorkerEndpointService workerEndpointService) {
+        this.workerEndpointService = workerEndpointService;
+    }
+
+    @POST
+    @Path("/register")
+    public Response registerPlugin(PluginInfoTO pluginInfoTO) {
+        try {
+            // Validate input
+            if (pluginInfoTO.getPluginId() == null || pluginInfoTO.getPluginId().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("pluginId is required")
+                        .build();
+            }
+
+            // Save plugin and profiles
+            workerEndpointService.registerPlugin(pluginInfoTO);
+
+            return Response.ok().build();
+        } catch (Exception e) {
+            // Log error here (log.error...)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Failed to register plugin: " + e.getMessage())
+                    .build();
+        }
     }
 
     //@Inject
@@ -68,19 +97,12 @@ public class WorkerEndpoint {
     @Path("/next")
     public Response getNextProcess() {
         // Implementation: fetch next process from DB
-        ScheduledProcessDto dto = null; // TODO
+        ScheduledProcessTO dto = null; // TODO
         if (dto != null) {
             return Response.ok(dto).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
-    }
-
-    @POST
-    @Path("/register")
-    public Response registerPlugin(PluginInfoDto pluginInfoDto) {
-        // Implementation: persist to DB, validate, etc.
-        return Response.ok().build();
     }
 
     // === Update Process State (e.g., running, completed, failed) ===
@@ -132,6 +154,7 @@ public class WorkerEndpoint {
 
      */
 
+    /*
     @PUT
     @Path("/{id}/state")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -139,17 +162,19 @@ public class WorkerEndpoint {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
         ProcessState processState = ProcessState.valueOf(taskStateS);
-        /*
+
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
         }
         try {
             return QueueSAO.QueueEntryType.valueOf(type);
-        }*/
+        }
 
         return Response.ok().entity("result Owners".toString()).build();
     }
+    */
 
+    /*
     @PUT
     @Path("/{id}/pid")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -157,17 +182,18 @@ public class WorkerEndpoint {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
         ProcessState processState = ProcessState.valueOf(taskStateS);
-        /*
+
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
         }
         try {
             return QueueSAO.QueueEntryType.valueOf(type);
-        }*/
+        }
 
         return Response.ok().entity("result Owners".toString()).build();
-    }
+    }*/
 
+    /*
     @PUT
     @Path("/{id}/name")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -175,16 +201,16 @@ public class WorkerEndpoint {
 
         String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
         ProcessState processState = ProcessState.valueOf(taskStateS);
-        /*
+
         if (StringUtilities.isEmpty(type)) {
             throw new IllegalArgumentException("Missing type parameter");
         }
         try {
             return QueueSAO.QueueEntryType.valueOf(type);
-        }*/
+        }
 
         return Response.ok().entity("result Owners".toString()).build();
-    }
+    }*/
 /*
     public ProcessDefinition buildProcessFromDatabase(Connection conn, String uuid) throws SQLException {
         ProcessDefinition processDefinition = new ProcessDefinition();

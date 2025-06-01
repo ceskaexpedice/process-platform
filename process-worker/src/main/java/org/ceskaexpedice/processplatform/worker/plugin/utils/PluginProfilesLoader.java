@@ -14,23 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin;
+package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginProfile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-public class PluginProfileLoader {
+/**
+ * PluginProfilesLoader
+ * @author ppodsednik
+ */
+public final class PluginProfilesLoader {
+
+    private PluginProfilesLoader() {}
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static List<PluginProfile> loadProfiles(File pluginJar, File externalProfilesDir, String pluginId) throws IOException {
+    public static List<PluginProfile> loadProfiles(File pluginJar, File externalProfilesDir, String pluginId) {
+        /*
         List<PluginProfile> internalProfiles = loadInternalProfiles(pluginJar, pluginId);
         List<PluginProfile> externalProfiles = loadExternalProfiles(externalProfilesDir, pluginId);
 
@@ -44,9 +47,12 @@ public class PluginProfileLoader {
         }
 
         return new ArrayList<>(merged.values());
+
+         */ return null;
     }
 
-    private static List<PluginProfile> loadInternalProfiles(File jarFile, String pluginId) throws IOException {
+    private static List<PluginProfile> loadInternalProfiles(File jarFile, String pluginId) {
+        /*
         try (JarFile jar = new JarFile(jarFile)) {
             JarEntry entry = jar.getJarEntry(pluginId + ".json");
             if (entry == null) return Collections.emptyList();
@@ -54,15 +60,19 @@ public class PluginProfileLoader {
             try (InputStream in = jar.getInputStream(entry)) {
                 return Arrays.asList(mapper.readValue(in, PluginProfile[].class));
             }
-        }
+        }*/
+        return null;
     }
 
-    private static List<PluginProfile> loadExternalProfiles(File dir, String pluginId) throws IOException {
+    private static List<PluginProfile> loadExternalProfiles(File dir, String pluginId) {
+        /*
         File json = new File(dir, pluginId + ".json");
         if (!json.exists()) return Collections.emptyList();
 
         try (InputStream in = new FileInputStream(json)) {
             return Arrays.asList(mapper.readValue(in, PluginProfile[].class));
         }
+
+         */ return null;
     }
 }

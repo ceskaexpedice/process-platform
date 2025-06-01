@@ -14,7 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.common.to;
 
-public class WorkerService {
+import java.util.List;
+import java.util.Map;
+
+/**
+ * PluginProfileTO
+ * @author ppodsednik
+ */
+public class PluginProfileTO {
+    private String profileId;
+    private String pluginId;
+    private Map<String, String> staticParams;
+    private List<String> jvmArgs;
+
+    public PluginProfileTO() {
+    }
+
+    public PluginProfileTO(String profileId, String pluginId, Map<String, String> staticParams, List<String> jvmArgs) {
+        this.profileId = profileId;
+        this.pluginId = pluginId;
+        this.staticParams = staticParams;
+        this.jvmArgs = jvmArgs;
+    }
+
+    // Getters and setters
 }

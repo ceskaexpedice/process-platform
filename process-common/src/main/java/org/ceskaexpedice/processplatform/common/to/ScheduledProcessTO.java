@@ -14,25 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.dto;
+package org.ceskaexpedice.processplatform.common.to;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class PluginProfileDto {
-    private String profileId;
+/**
+ * ScheduledProcessTO
+ * @author ppodsednik
+ */
+public class ScheduledProcessTO {
+    private UUID processId;
     private String pluginId;
-    private Map<String, String> staticParams;
+    private String profileId;
+    private String mainClass;
     private List<String> jvmArgs;
+    private Map<String, String> staticParams;
+    private Map<String, Object> payload;  // JSON payload varies by plugin
 
-    public PluginProfileDto() {
+    public ScheduledProcessTO() {
     }
 
-    public PluginProfileDto(String profileId, String pluginId, Map<String, String> staticParams, List<String> jvmArgs) {
-        this.profileId = profileId;
+    public ScheduledProcessTO(UUID processId, String pluginId, String profileId, String mainClass, List<String> jvmArgs,
+                              Map<String, String> staticParams, Map<String, Object> payload) {
+        this.processId = processId;
         this.pluginId = pluginId;
-        this.staticParams = staticParams;
+        this.profileId = profileId;
+        this.mainClass = mainClass;
         this.jvmArgs = jvmArgs;
+        this.staticParams = staticParams;
+        this.payload = payload;
     }
 
     // Getters and setters

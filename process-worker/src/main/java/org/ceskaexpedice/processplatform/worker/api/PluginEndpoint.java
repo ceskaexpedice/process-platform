@@ -23,23 +23,16 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * PluginEndpoint
+ * @author ppodsednik
+ */
 @Path("/plugin")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PluginEndpoint {
 
     public PluginEndpoint(PluginEndpointService pluginEndpointService) {
-    }
-
-    // === Get Process Logs (stdout or stderr) ===
-    @GET
-    @Path("/logs/{uuid}")
-    public Response getLogs(
-            @PathParam("uuid") String uuid,
-            @QueryParam("stream") @DefaultValue("stdout") String streamType) {
-        // streamType can be "stdout" or "stderr"
-        // You can return logs as plain text or application/octet-stream if binary
-        return Response.ok(/* logs as text or file */).entity("{\"uuid\":\"" + uuid + "\" }").build();
     }
 
 }

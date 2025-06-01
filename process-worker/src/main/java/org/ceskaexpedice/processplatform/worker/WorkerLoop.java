@@ -17,20 +17,22 @@
 package org.ceskaexpedice.processplatform.worker;
 
 
-import org.ceskaexpedice.processplatform.common.dto.ProcessTask;
-import org.ceskaexpedice.processplatform.common.dto.ScheduledProcessDto;
-import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
 
 import java.util.Optional;
 
+/**
+ * WorkerLoop
+ * @author ppodsednik
+ */
 class WorkerLoop {
 
-    private final ManagerClient_toDelete managerClient;
+    private final ManagerClient managerClient;
     private volatile boolean running = true;
 
-    WorkerLoop(WorkerConfiguration workerConfiguration) {
-        this.managerClient = new ManagerClient(workerConfiguration);
+    WorkerLoop(ManagerClient managerClient) {
+        this.managerClient = managerClient;
     }
 
     void start() {
@@ -42,11 +44,11 @@ class WorkerLoop {
         Thread pollingThread = new Thread(() -> {
             while (running) {
                 try {
-                    Optional<ProcessTask> taskOpt = pollManagerForTask();
+                    Optional<ScheduledProcessTO> taskOpt = pollManagerForTask();
 
                     if (taskOpt.isPresent()) {
-                        ProcessTask processTask = taskOpt.get();
-                        PluginJvmLauncher.launchJvm(processTask);
+                        ScheduledProcessTO scheduledProcessTO = taskOpt.get();
+                        PluginJvmLauncher.launchJvm(scheduledProcessTO);
                        // int exitCode = process.waitFor();
                        // reportProcessResult(processTask, exitCode);
                     } else {
@@ -74,10 +76,10 @@ class WorkerLoop {
         running = false;
     }
 
-    private Optional<ProcessTask> pollManagerForTask() {
+    private Optional<ScheduledProcessTO> pollManagerForTask() {
         try {
             // ProcessTask processTask = managerClient.nextProcessTask();
-            ScheduledProcessDto processTask = managerClient.getNextProcess();
+            ScheduledProcessTO processTask = managerClient.getNextProcess();
 
             if(processTask != null){
                 return Optional.of(processTask);

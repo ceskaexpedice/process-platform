@@ -16,46 +16,51 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.common.dto.PluginInfoDto;
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginJvmLauncher;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginScanner;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfoMapper;
+import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
 
 import java.io.File;
 import java.util.List;
 
+/**
+ * WorkerMain
+ * @author ppodsednik
+ */
 public class WorkerMain {
 
-    private WorkerLoop workerLoop;
     private WorkerConfiguration workerConfiguration;
-    private List<PluginInfo> pluginsList;
+    private WorkerLoop workerLoop;
+    private ManagerClient managerClient;
 
     public WorkerMain() {
     }
 
     public void initialize(WorkerConfiguration workerConfiguration) {
         this.workerConfiguration = workerConfiguration;
-        pluginsList = scanPlugins();
-        if(!pluginsList.isEmpty()){
-            registerPlugins();
+        List<PluginInfo> pluginsList = scanPlugins();
+        if(pluginsList.isEmpty()){
+            throw new IllegalStateException("No plugins found");
         }
-        this.workerLoop = new WorkerLoop(workerConfiguration);
+        registerPlugins(pluginsList);
+        this.managerClient = new ManagerClient(workerConfiguration);
+        this.workerLoop = new WorkerLoop(managerClient);
         workerLoop.start();
     }
 
     private List<PluginInfo> scanPlugins() {
         File pluginsDir = new File("plugins"); // TODO from config
-        List<PluginInfo> pluginsList = PluginScanner.scanPlugins(pluginsDir);
+        List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
-    private void registerPlugins() {
+    private void registerPlugins(List<PluginInfo> pluginsList) {
         for (PluginInfo pluginInfo : pluginsList) {
-            System.out.println("Discovered plugin: " + plugin);
-            PluginInfoDto pluginInfoDto = PluginInfoMapper.toDto(pluginInfo);
-            managerClient.registerPlugin(pluginInfoDto);
-            // TODO: Register plugin with manager via REST
+            System.out.println("Discovered plugin: " + pluginInfo);
+            PluginInfoTO pluginInfoTO = PluginInfoMapper.toTO(pluginInfo);
+            managerClient.registerPlugin(pluginInfoTO);
         }
     }
 
