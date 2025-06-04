@@ -18,9 +18,12 @@ package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginStarter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +34,7 @@ public final class PluginJvmLauncher {
 
     private PluginJvmLauncher() {}
 
-    public static void launchJvm(ScheduledProcessTO scheduledProcessTO) {
+    public static void launchJvm(ScheduledProcessTO scheduledProcessTO, WorkerConfiguration workerConfiguration) {
         // TODO payload must be pars to be passed to the plugin through main method args
         /*
         File pluginDir = new File("plugins/" + processName);
@@ -52,21 +55,22 @@ public final class PluginJvmLauncher {
          */
 
         try {
+            List<String> command = new ArrayList<>();
+            command.add("java");
+            List<String> javaProcessParameters = scheduledProcessTO.getJvmArgs();
+            for (String jpParam : javaProcessParameters) {
+                command.add(jpParam);
+            }
+            command.add("-cp");
+            String classpath = getOwnJarPath() + ";" + workerConfiguration.get("processApiPath");
+            command.add(classpath);
+            command.add(PluginStarter.class.getName());
+            command.add(workerConfiguration.get("pluginPath").toString());
+            command.add(scheduledProcessTO.getPluginId());
+            command.add(scheduledProcessTO.getMainClass());
+            command.add("payload");
 
-            String classpath = getOwnJarPath() + ";c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar";
-            List<String> command = List.of(
-                    "java",
-                    "-Xmx1024m",
-                    "-Xms256m",
-                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001",
-                    "-cp", classpath,
-                    "org.ceskaexpedice.processplatform.worker.plugin.PluginStarter",
-                    "import",
-                    "org.kramerius.Import",
-                    "importPayload"
-            );
             ProcessBuilder pb = new ProcessBuilder(command);
-
             pb.inheritIO(); // pipe stdout/stderr to current console
             Process processR = pb.start();
             int val = processR.waitFor();

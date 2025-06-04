@@ -14,23 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.api;
+package org.ceskaexpedice.processplatform.worker.api.service;
 
-import org.ceskaexpedice.processplatform.worker.api.service.PluginService;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
 /**
- * PluginEndpoint
+ * ManagerEndpointService
  * @author ppodsednik
  */
-@Path("/plugin")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class PluginEndpoint {
+public class AgentControlService {
 
-    public PluginEndpoint(PluginService pluginService) {
+    public AgentControlService(WorkerMain workerMain) {
     }
-
 }

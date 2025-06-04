@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.api.service.ManagerEndpointService;
+import org.ceskaexpedice.processplatform.worker.api.service.AgentControlService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -29,9 +29,9 @@ import javax.ws.rs.core.Response;
 @Path("/manager")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ManagerEndpoint {
+public class AgentControlEndpoint {
 
-    public ManagerEndpoint(ManagerEndpointService managerEndpointService) {
+    public AgentControlEndpoint(AgentControlService agentControlService) {
     }
 
     // === Get Process Logs (stdout or stderr) ===

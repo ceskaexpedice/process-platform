@@ -35,14 +35,13 @@ public class PluginStarter implements PluginContext {
             System.exit(1);
         }
 
-        String pluginName = args[0];  // e.g., "import"
-        String mainClassName = args[1];  // e.g., "import"
-        String payload = args[2];      // JSON or command string
+        String pluginPath = args[0];  // e.g., "import"
+        String pluginName = args[1];  // e.g., "import"
+        String mainClassName = args[2];  // e.g., "import"
+        String payload = args[3];      // JSON or command string
 
         try {
             PluginContextHolder.setContext(new PluginStarter());
-            // TODO use config
-            String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
             ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(pluginPath), pluginName);
             ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
             try {

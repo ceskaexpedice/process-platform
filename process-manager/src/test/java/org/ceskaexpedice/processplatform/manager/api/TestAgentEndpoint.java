@@ -12,9 +12,10 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.worker.api;
+package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.worker.api.service.ManagerEndpointService;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;
@@ -27,43 +28,26 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestManagerEndpoint
+ * TestRest Description
+ *
  * @author ppodsednik
  */
-public class TestManagerEndpoint extends JerseyTest {
-
-    public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
-    //private HttpServer server;
-
-  /*
-  @BeforeEach
-  public void setUp() throws Exception {
-    final ResourceConfig rc = new ResourceConfig(ProcessResource.class);
-    server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-    server.start();
-  }*/
+public class TestAgentEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        ManagerEndpointService managerEndpointServiceMock = mock(ManagerEndpointService.class);
+        AgentService agentService = mock(AgentService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ManagerEndpoint(managerEndpointServiceMock));
+        resourceConfig.register(new AgentEndpoint(agentService));
         return resourceConfig;
     }
 
-  /*
-  @AfterEach
-  public void tearDown() throws Exception {
-    //server.shutdownNow();
-  }*/
-
     @Test
-    public void testGetLogs() {
-        Response response = target("manager/logs/blaf")
-                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+    public void testNext() {
+        Response response = target("worker/nextProcess").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
+        ScheduledProcessTO entity = response.readEntity(ScheduledProcessTO.class);
         System.out.println(entity);
     }
 

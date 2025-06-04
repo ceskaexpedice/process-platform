@@ -47,5 +47,32 @@ public class ScheduledProcessTO {
         this.payload = payload;
     }
 
-    // Getters and setters
+    public UUID getProcessId() {
+        return processId;
+    }
+
+    public String getPluginId() {
+        return pluginId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public String getMainClass() {
+        return mainClass;
+    }
+
+    public List<String> getJvmArgs() {
+        return jvmArgs;
+    }
+
+    public Map<String, String> getStaticParams() {
+        return staticParams;
+    }
+
+    public Map<String, Object> getPayload() {
+        return payload;
+    }
+
 }

@@ -14,15 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.api.service;
+package org.ceskaexpedice.processplatform.testplugin1.plugin;
 
-import org.ceskaexpedice.processplatform.worker.WorkerMain;
+import org.ceskaexpedice.processplatform.api.ProcessPlugin;
 
-/**
- * PluginEndpointService
- * @author ppodsednik
- */
-public class PluginEndpointService {
-    public PluginEndpointService(WorkerMain workerMain) {
+public class TestPlugin1SPI implements ProcessPlugin {
+
+    @Override
+    public String getPluginId() {
+        return "testPlugin1";
     }
+
+    @Override
+    public String getDescription() {
+        return "Testing plugin 1";
+    }
+
+    @Override
+    public String getMainClass() {
+        return "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1";
+    }
+
 }

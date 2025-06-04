@@ -12,16 +12,14 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.manager.api;
+package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.manager.api.service.AdminEndpointService;
+import org.ceskaexpedice.processplatform.worker.api.service.AgentControlService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,11 +27,10 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestRest Description
- *
+ * TestManagerEndpoint
  * @author ppodsednik
  */
-public class TestAdminEndpoint extends JerseyTest {
+public class TestAgentControlEndpoint extends JerseyTest {
 
     public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -49,9 +46,9 @@ public class TestAdminEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        AdminEndpointService adminEndpointServiceMock = mock(AdminEndpointService.class);
+        AgentControlService agentControlServiceMock = mock(AgentControlService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new AdminEndpoint(adminEndpointServiceMock));
+        resourceConfig.register(new AgentControlEndpoint(agentControlServiceMock));
         return resourceConfig;
     }
 
@@ -62,30 +59,12 @@ public class TestAdminEndpoint extends JerseyTest {
   }*/
 
     @Test
-    public void testGetDefinitions() {
-        Response response = target("admin/definitions")
+    public void testGetLogs() {
+        Response response = target("manager/logs/blaf")
                 .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
         String entity = response.readEntity(String.class);
         System.out.println(entity);
-    }
-
-    @Test
-    public void testGetProcessByProcessId() {
-        Response response = target("processes/by_process_id/pid")
-                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-    }
-
-    @Test
-    public void testScheduleProcess() {
-        Response response = target("processes").request(MediaType.APPLICATION_JSON).post((Entity.entity(
-                "{\"uf\": 99}", MediaType.APPLICATION_JSON_TYPE)));
-        Assertions.assertEquals(200, response.getStatus());
-        String responseBody = response.readEntity(String.class);
-        System.out.println(responseBody);
     }
 
 }

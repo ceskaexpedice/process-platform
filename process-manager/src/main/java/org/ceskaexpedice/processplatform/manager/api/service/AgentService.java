@@ -18,12 +18,13 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 
 /**
  * WorkerService
  * @author ppodsednik
  */
-public class WorkerEndpointService {
+public class AgentService {
 
     public void registerPlugin(PluginInfoTO pluginInfoTO) {
         // Save plugin to 'plugins' table
@@ -34,6 +35,10 @@ public class WorkerEndpointService {
         for (PluginProfileTO profile : pluginInfoTO.getProfiles()) {
             // pluginProfilesRepository.save(new PluginProfileEntity(profile.getProfileId(), profile.getPluginId(), ...));
         }
+    }
+
+    public ScheduledProcessTO getNextScheduledProcess() {
+        return null;
     }
 
 }

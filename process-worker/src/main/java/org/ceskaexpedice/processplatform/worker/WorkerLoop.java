@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
 
 import java.util.Optional;
@@ -29,10 +30,12 @@ import java.util.Optional;
 class WorkerLoop {
 
     private final ManagerClient managerClient;
+    private final WorkerConfiguration workerConfiguration;
     private volatile boolean running = true;
 
-    WorkerLoop(ManagerClient managerClient) {
-        this.managerClient = managerClient;
+    WorkerLoop(WorkerConfiguration workerConfiguration) {
+        this.managerClient = new ManagerClient(workerConfiguration);
+        this.workerConfiguration = workerConfiguration;
     }
 
     void start() {
@@ -48,7 +51,7 @@ class WorkerLoop {
 
                     if (taskOpt.isPresent()) {
                         ScheduledProcessTO scheduledProcessTO = taskOpt.get();
-                        PluginJvmLauncher.launchJvm(scheduledProcessTO);
+                        PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
                        // int exitCode = process.waitFor();
                        // reportProcessResult(processTask, exitCode);
                     } else {

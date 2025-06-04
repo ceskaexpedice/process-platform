@@ -4,3 +4,7 @@ include	'process-common'
 include	'process-api'
 include	'process-manager'
 include	'process-worker'
+
+include	'test-plugins:test-plugin1'
+include	'test-plugins:test-plugin2'
+

@@ -18,92 +18,61 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
-import org.ceskaexpedice.processplatform.manager.api.service.WorkerEndpointService;
+import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
 
 /**
  * WorkerEndpoint
  * @author ppodsednik
  */
 @Path("/worker")
-public class WorkerEndpoint {
+public class AgentEndpoint {
 
-    private final WorkerEndpointService workerEndpointService;
+    private final AgentService agentService;
 
-    public WorkerEndpoint(WorkerEndpointService workerEndpointService) {
-        this.workerEndpointService = workerEndpointService;
+    public AgentEndpoint(AgentService agentService) {
+        this.agentService = agentService;
     }
 
     @POST
-    @Path("/register")
-    public Response registerPlugin(PluginInfoTO pluginInfoTO) {
-        try {
-            // Validate input
-            if (pluginInfoTO.getPluginId() == null || pluginInfoTO.getPluginId().isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("pluginId is required")
-                        .build();
-            }
-
-            // Save plugin and profiles
-            workerEndpointService.registerPlugin(pluginInfoTO);
-
-            return Response.ok().build();
-        } catch (Exception e) {
-            // Log error here (log.error...)
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Failed to register plugin: " + e.getMessage())
-                    .build();
-        }
-    }
-
-    //@Inject
-//    private TaskQueue taskQueue;
-    // === Get Next Available Process ===
-    @POST
-    @Path("/next")
-    public Response getNextProcess(List<String> supportedProcessIds) {
-        /*
-        {
-  "processId": "uuid-1234-5678",
-  "pluginId": "import",
-  "profileId": "import-cgi",
-  "mainClass": "cz.kramerius.plugins.importer.Main",
-  "jvmArgs": ["-Xmx1G"],
-  "staticParams": {
-    "pars": "ADD"
-  },
-  "payload": {
-    "importDir": "/data/import",
-    "addCollection": true
-  }
-}
-
-         */
-
-
-        // Return the next suitable process based on supported plugins
-        // Merges data from process_definition + processes
-        return Response.ok(/* Process */).build();
+    @Path("/register-plugin")
+    public void registerPlugin(PluginInfoTO pluginInfo) {
+        agentService.registerPlugin(pluginInfo);
     }
 
     @GET
-    @Path("/next")
-    public Response getNextProcess() {
-        // Implementation: fetch next process from DB
-        ScheduledProcessTO dto = null; // TODO
-        if (dto != null) {
-            return Response.ok(dto).build();
+    @Path("/next-process")
+    public ScheduledProcessTO getNextProcess() {
+        return agentService.getNextScheduledProcess();
+        /*
+                // Implementation: fetch next process from DB
+        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+                UUID.randomUUID(),
+                "pluginInfo.getPluginId()",
+                "profileId",
+                "pluginInfo.getMainClass()",
+                null,
+                null,
+                null);
+        if (scheduledProcessTO != null) {
+            return Response.ok(scheduledProcessTO).build();
         } else {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
+
+         */
     }
+
+    /*
+    @POST
+    @Path("/process/{processId}/status")
+    public void updateProcessStatus(@PathParam("processId") String processId, ProcessStatusUpdateTO statusUpdate) {
+        workerService.updateProcessStatus(processId, statusUpdate);
+    }*/
+
+
 
     // === Update Process State (e.g., running, completed, failed) ===
     @PUT
@@ -129,6 +98,7 @@ public class WorkerEndpoint {
         return Response.ok().build();
     }
 
+    /*
     @GET
     @Path("next")
     @Produces(MediaType.APPLICATION_JSON)
@@ -139,6 +109,8 @@ public class WorkerEndpoint {
         return Response.ok().entity("result Owners".toString()).build();
     }
 
+
+     */
     /*
     @GET
     @Path("/get-process/{uuid}")

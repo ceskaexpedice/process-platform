@@ -14,16 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.api.service;
-
-import org.ceskaexpedice.processplatform.worker.WorkerMain;
+package org.ceskaexpedice.processplatform.manager.api.service;
 
 /**
- * ManagerEndpointService
+ * AdminService
  * @author ppodsednik
  */
-public class ManagerEndpointService {
-
-    public ManagerEndpointService(WorkerMain workerMain) {
-    }
+public class ProcessService {
 }

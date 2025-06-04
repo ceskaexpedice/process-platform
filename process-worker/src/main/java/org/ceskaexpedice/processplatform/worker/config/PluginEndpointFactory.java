@@ -20,7 +20,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.PluginEndpoint;
-import org.ceskaexpedice.processplatform.worker.api.service.PluginEndpointService;
+import org.ceskaexpedice.processplatform.worker.api.service.PluginService;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
@@ -38,7 +38,7 @@ public class PluginEndpointFactory implements Factory<PluginEndpoint> {
     public PluginEndpoint provide() {
         ServletContext ctx = request.getServletContext();
         WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new PluginEndpoint(new PluginEndpointService(workerMain));
+        return new PluginEndpoint(new PluginService(workerMain));
     }
 
     @Override

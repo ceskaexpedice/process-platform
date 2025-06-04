@@ -14,11 +14,18 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfoMapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 
 /**
  * TestPluginUtils
@@ -35,12 +42,31 @@ public class TestPluginUtils {
     }
 
     @Test
-    public void testUff() {
-        String pluginPath = "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins";
-        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(pluginPath));
-        //ProcessTask processTask = new ProcessTask(); // this task comes from the manager
-        PluginJvmLauncher.launchJvm(null);
-        System.out.println("pluginInfos: " + pluginInfos);
+    public void testPluginJvmLauncher() {
+        Properties props = new Properties();
+        props.put("pluginPath", "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
+        props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
+        WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
+        List<String> jvmArgs = new ArrayList<>();
+        jvmArgs.add("-Xmx1024m");
+        jvmArgs.add("-Xms256m");
+        jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
+
+        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(workerConfiguration.get("pluginPath").toString()));
+        for (PluginInfo pluginInfo : pluginInfos) {
+            if(pluginInfo.getPluginId().equals("testPlugin1")){
+                ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+                        UUID.randomUUID(),
+                        pluginInfo.getPluginId(),
+                        "profileId",
+                        pluginInfo.getMainClass(),
+                        jvmArgs,
+                        null,
+                        null);
+                PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
+            }
+        }
+
     }
 
 }

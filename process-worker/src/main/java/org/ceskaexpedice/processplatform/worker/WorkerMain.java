@@ -31,32 +31,31 @@ import java.util.List;
  */
 public class WorkerMain {
 
-    private WorkerConfiguration workerConfiguration;
     private WorkerLoop workerLoop;
-    private ManagerClient managerClient;
+    private WorkerConfiguration workerConfiguration;
 
     public WorkerMain() {
     }
 
     public void initialize(WorkerConfiguration workerConfiguration) {
         this.workerConfiguration = workerConfiguration;
-        List<PluginInfo> pluginsList = scanPlugins();
-        if(pluginsList.isEmpty()){
-            throw new IllegalStateException("No plugins found");
-        }
-        registerPlugins(pluginsList);
-        this.managerClient = new ManagerClient(workerConfiguration);
-        this.workerLoop = new WorkerLoop(managerClient);
+        registerPlugins();
+        this.workerLoop = new WorkerLoop(workerConfiguration);
         workerLoop.start();
     }
 
     private List<PluginInfo> scanPlugins() {
-        File pluginsDir = new File("plugins"); // TODO from config
+        File pluginsDir = new File(workerConfiguration.get("pluginPath"));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
-    private void registerPlugins(List<PluginInfo> pluginsList) {
+    private void registerPlugins() {
+        List<PluginInfo> pluginsList = scanPlugins();
+        if(pluginsList.isEmpty()){
+            throw new IllegalStateException("No plugins found");
+        }
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
         for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + pluginInfo);
             PluginInfoTO pluginInfoTO = PluginInfoMapper.toTO(pluginInfo);
