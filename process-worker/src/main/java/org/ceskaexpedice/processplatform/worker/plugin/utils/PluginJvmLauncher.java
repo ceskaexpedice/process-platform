@@ -68,7 +68,10 @@ public final class PluginJvmLauncher {
             command.add(workerConfiguration.get("pluginPath").toString());
             command.add(scheduledProcessTO.getPluginId());
             command.add(scheduledProcessTO.getMainClass());
-            command.add("payload");
+
+            for(String key : scheduledProcessTO.getPayload().keySet()){
+                command.add(scheduledProcessTO.getPayload().get(key).toString());
+            }
 
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.inheritIO(); // pipe stdout/stderr to current console

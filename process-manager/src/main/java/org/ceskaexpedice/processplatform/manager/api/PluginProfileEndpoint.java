@@ -27,6 +27,10 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PluginProfileEndpoint {
+    /*
+    /pluginProfiles/{pluginId}/{profileType}/payloadSpec → returns JSON spec
+    /pluginProfiles/{pluginId}/{profileType}/validatePayload → accepts payload, returns 200/400
+     */
 
     private final PluginProfileService pluginProfileService;
 

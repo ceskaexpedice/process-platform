@@ -14,27 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.to;
+package org.ceskaexpedice.processplatform.testplugin1.plugin;
 
-import java.util.List;
+import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.api.ProcessPlugin;
 
-/**
- * PluginProfileTO
- * @author ppodsednik
- */
-public class PluginProfileTO {
-    private String profileId;
-    private String pluginId;
-    private List<String> jvmArgs;
+import java.util.Map;
 
-    public PluginProfileTO() {
+public class Plugin1SPI implements ProcessPlugin {
+
+    @Override
+    public String getPluginId() {
+        return "testPlugin1";
     }
 
-    public PluginProfileTO(String profileId, String pluginId, List<String> jvmArgs) {
-        this.profileId = profileId;
-        this.pluginId = pluginId;
-        this.jvmArgs = jvmArgs;
+    @Override
+    public String getDescription() {
+        return "Testing plugin 1";
     }
 
-    // Getters and setters
+    @Override
+    public String getMainClass() {
+        return "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1";
+    }
+
+    @Override
+    public Map<String, PayloadFieldSpec> getPayloadSpec() {
+        return Map.of();
+    }
+
 }

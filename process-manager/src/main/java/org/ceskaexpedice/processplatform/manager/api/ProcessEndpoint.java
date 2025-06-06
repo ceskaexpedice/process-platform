@@ -35,6 +35,13 @@ public class ProcessEndpoint {
     public ProcessEndpoint(ProcessService processService) {
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response scheduleProcess(JSONObject processDefinition) {
+        return Response.ok().entity("{}").build();
+    }
+
     @GET
     @Path("owners")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -119,10 +126,4 @@ public class ProcessEndpoint {
     }
 
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response scheduleProcess(JSONObject processDefinition) {
-        return Response.ok().entity("{}").build();
-    }
 }

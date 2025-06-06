@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.api;
 
+import java.util.Map;
+
 /**
  * ProcessPlugin
  * @author ppodsednik
@@ -28,4 +30,5 @@ public interface ProcessPlugin {
 
     String getMainClass();       // e.g., "cz.kramerius.plugin.importer.Main"
 
+    Map<String, PayloadFieldSpec> getPayloadSpec();
 }

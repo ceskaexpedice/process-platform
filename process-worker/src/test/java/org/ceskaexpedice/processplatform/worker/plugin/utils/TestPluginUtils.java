@@ -22,10 +22,7 @@ import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfoMapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * TestPluginUtils
@@ -55,14 +52,16 @@ public class TestPluginUtils {
         List<PluginInfo> pluginInfos = PluginsLoader.load(new File(workerConfiguration.get("pluginPath").toString()));
         for (PluginInfo pluginInfo : pluginInfos) {
             if(pluginInfo.getPluginId().equals("testPlugin1")){
+                Map<String,Object> payload = new HashMap<>();
+                payload.put("name","Petr");
+                payload.put("surname","Harasil");
                 ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
                         UUID.randomUUID(),
                         pluginInfo.getPluginId(),
                         "profileId",
                         pluginInfo.getMainClass(),
                         jvmArgs,
-                        null,
-                        null);
+                        payload);
                 PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
             }
         }

@@ -14,25 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.testplugin1.plugin;
+package org.ceskaexpedice.processplatform.api.context;
 
-import org.ceskaexpedice.processplatform.api.ProcessPlugin;
+/**
+ * PluginContext
+ * @author ppodsednik
+ */
+public interface PluginContext {
 
-public class TestPlugin1SPI implements ProcessPlugin {
+    void updateTaskState(String taskId, String taskState);
 
-    @Override
-    public String getPluginId() {
-        return "testPlugin1";
-    }
+    void updateTaskPid(String taskId, String pid);
 
-    @Override
-    public String getDescription() {
-        return "Testing plugin 1";
-    }
+    void updateTaskName(String taskId, String name);
 
-    @Override
-    public String getMainClass() {
-        return "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1";
-    }
+    void scheduleProcess(String processDefinition);
 
 }

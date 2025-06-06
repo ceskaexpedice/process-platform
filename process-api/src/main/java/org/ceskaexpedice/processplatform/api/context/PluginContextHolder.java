@@ -14,27 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.to;
-
-import java.util.List;
+package org.ceskaexpedice.processplatform.api.context;
 
 /**
- * PluginProfileTO
+ * PluginContextHolder
  * @author ppodsednik
  */
-public class PluginProfileTO {
-    private String profileId;
-    private String pluginId;
-    private List<String> jvmArgs;
+public class PluginContextHolder {
+    private static PluginContext context;
 
-    public PluginProfileTO() {
+    public static void setContext(PluginContext ctx) {
+        context = ctx;
     }
 
-    public PluginProfileTO(String profileId, String pluginId, List<String> jvmArgs) {
-        this.profileId = profileId;
-        this.pluginId = pluginId;
-        this.jvmArgs = jvmArgs;
+    public static PluginContext getContext() {
+        return context;
     }
-
-    // Getters and setters
 }
