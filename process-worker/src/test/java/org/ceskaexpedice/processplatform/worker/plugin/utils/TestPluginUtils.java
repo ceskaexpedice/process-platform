@@ -52,7 +52,7 @@ public class TestPluginUtils {
         List<PluginInfo> pluginInfos = PluginsLoader.load(new File(workerConfiguration.get("pluginPath").toString()));
         for (PluginInfo pluginInfo : pluginInfos) {
             if(pluginInfo.getPluginId().equals("testPlugin1")){
-                Map<String,Object> payload = new HashMap<>();
+                Map<String,String> payload = new HashMap<>();
                 payload.put("name","Petr");
                 payload.put("surname","Harasil");
                 ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(

@@ -30,14 +30,14 @@ public class ScheduledProcessTO {
     private String profileId;
     private String mainClass;
     private List<String> jvmArgs;
-    private Map<String, Object> payload;  // JSON payload varies by plugin
+    private Map<String, String> payload;  // JSON payload varies by plugin
     // importDir: c:\pavel
 
     public ScheduledProcessTO() {
     }
 
     public ScheduledProcessTO(UUID processId, String pluginId, String profileId, String mainClass, List<String> jvmArgs,
-                              Map<String, Object> payload) {
+                              Map<String, String> payload) {
         this.processId = processId;
         this.pluginId = pluginId;
         this.profileId = profileId;
@@ -66,7 +66,7 @@ public class ScheduledProcessTO {
         return jvmArgs;
     }
 
-    public Map<String, Object> getPayload() {
+    public Map<String, String> getPayload() {
         return payload;
     }
 

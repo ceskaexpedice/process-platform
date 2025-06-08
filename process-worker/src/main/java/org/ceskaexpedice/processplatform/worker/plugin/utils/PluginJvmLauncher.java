@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -23,8 +24,11 @@ import org.ceskaexpedice.processplatform.worker.plugin.PluginStarter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 /**
  * PluginJvmLauncher
@@ -69,9 +73,9 @@ public final class PluginJvmLauncher {
             command.add(scheduledProcessTO.getPluginId());
             command.add(scheduledProcessTO.getMainClass());
 
-            for(String key : scheduledProcessTO.getPayload().keySet()){
-                command.add(scheduledProcessTO.getPayload().get(key).toString());
-            }
+            String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
+            String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
+            command.add(encodedPayload);
 
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.inheritIO(); // pipe stdout/stderr to current console
@@ -84,7 +88,8 @@ public final class PluginJvmLauncher {
                 //LOGGER.info(s);
             }
             //LOGGER.info("return value exiting process '" + val + "'");
-        } catch (IOException | InterruptedException e) {
+        } catch (Throwable e) {
+            System.out.println();
             // LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
