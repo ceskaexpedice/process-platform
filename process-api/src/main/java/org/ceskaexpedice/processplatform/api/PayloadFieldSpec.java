@@ -16,7 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.api;
 
-public class PayloadFieldSpec {
-    private String type;       // e.g., "string", "boolean", "number"
-    private boolean required;
+public record PayloadFieldSpec(
+        String type,      // e.g., "string", "boolean", "number"
+        boolean required
+) {
 }

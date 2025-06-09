@@ -66,8 +66,12 @@ public final class PluginJvmLauncher {
                 command.add(jpParam);
             }
             command.add("-cp");
-            String classpath = getOwnJarPath() + ";" + workerConfiguration.get("processApiPath");
-            command.add(classpath);
+
+            String starterClasspath = workerConfiguration.get("starter.classpath");
+            command.add(starterClasspath);
+//            String classpath = getOwnJarPath() + ";" + workerConfiguration.get("processApiPath");
+           // command.add(classpath);
+
             command.add(PluginStarter.class.getName());
             command.add(workerConfiguration.get("pluginPath").toString());
             command.add(scheduledProcessTO.getPluginId());

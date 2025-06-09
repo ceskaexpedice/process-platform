@@ -20,6 +20,7 @@ import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -42,6 +43,15 @@ public class WorkerStartupListener implements ServletContextListener {
         }
 
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
+
+        String libPath = sce.getServletContext().getRealPath("/WEB-INF/lib");
+        String starterClasspath = buildClasspath(libPath);
+        config.set("starter.classpath", starterClasspath);
+        String envClasspath = System.getenv("STARTER_CLASSPATH");
+        if (envClasspath != null) {
+            config.set("starter.classpath", envClasspath);
+        }
+
         WorkerMain workerMain = new WorkerMain();
         workerMain.initialize(config);
 
@@ -56,4 +66,20 @@ public class WorkerStartupListener implements ServletContextListener {
             wm.shutdown();
         }
     }
+
+    private String buildClasspath(String libDir) {
+        File dir = new File(libDir);
+        StringBuilder classpath = new StringBuilder();
+        File[] files = dir.listFiles((d, name) -> name.endsWith(".jar"));
+        if (files != null) {
+            for (File jar : files) {
+                if (classpath.length() > 0) {
+                    classpath.append(File.pathSeparator);
+                }
+                classpath.append(jar.getAbsolutePath());
+            }
+        }
+        return classpath.toString();
+    }
+
 }

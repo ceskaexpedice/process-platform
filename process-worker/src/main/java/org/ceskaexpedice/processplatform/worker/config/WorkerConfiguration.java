@@ -39,22 +39,32 @@ public class WorkerConfiguration {
         }
     }
 
+    /**
+     * Gets a property value by key.
+     * @param key the property key
+     * @return the property value, or null if not found
+     */
     public String get(String key) {
         return props.getProperty(key);
     }
 
+    /**
+     * Allows programmatic setting of a property.
+     * This is useful for tests or for dynamic overrides.
+     * @param key the property key
+     * @param value the property value
+     */
+    public void set(String key, String value) {
+        props.setProperty(key, value);
+    }
+
+    /**
+     * Convenience method to get a property with a default fallback.
+     * @param key the property key
+     * @param defaultValue the value to return if key is not found
+     * @return the property value or default
+     */
     public String getOrDefault(String key, String defaultValue) {
         return props.getProperty(key, defaultValue);
     }
-
-    public int getInt(String key, int defaultVal) {
-        try {
-            return Integer.parseInt(props.getProperty(key));
-        } catch (Exception e) {
-            return defaultVal;
-        }
-    }
-
-    // ...other typed methods
 }
-

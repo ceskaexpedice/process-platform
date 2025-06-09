@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
+import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
 import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginProfile;
@@ -93,10 +94,11 @@ public final class PluginsLoader {
         String pluginId = pluginInstance.getPluginId();
         String description = pluginInstance.getDescription();
         String mainClass = pluginInstance.getMainClass();
+        Map<String, PayloadFieldSpec> payloadSpec = pluginInstance.getPayloadSpec();
 
         List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, profilesDir, pluginId);
 
-        return new PluginInfo(pluginId, description, mainClass, profiles);
+        return new PluginInfo(pluginId, description, mainClass, payloadSpec, profiles);
     }
 
 }

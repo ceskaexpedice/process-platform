@@ -14,6 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
 import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import static org.mockito.Mockito.mock;
 
@@ -33,6 +35,13 @@ public class TestWorkerMain {
 
     @Test
     public void testMain() {
+        Properties props = new Properties();
+        props.put("pluginPath", "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
+        props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
+        WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
+
+        WorkerMain workerMain = new WorkerMain();
+        workerMain.initialize(workerConfiguration);
     }
 
 }

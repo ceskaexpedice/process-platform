@@ -16,7 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.common.to;
 
+import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * PluginInfoTO
@@ -26,15 +29,15 @@ public class PluginInfoTO {
     private String pluginId;
     private String description;
     private String mainClass;
+    private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
     private List<PluginProfileTO> profiles;
 
-    public PluginInfoTO() {
-    }
-
-    public PluginInfoTO(String pluginId, String description, String mainClass, List<PluginProfileTO> profiles) {
+    public PluginInfoTO(String pluginId, String description, String mainClass,
+                        Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfileTO> profiles) {
         this.pluginId = pluginId;
         this.description = description;
         this.mainClass = mainClass;
+        this.payloadFieldSpecMap = payloadFieldSpecMap;
         this.profiles = profiles;
     }
 
@@ -42,31 +45,20 @@ public class PluginInfoTO {
         return pluginId;
     }
 
-    public void setPluginId(String pluginId) {
-        this.pluginId = pluginId;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getMainClass() {
         return mainClass;
     }
 
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
+    public Map<String, PayloadFieldSpec> getPayloadFieldSpecMap() {
+        return payloadFieldSpecMap;
     }
 
     public List<PluginProfileTO> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(List<PluginProfileTO> profiles) {
-        this.profiles = profiles;
-    }
 }

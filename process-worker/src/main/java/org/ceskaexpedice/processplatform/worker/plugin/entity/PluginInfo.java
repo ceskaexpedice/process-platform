@@ -16,7 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.entity;
 
+import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * PluginInfo
@@ -26,12 +29,15 @@ public class PluginInfo {
     private final String pluginId;
     private final String description;
     private final String mainClass;
+    private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
     private final List<PluginProfile> profiles;
 
-    public PluginInfo(String pluginId, String description, String mainClass, List<PluginProfile> profiles) {
+    public PluginInfo(String pluginId, String description, String mainClass,
+                      Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfile> profiles) {
         this.pluginId = pluginId;
         this.description = description;
         this.mainClass = mainClass;
+        this.payloadFieldSpecMap = payloadFieldSpecMap;
         this.profiles = profiles;
     }
 
@@ -45,6 +51,10 @@ public class PluginInfo {
 
     public String getMainClass() {
         return mainClass;
+    }
+
+    public Map<String, PayloadFieldSpec> getPayloadFieldSpecMap() {
+        return payloadFieldSpecMap;
     }
 
     public List<PluginProfile> getProfiles() {

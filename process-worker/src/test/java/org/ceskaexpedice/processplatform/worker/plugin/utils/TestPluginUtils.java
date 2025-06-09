@@ -42,8 +42,15 @@ public class TestPluginUtils {
     public void testPluginJvmLauncher() {
         Properties props = new Properties();
         props.put("pluginPath", "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
-        props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
+
+        //props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
+
+
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
+        //workerConfiguration.set("starter.classpath", "target/test-classes" + File.pathSeparator + "libs/*");
+        String starterClasspath = System.getProperty("java.class.path");
+        workerConfiguration.set("starter.classpath", starterClasspath);
+
         List<String> jvmArgs = new ArrayList<>();
         jvmArgs.add("-Xmx1024m");
         jvmArgs.add("-Xms256m");

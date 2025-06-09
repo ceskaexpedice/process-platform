@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.testplugin1.plugin;
 import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Plugin1SPI implements ProcessPlugin {
@@ -40,7 +41,10 @@ public class Plugin1SPI implements ProcessPlugin {
 
     @Override
     public Map<String, PayloadFieldSpec> getPayloadSpec() {
-        return Map.of();
+        Map<String, PayloadFieldSpec>  map = new HashMap<>();
+        map.put("name", new PayloadFieldSpec("string", true));
+        map.put("surname", new PayloadFieldSpec("string", true));
+        return map;
     }
 
 }
