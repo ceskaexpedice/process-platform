@@ -22,13 +22,10 @@ import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginStarter;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * PluginJvmLauncher
@@ -36,7 +33,8 @@ import java.util.Map;
  */
 public final class PluginJvmLauncher {
 
-    private PluginJvmLauncher() {}
+    private PluginJvmLauncher() {
+    }
 
     public static void launchJvm(ScheduledProcessTO scheduledProcessTO, WorkerConfiguration workerConfiguration) {
         // TODO payload must be pars to be passed to the plugin through main method args
@@ -59,24 +57,31 @@ public final class PluginJvmLauncher {
          */
 
         try {
+            File processWorkingDir = processWorkingDirectory(scheduledProcessTO.getProcessId());
+            File standardStreamFile = standardOutFile(processWorkingDir);
+            File errStreamFile = errorOutFile(processWorkingDir);
+
             List<String> command = new ArrayList<>();
             command.add("java");
             List<String> javaProcessParameters = scheduledProcessTO.getJvmArgs();
             for (String jpParam : javaProcessParameters) {
                 command.add(jpParam);
             }
+            command.add("-D" + PluginStarter.SOUT_FILE + "=" + standardStreamFile.getAbsolutePath());
+            command.add("-D" + PluginStarter.SERR_FILE + "=" + errStreamFile.getAbsolutePath());
             command.add("-cp");
-
             String starterClasspath = workerConfiguration.get("starter.classpath");
             command.add(starterClasspath);
 //            String classpath = getOwnJarPath() + ";" + workerConfiguration.get("processApiPath");
-           // command.add(classpath);
+            // command.add(classpath);
 
             command.add(PluginStarter.class.getName());
-            command.add(workerConfiguration.get("pluginPath").toString());
+            String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
+            String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
+            command.add(encodedConfig);
             command.add(scheduledProcessTO.getPluginId());
+            command.add(scheduledProcessTO.getProfileId());
             command.add(scheduledProcessTO.getMainClass());
-
             String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
             String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
             command.add(encodedPayload);
@@ -98,11 +103,49 @@ public final class PluginJvmLauncher {
         }
     }
 
+    private static File processWorkingDirectory(UUID processId) {
+        //String key = LRProcess.class.getName() + ".workingdir";
+        //String value = System.getProperty(key, DefinitionManager.DEFAULT_LP_WORKDIR
+        //      + File.separator + processId);
+        String value = WorkerConfiguration.DEFAULT_WORKER_WORKDIR + File.separator + processId;
+        File processWorkingDir = new File(value);
+        if (!processWorkingDir.exists()) {
+            boolean mkdirs = processWorkingDir.mkdirs();
+            if (!mkdirs)
+                throw new RuntimeException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
+        }
+        return processWorkingDir;
+    }
+
+    private static File errorOutFile(File processWorkingDir) {
+        return new File(createFolderIfNotExists(processWorkingDir
+                + File.separator + "plgErr"),
+                "sterr.err");
+    }
+
+    private static File standardOutFile(File processWorkingDir) {
+        return new File(createFolderIfNotExists(processWorkingDir
+                + File.separator + "plgOut"),
+                "stout.out");
+    }
+
+    private static File createFolderIfNotExists(String folder) {
+        File fldr = new File(folder);
+        if (!fldr.exists()) {
+            boolean mkdirs = fldr.mkdirs();
+            if (!mkdirs)
+                throw new RuntimeException("cannot create directory '"
+                        + fldr.getAbsolutePath() + "'");
+        }
+        return fldr;
+    }
+
+    /*
     static String getOwnJarPath() {
         return PluginJvmLauncher.class
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()
                 .getPath();
-    }
+    }*/
 }

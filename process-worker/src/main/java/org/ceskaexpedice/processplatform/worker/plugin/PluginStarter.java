@@ -18,10 +18,15 @@ package org.ceskaexpedice.processplatform.worker.plugin;
 
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.logging.LoggingLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.utils.ReflectionUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -34,25 +39,55 @@ import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJs
  * @author ppodsednik
  */
 public class PluginStarter implements PluginContext {
+    public static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PluginStarter.class.getName());
+    public static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
+    public static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";
+
+    public static final String SOUT_FILE = "SOUT";
+    public static final String SERR_FILE = "SERR";
+
+    private final WorkerConfiguration workerConfig;
+
+    public PluginStarter(Map<String, String> workerProps) {
+        this.workerConfig = new WorkerConfiguration(workerProps);
+    }
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Usage: ProcessStarter <processName> <payload>");
+        /* TODO
+        if (args.length < 4) {
+            System.err.println("Usage: PluginStarter <pluginPath> <pluginName> <mainClassName> <payloadBase64> [pluginArgs...]");
             System.exit(1);
-        }
+        }*/
 
-        String pluginPath = args[0];  // e.g., "import"
-        String pluginName = args[1];  // e.g., "import"
-        String mainClassName = args[2];  // e.g., "import"
+        String workerConfigBase64 = args[0];
+        String pluginId = args[1];
+        String profileId = args[2];
+        String mainClassName = args[3];
+        String payloadBase64 = args[4];
 
+        PrintStream outStream = null;
+        PrintStream errStream = null;
         try {
-            String encodedPayload = args[3];
-            String payloadJson = new String(Base64.getDecoder().decode(encodedPayload), StandardCharsets.UTF_8);
-            //Map<String, String> payload = new ObjectMapper().readValue(payloadJson, new TypeReference<>() {});
-            Map<String, String> payload = parseSimpleJson(payloadJson);
+            outStream = createPrintStream(System.getProperty(SOUT_FILE));
+            errStream = createPrintStream(System.getProperty(SERR_FILE));
+            System.setErr(errStream);
+            System.setOut(outStream);
 
-            PluginContextHolder.setContext(new PluginStarter());
-            ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(pluginPath), pluginName);
+            setDefaultLoggingIfNecessary();
+
+            LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
+            LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
+
+
+            String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
+            Map<String, String> payload = parseSimpleJson(payloadJson);
+            String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
+            Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
+            // Set plugin context
+            PluginContextHolder.setContext(new PluginStarter(workerProps));
+
+            // Load plugin class
+            ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerProps.get("pluginPath")), pluginId);
             ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(loader);
@@ -62,40 +97,28 @@ public class PluginStarter implements PluginContext {
                     processMethod = mainMethodType(clz);
                 }
 
-               // processMethod = mainMethodType(clz);
-
-
+                // TODO Everything after index 4 is plugin args
+                String[] pluginArgs = Arrays.copyOfRange(args, 1, args.length);
                 if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {
-                    try {
-                        Object[] params = ReflectionUtils.map(processMethod.getMethod(), args, payload);
-                        processMethod.getMethod().invoke(null, params);
-                    } catch (Throwable e) {
-                        throw new RuntimeException(e);
-                    }
+                    Object[] params = ReflectionUtils.map(processMethod.getMethod(), pluginArgs, payload);
+                    processMethod.getMethod().invoke(null, params);
                 } else {
-                    try {
-                        Object[] objs = new Object[1];
-                        objs[0] = args;
-                        processMethod.getMethod().invoke(null, objs);
-                        //processMethod.getMethod().invoke(null, (Object) args);
-                    } catch (Throwable e) {
-                        throw new RuntimeException(e);
-                    }
+                    processMethod.getMethod().invoke(null, (Object) pluginArgs);
                 }
+
             } finally {
                 Thread.currentThread().setContextClassLoader(oldCl);
             }
-            //String pid = getPID();
-            //updatePID(pid);
         } catch (Throwable e) {
-            System.err.println("Failed to start process: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Failed to start plugin process: " + e.getMessage());
+            e.printStackTrace(System.err);
+            System.exit(2);
         }
     }
 
     @Override
     public void updateTaskState(String taskId, String taskState) {
-        // TODO must be able to call worker's PluginEndpoint
+        // TODO: Implement REST call to worker's PluginEndpoint
     }
 
     @Override
@@ -110,8 +133,20 @@ public class PluginStarter implements PluginContext {
 
     @Override
     public void scheduleProcess(String processDefinition) {
-
+        System.out.println("TestPlugin1.scheduleProcess:" + processDefinition);
     }
 
+    private static PrintStream createPrintStream(String file) throws FileNotFoundException {
+        return new PrintStream(new FileOutputStream(file));
+    }
+
+    private static void setDefaultLoggingIfNecessary() {
+        String classProperty = System.getProperty(LOGGING_CLASS_PROPERTY);
+        String fileProperty = System.getProperty(LOGGING_FILE_PROPERTY);
+        if ((classProperty == null) && (fileProperty == null)) {
+            // loads default logging
+            new LoggingLoader();
+        }
+    }
 
 }

@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -24,6 +26,9 @@ import java.util.Properties;
  * @author ppodsednik
  */
 public class WorkerConfiguration {
+    public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
+    public static final String DEFAULT_WORKER_WORKDIR = WORKING_DIR + File.separator + "worker";
+
     private final Properties props = new Properties();
 
     public WorkerConfiguration(Properties fileProps) {
@@ -37,6 +42,20 @@ public class WorkerConfiguration {
         for (String name : fileProps.stringPropertyNames()) {
             props.putIfAbsent(name, fileProps.getProperty(name));
         }
+
+    }
+
+    // Overloaded constructor for Map-based initialization
+    public WorkerConfiguration(Map<String, String> directProps) {
+        props.putAll(directProps);
+    }
+
+    public Map<String, String> getAll() {
+        Map<String, String> result = new HashMap<>();
+        for (String name : props.stringPropertyNames()) {
+            result.put(name, props.getProperty(name));
+        }
+        return result;
     }
 
     /**
