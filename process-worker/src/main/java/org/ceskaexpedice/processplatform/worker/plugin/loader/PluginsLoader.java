@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.plugin.utils;
+package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginProfile;
 
 import java.io.File;
 import java.net.MalformedURLException;

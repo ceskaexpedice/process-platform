@@ -18,9 +18,10 @@ package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfoMapper;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
+import org.ceskaexpedice.processplatform.worker.utils.ManagerClient;
+import org.ceskaexpedice.processplatform.worker.utils.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -58,7 +59,7 @@ public class WorkerMain {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + pluginInfo);
-            PluginInfoTO pluginInfoTO = PluginInfoMapper.toTO(pluginInfo);
+            PluginInfoTO pluginInfoTO = Utils.toTO(pluginInfo);
             managerClient.registerPlugin(pluginInfoTO);
         }
     }

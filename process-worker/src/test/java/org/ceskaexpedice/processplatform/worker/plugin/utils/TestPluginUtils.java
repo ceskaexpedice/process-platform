@@ -14,15 +14,17 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.utils;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfoMapper;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.*;
+
+import static org.ceskaexpedice.processplatform.worker.Constants.PLUGIN_PATH;
 
 /**
  * TestPluginUtils
@@ -41,7 +43,7 @@ public class TestPluginUtils {
     @Test
     public void testPluginJvmLauncher() {
         Properties props = new Properties();
-        props.put("pluginPath", "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
+        props.put(PLUGIN_PATH, "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
 
         //props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
 

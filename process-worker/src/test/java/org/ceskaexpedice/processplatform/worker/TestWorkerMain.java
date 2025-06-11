@@ -15,13 +15,8 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginsLoader;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.util.List;
 import java.util.Properties;
 
 import static org.mockito.Mockito.mock;

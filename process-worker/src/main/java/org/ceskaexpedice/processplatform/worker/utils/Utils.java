@@ -16,7 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils;
 
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 
 import javax.servlet.ServletContextEvent;
 import java.io.File;
@@ -72,5 +74,25 @@ public final class Utils {
         return classpath.toString();
     }
 
+    public static PluginInfoTO toTO(PluginInfo pluginInfo) {
+        /*
+        List<PluginProfileTO> profiles = pluginInfo.getProfiles().stream()
+                .map(profile -> new PluginProfileTO(
+                        profile.getProfileId(),
+                        pluginInfo.getPluginId(),
+                        profile.getStaticParams(),
+                        profile.getJvmArgs()
+                ))
+                .collect(Collectors.toList());
+
+        return new PluginInfoTO(
+                pluginInfo.getPluginId(),
+                pluginInfo.getDescription(),
+                pluginInfo.getMainClass(),
+                profiles
+        );
+
+         */ return null;
+    }
 
 }

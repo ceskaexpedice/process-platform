@@ -19,7 +19,8 @@ package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.utils.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.utils.ManagerClient;
 
 import java.util.Optional;
 
