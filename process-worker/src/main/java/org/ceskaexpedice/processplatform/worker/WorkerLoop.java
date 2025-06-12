@@ -40,12 +40,6 @@ class WorkerLoop {
     }
 
     void start() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // TODO Logger
-            System.out.println("Shutdown signal received. Stopping worker...");
-            stop();
-        }));
-
         Thread pollingThread = new Thread(() -> {
             while (running) {
                 try {

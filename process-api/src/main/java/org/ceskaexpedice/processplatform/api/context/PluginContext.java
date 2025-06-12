@@ -16,17 +16,17 @@
  */
 package org.ceskaexpedice.processplatform.api.context;
 
+import org.ceskaexpedice.processplatform.api.ProcessState;
+
 /**
  * PluginContext
  * @author ppodsednik
  */
 public interface PluginContext {
 
-    void updateTaskState(String taskId, String taskState);
+    void updateProcessState(ProcessState processState);
 
-    void updateTaskPid(String taskId, String pid);
-
-    void updateTaskName(String taskId, String name);
+    void updateProcessName(String name);
 
     void scheduleProcess(String processDefinition);
 

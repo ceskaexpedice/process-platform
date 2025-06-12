@@ -16,18 +16,20 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
+import org.ceskaexpedice.processplatform.api.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
+import org.ceskaexpedice.processplatform.api.ProcessState;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.utils.logging.LoggingLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.logging.Level;
 
 import static org.ceskaexpedice.processplatform.worker.Constants.*;
 import static org.ceskaexpedice.processplatform.worker.plugin.executor.ReflectionUtils.annotatedMethodType;
@@ -38,25 +40,29 @@ import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJs
  * @author ppodsednik
  */
 public class PluginStarter implements PluginContext {
-    public static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PluginStarter.class.getName());
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PluginStarter.class.getName());
+    private static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
+    private static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";
 
     private final WorkerConfiguration workerConfig;
 
-    public PluginStarter(Map<String, String> workerProps) {
-        this.workerConfig = new WorkerConfiguration(workerProps);
+    public PluginStarter(WorkerConfiguration workerConfiguration) {
+        this.workerConfig = workerConfiguration;
     }
 
     public static void main(String[] args) {
-        /* TODO
-        if (args.length < 4) {
-            System.err.println("Usage: PluginStarter <pluginPath> <pluginName> <mainClassName> <payloadBase64> [pluginArgs...]");
-            System.exit(1);
-        }*/
         String mainClass = System.getProperty(MAIN_CLASS_KEY);
         String pluginId = System.getProperty(PLUGIN_ID_KEY);
         String profileId = System.getProperty(PROFILE_ID_KEY);
+
         String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64);
+        String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
+        Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
+        WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
+
         String payloadBase64 = System.getProperty(PLUGIN_PAYLOAD_BASE64);
+        String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
+        Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
 
         PrintStream outStream = null;
         PrintStream errStream = null;
@@ -65,63 +71,100 @@ public class PluginStarter implements PluginContext {
             errStream = createPrintStream(System.getProperty(SERR_FILE));
             System.setErr(errStream);
             System.setOut(outStream);
-
             setDefaultLoggingIfNecessary();
-
             LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
             LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
 
+            String pid = getPID();
+            updatePID(pid);
 
-            String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
-            Map<String, String> payload = parseSimpleJson(payloadJson);
-            String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
-            Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
-            // Set plugin context
-            PluginContextHolder.setContext(new PluginStarter(workerProps));
-
-            // Load plugin class
-            ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerProps.get(PLUGIN_PATH)), pluginId);
-            ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            PluginContextHolder.setContext(new PluginStarter(workerConfig));
+            runPlugin(pluginId, mainClass, pluginPayload, workerConfig);
+            checkErrorFile();
+            PluginContextHolder.getContext().updateProcessState(ProcessState.FINISHED);
+        } catch (WarningException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             try {
-                Thread.currentThread().setContextClassLoader(loader);
-                Class<?> clz = loader.loadClass(mainClass);
-                ReflectionUtils.MethodType processMethod = annotatedMethodType(clz);
-                if (processMethod == null) {
-                    // TODO processMethod = mainMethodType(clz);
+                PluginContextHolder.getContext().updateProcessState(ProcessState.WARNING);
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+            if (outStream != null) {
+                try {
+                    outStream.close();
+                } catch (Exception e1) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
-
-                // TODO Everything after index 4 is plugin args
-                //String[] pluginArgs = Arrays.copyOfRange(args, 0, args.length);
-                String[] pluginArgs = {};
-                if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {
-                    Object[] params = ReflectionUtils.map(processMethod.getMethod(), pluginArgs, payload);
-                    processMethod.getMethod().invoke(null, params);
-                } else {
-                    // TODO processMethod.getMethod().invoke(null, (Object) pluginArgs);
+            }
+            if (errStream != null) {
+                try {
+                    errStream.close();
+                } catch (Exception e1) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
-
-            } finally {
-                Thread.currentThread().setContextClassLoader(oldCl);
             }
         } catch (Throwable e) {
-            System.err.println("Failed to start plugin process: " + e.getMessage());
-            e.printStackTrace(System.err);
-            System.exit(2);
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            try {
+                PluginContextHolder.getContext().updateProcessState(ProcessState.FAILED);
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            }
+            if (outStream != null) {
+                try {
+                    outStream.close();
+                } catch (Exception e1) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+            if (errStream != null) {
+                try {
+                    errStream.close();
+                } catch (Exception e1) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        } finally {
+            // TODO is it necessary to shutdown AkubraRepo here?
+            /*
+            String uuid = System.getProperty(ProcessStarter.UUID_KEY);
+            String closeTokenFlag = System.getProperty(AUTOMATIC_CLOSE_TOKEN, "true");
+            if (closeTokenFlag != null && closeTokenFlag.trim().toLowerCase().equals("true")) {
+                ProcessUtils.closeToken(uuid);
+            }*/
+        }
+    }
+
+    private static void runPlugin(String pluginId, String mainClass, Map<String, String> pluginPayload, WorkerConfiguration workerConfig)
+            throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerConfig.get(PLUGIN_PATH)), pluginId);
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(loader);
+            Class<?> clz = loader.loadClass(mainClass);
+            ReflectionUtils.MethodType processMethod = annotatedMethodType(clz);
+            if (processMethod == null) {
+                throw new IllegalStateException("Could not find process method for class: " + mainClass);
+            }
+            String[] pluginArgs = {}; // TODO
+            if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {
+                Object[] params = ReflectionUtils.map(processMethod.getMethod(), pluginArgs, pluginPayload);
+                processMethod.getMethod().invoke(null, params);
+            } else {
+                // TODO processMethod.getMethod().invoke(null, (Object) pluginArgs);
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
 
     @Override
-    public void updateTaskState(String taskId, String taskState) {
+    public void updateProcessState(ProcessState processState) {
         // TODO: Implement REST call to worker's PluginEndpoint
     }
 
     @Override
-    public void updateTaskPid(String taskId, String pid) {
-
-    }
-
-    @Override
-    public void updateTaskName(String taskId, String name) {
+    public void updateProcessName(String name) {
 
     }
 
@@ -141,6 +184,47 @@ public class PluginStarter implements PluginContext {
             // loads default logging
             new LoggingLoader();
         }
+    }
+
+    /**
+     * Returns PID of process
+     *
+     * @return
+     */
+    private static String getPID() {
+        String pid = null;
+        String name = ManagementFactory.getRuntimeMXBean().getName();
+        String[] split = name.split("@");
+        if ((split != null) && (split.length > 1)) {
+            pid = split[0];
+        }
+        return pid;
+    }
+
+    private static void updatePID(String pid) {
+        // TODO call worker PluginAgent to pass the pid to the manager
+
+        /*
+        try {
+            PID_UPDATED_BY_ME = ProcessUpdatingChannel.getChannel().updatePID(pid);
+        } catch (ClassNotFoundException e) {
+            throw new IOException(e);
+        } catch (IllegalAccessException e) {
+            throw new IOException(e);
+        } catch (InstantiationException e) {
+            throw new IOException(e);
+        }*/
+    }
+
+    private static void checkErrorFile() {
+        /* TODO
+        if (Boolean.getBoolean(ProcessStarter.SHOULD_CHECK_ERROR_STREAM)) {
+            String serrFileName = System.getProperty(SERR_FILE);
+            File serrFile = new File(serrFileName);
+            if (serrFile.length() > 0) throw new WarningException("system error file contains errors");
+        }
+
+         */
     }
 
 }

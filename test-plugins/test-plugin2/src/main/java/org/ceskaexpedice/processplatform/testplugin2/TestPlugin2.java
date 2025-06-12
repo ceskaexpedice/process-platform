@@ -1,15 +1,15 @@
-package org.ceskaexpedice.processplatform.testplugin1;
+package org.ceskaexpedice.processplatform.testplugin2;
 import org.apache.commons.lang3.StringUtils;
 import org.ceskaexpedice.processplatform.api.annotations.ParameterName;
 import org.ceskaexpedice.processplatform.api.annotations.ProcessPlugin;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 
-public class TestPlugin1 {
+public class TestPlugin2 {
 
     @ProcessPlugin
-    public static void process(@ParameterName("name") String name, @ParameterName("surname") String surname) {
-        System.out.println("TestPlugin1.process:" + name + ":" + surname);
+    public static void process() {
+        System.out.println("TestPlugin2.process");
 
         PluginContext pluginContext = PluginContextHolder.getContext();
         pluginContext.scheduleProcess("SomeProcess");

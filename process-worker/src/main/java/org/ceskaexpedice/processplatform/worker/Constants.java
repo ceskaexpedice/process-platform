@@ -17,10 +17,6 @@
 package org.ceskaexpedice.processplatform.worker;
 
 public final class Constants {
-
-    public static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
-    public static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";
-
     public static final String SOUT_FILE = "SOUT";
     public static final String SERR_FILE = "SERR";
     public static final String MAIN_CLASS_KEY = "mainClass";
@@ -30,5 +26,4 @@ public final class Constants {
     public static final String UUID_KEY = "uuid";
     public static final String WORKER_CONFIG_BASE64 = "workerConfigBase64";
     public static final String PLUGIN_PAYLOAD_BASE64 = "pluginPayloadBase64";
-
 }

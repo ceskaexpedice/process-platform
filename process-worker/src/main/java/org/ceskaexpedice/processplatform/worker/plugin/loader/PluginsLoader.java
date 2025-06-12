@@ -22,9 +22,8 @@ import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginProfile;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
+import java.security.CodeSource;
 import java.util.*;
 
 /**
@@ -35,17 +34,11 @@ public final class PluginsLoader {
 
     private PluginsLoader() {}
 
-    public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
-        File pluginDir = new File(pluginsDir, pluginId);
-        if (!pluginDir.exists() || !pluginDir.isDirectory()) {
-            throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
-        }
-
+    public static URLClassLoader createPluginClassLoader(File pluginDir) {
         File[] jars = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jars == null || jars.length == 0) {
             throw new IllegalStateException("No JAR files found in: " + pluginDir.getAbsolutePath());
         }
-
         URL[] urls = new URL[jars.length];
         for (int i = 0; i < jars.length; i++) {
             try {
@@ -54,36 +47,46 @@ public final class PluginsLoader {
                 throw new RuntimeException(e);
             }
         }
-
         return new URLClassLoader(urls, PluginsLoader.class.getClassLoader());
+    }
+
+    public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
+        File pluginDir = new File(pluginsDir, pluginId);
+        if (!pluginDir.exists() || !pluginDir.isDirectory()) {
+            throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
+        }
+        return createPluginClassLoader(pluginDir);
     }
 
     public static List<PluginInfo> load(File pluginsDir) {
         List<PluginInfo> result = new ArrayList<>();
+        File[] pluginsDirDirs = pluginsDir.listFiles(File::isDirectory);
+        if (pluginsDirDirs == null){
+            return result;
+        }
 
-        File[] pluginDirs = pluginsDir.listFiles(File::isDirectory);
-        if (pluginDirs == null) return result;
-
-        for (File pluginDir : pluginDirs) {
-            URL[] jarUrls = Arrays.stream(Objects.requireNonNull(pluginDir.listFiles((dir, name) -> name.endsWith(".jar"))))
-                    .map(f -> {
-                        try {
-                            return f.toURI().toURL();
-                        } catch (Exception e) {
-                            throw new RuntimeException("Invalid JAR: " + f, e);
-                        }
-                    })
-                    .toArray(URL[]::new);
-
-            URLClassLoader pluginClassLoader = new URLClassLoader(jarUrls, PluginsLoader.class.getClassLoader());
+        for (File pluginDir : pluginsDirDirs) {
+            URLClassLoader pluginClassLoader = createPluginClassLoader(pluginDir);
 
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
-                File pluginJar = new File(pluginDir, "plugin.jar"); // TODO
+                // Get the JAR file from which the plugin was loaded
+                CodeSource codeSource = plugin.getClass().getProtectionDomain().getCodeSource();
+                File pluginJar;
+                if (codeSource != null && codeSource.getLocation() != null) {
+                    URI uri;
+                    try {
+                        uri = codeSource.getLocation().toURI();
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                    pluginJar = new File(uri);  // This should be the actual JAR file
+                } else {
+                    throw new IllegalStateException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
+                }
                 File profilesDir = new File(pluginDir, "profiles"); // TODO
                 PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, profilesDir);
                 result.add(pluginInfo);
-                //result.add(new PluginInfo(plugin.getPluginId(), plugin.getDescription(), plugin.getMainClass(), pluginDir));
             }
         }
 
