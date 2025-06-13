@@ -21,9 +21,11 @@ import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.PLUGIN_PATH;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * TestPluginJvmLauncher
@@ -34,74 +36,62 @@ public class TestPluginJvmLauncher {
 
     @Test
     public void testPlugin1JvmLauncher() {
+        URL resource = getClass().getClassLoader().getResource("plugins");
+        assertNotNull(resource, "Plugins directory not found in test resources");
+
         Properties props = new Properties();
-        props.put(PLUGIN_PATH, "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
-
-        //props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
-
-
+        props.put(PLUGIN_PATH_KEY, resource.getFile());
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
-        //workerConfiguration.set("starter.classpath", "target/test-classes" + File.pathSeparator + "libs/*");
         String starterClasspath = System.getProperty("java.class.path");
-        workerConfiguration.set("starter.classpath", starterClasspath);
+        workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
 
         List<String> jvmArgs = new ArrayList<>();
         jvmArgs.add("-Xmx1024m");
         jvmArgs.add("-Xms256m");
         jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
 
-        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(workerConfiguration.get("pluginPath").toString()));
-        for (PluginInfo pluginInfo : pluginInfos) {
-            if(pluginInfo.getPluginId().equals("testPlugin1")){
-                Map<String,String> payload = new HashMap<>();
-                payload.put("name","Petr");
-                payload.put("surname","Harasil");
-                ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
-                        UUID.randomUUID(),
-                        pluginInfo.getPluginId(),
-                        "profileId",
-                        pluginInfo.getMainClass(),
-                        jvmArgs,
-                        payload);
-                PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
-            }
-        }
+        Map<String,String> payload = new HashMap<>();
+        payload.put("name","Petr");
+        payload.put("surname","Harasil");
 
+        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+                UUID.randomUUID(),
+                "testPlugin1",
+                "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                payload,
+                jvmArgs);
+
+        PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
+        // TODO add asserts
     }
 
     @Test
     public void testPlugin2JvmLauncher() {
+        URL resource = getClass().getClassLoader().getResource("plugins");
+        assertNotNull(resource, "Plugins directory not found in test resources");
+
         Properties props = new Properties();
-        props.put(PLUGIN_PATH, "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
-
-        //props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
-
-
+        props.put(PLUGIN_PATH_KEY, resource.getFile());
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
-        //workerConfiguration.set("starter.classpath", "target/test-classes" + File.pathSeparator + "libs/*");
         String starterClasspath = System.getProperty("java.class.path");
-        workerConfiguration.set("starter.classpath", starterClasspath);
+        workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
 
         List<String> jvmArgs = new ArrayList<>();
         jvmArgs.add("-Xmx1024m");
         jvmArgs.add("-Xms256m");
-        jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
+        //jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
 
-        List<PluginInfo> pluginInfos = PluginsLoader.load(new File(workerConfiguration.get("pluginPath").toString()));
-        for (PluginInfo pluginInfo : pluginInfos) {
-            if(pluginInfo.getPluginId().equals("testPlugin2")){
-                Map<String,String> payload = new HashMap<>();
-                ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
-                        UUID.randomUUID(),
-                        pluginInfo.getPluginId(),
-                        "profileId",
-                        pluginInfo.getMainClass(),
-                        jvmArgs,
-                        payload);
-                PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
-            }
-        }
+        Map<String,String> payload = new HashMap<>();
 
+        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+                UUID.randomUUID(),
+                "testPlugin2",
+                "org.ceskaexpedice.processplatform.testplugin2.TestPlugin2",
+                payload,
+                jvmArgs);
+
+        PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
+        // TODO add asserts
     }
 
 }

@@ -59,7 +59,7 @@ public class WorkerMain {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + pluginInfo);
-            PluginInfoTO pluginInfoTO = Utils.toTO(pluginInfo);
+            PluginInfoTO pluginInfoTO = toTO(pluginInfo);
             managerClient.registerPlugin(pluginInfoTO);
         }
     }
@@ -67,4 +67,27 @@ public class WorkerMain {
     public void shutdown() {
         workerLoop.stop();
     }
+
+    private static PluginInfoTO toTO(PluginInfo pluginInfo) {
+        /* TODO
+        List<PluginProfileTO> profiles = pluginInfo.getProfiles().stream()
+                .map(profile -> new PluginProfileTO(
+                        profile.getProfileId(),
+                        pluginInfo.getPluginId(),
+                        profile.getStaticParams(),
+                        profile.getJvmArgs()
+                ))
+                .collect(Collectors.toList());
+
+        return new PluginInfoTO(
+                pluginInfo.getPluginId(),
+                pluginInfo.getDescription(),
+                pluginInfo.getMainClass(),
+                profiles
+        );
+
+         */ return null;
+    }
+
+
 }

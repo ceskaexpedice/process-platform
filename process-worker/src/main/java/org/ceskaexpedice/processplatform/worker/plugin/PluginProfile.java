@@ -16,6 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,26 +27,15 @@ import java.util.Map;
  * @author ppodsednik
  */
 public class PluginProfile {
-    private final String profileId;        // e.g. "import-cgi"
-    //private final String pluginId;         // base plugin, e.g. "import"
-    private final Map<String, String> staticParams;  // e.g. {"pars": "ADD"}
-    private final List<String> jvmArgs;    // e.g. ["-Xmx1G"]
-
-    public PluginProfile(String profileId, String pluginId, Map<String, String> staticParams, List<String> jvmArgs) {
-        this.profileId = profileId;
-        this.staticParams = staticParams;
-        this.jvmArgs = jvmArgs;
-    }
-
-    /*
-    public class PluginProfile {
     private final String profileId;
-    private final List<String> staticParams;
     private final List<String> jvmArgs;
 
-    public PluginProfile(String profileId, List<String> staticParams, List<String> jvmArgs) {
+    @JsonCreator
+    public PluginProfile(
+            @JsonProperty("profileId") String profileId,
+            @JsonProperty("jvmArgs") List<String> jvmArgs
+    ) {
         this.profileId = profileId;
-        this.staticParams = staticParams;
         this.jvmArgs = jvmArgs;
     }
 
@@ -51,50 +43,7 @@ public class PluginProfile {
         return profileId;
     }
 
-    public List<String> getStaticParams() {
-        return staticParams;
-    }
-
     public List<String> getJvmArgs() {
         return jvmArgs;
     }
 }
-
-
-     */
-
-    // Getters...
-}
-/*
-[
-  {
-    "pluginId": "import",
-    "description": "Import plugin",
-    "mainClass": "cz.kramerius.plugins.importer.Main",
-    "profiles": [
-      {
-        "profileId": "import-cgi",
-        "pluginId": "import",
-        "staticParams": {
-          "pars": "ADD"
-        },
-        "jvmArgs": [
-          "-Xmx1G"
-        ]
-      },
-      {
-        "profileId": "import-cgi-remove",
-        "pluginId": "import",
-        "staticParams": {
-          "pars": "REMOVE"
-        },
-        "jvmArgs": [
-          "-Xmx1G"
-        ]
-      }
-    ]
-  }
-]
-
-
- */

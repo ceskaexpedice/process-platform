@@ -15,14 +15,14 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.plugin.PluginProfile;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TestPluginsLoader
@@ -39,6 +39,34 @@ public class TestPluginsLoader {
         File pluginDir = new File(resource.getFile());
         List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
         assertEquals(2, pluginInfos.size());
+        PluginInfo testPlugin1 = null;
+        PluginInfo testPlugin2 = null;
+        for (PluginInfo pluginInfo : pluginInfos) {
+            if(pluginInfo.getPluginId().equals("testPlugin1")){
+                testPlugin1 = pluginInfo;
+            }else{
+                testPlugin2 = pluginInfo;
+            }
+        }
+        assertNotNull(testPlugin1);
+        assertNotNull(testPlugin2);
+        assertEquals(3, testPlugin1.getProfiles().size());
+        PluginProfile profileBiggest = null;
+        for (PluginProfile profile : testPlugin1.getProfiles()) {
+            if(profile.getProfileId().equals("testPlugin1-big")){
+                profileBiggest = profile;
+            }
+        }
+        assertNotNull(profileBiggest);
+        boolean biggestXmx = false;
+        for (String jvmArg : profileBiggest.getJvmArgs()) {
+            if(jvmArg.equals("-Xmx64g")){
+                biggestXmx = true;
+            }
+        }
+        assertTrue(biggestXmx); // make sure it was overriden in the process
+
+        assertEquals(1, testPlugin2.getProfiles().size());
     }
 
 }

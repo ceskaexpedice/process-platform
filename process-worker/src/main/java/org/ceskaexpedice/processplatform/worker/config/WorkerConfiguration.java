@@ -28,6 +28,8 @@ import java.util.Properties;
 public class WorkerConfiguration {
     public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
     public static final String DEFAULT_WORKER_WORKDIR = WORKING_DIR + File.separator + "worker";
+    public static final String PLUGIN_PATH_KEY = "pluginPath";
+    public static final String STARTER_CLASSPATH_KEY = "starterClasspath";
 
     private final Properties props = new Properties();
 

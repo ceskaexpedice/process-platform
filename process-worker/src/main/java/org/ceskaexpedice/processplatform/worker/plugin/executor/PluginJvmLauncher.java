@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.*;
+import static org.ceskaexpedice.processplatform.worker.plugin.executor.PluginStarter.*;
 
 /**
  * PluginJvmLauncher
@@ -71,10 +71,10 @@ public final class PluginJvmLauncher {
 
         String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
         String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
-        command.add("-D" + WORKER_CONFIG_BASE64 + "=" + encodedConfig);
+        command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
 
         command.add("-cp");
-        String starterClasspath = workerConfiguration.get("starter.classpath");
+        String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
         command.add(starterClasspath);
 
         command.add(PluginStarter.class.getName());
@@ -88,16 +88,15 @@ public final class PluginJvmLauncher {
         }
         command.add("-D" + MAIN_CLASS_KEY + "="  + scheduledProcessTO.getMainClass());
         command.add("-D" + PLUGIN_ID_KEY + "="  + scheduledProcessTO.getPluginId());
-        command.add("-D" + PROFILE_ID_KEY + "="  + scheduledProcessTO.getProfileId());
         command.add("-D" + UUID_KEY + "="  + scheduledProcessTO.getProcessId());
         String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
         String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
-        command.add("-D" + PLUGIN_PAYLOAD_BASE64 + "=" + encodedPayload);
+        command.add("-D" + PLUGIN_PAYLOAD_BASE64_KEY + "=" + encodedPayload);
         File processWorkingDir = processWorkingDirectory(scheduledProcessTO.getProcessId());
         File standardStreamFile = standardOutFile(processWorkingDir);
         File errStreamFile = errorOutFile(processWorkingDir);
-        command.add("-D" + SOUT_FILE + "=" + standardStreamFile.getAbsolutePath());
-        command.add("-D" + SERR_FILE + "=" + errStreamFile.getAbsolutePath());
+        command.add("-D" + SOUT_FILE_KEY + "=" + standardStreamFile.getAbsolutePath());
+        command.add("-D" + SERR_FILE_KEY + "=" + errStreamFile.getAbsolutePath());
     }
 
     private static File processWorkingDirectory(UUID processId) {

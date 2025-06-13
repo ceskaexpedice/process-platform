@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.*;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.ceskaexpedice.processplatform.worker.plugin.executor.ReflectionUtils.annotatedMethodType;
 import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
@@ -44,6 +44,14 @@ public class PluginStarter implements PluginContext {
     private static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
     private static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";
 
+    public static final String MAIN_CLASS_KEY = "mainClass";
+    public static final String PLUGIN_ID_KEY = "pluginId";
+    public static final String UUID_KEY = "uuid";
+    public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
+    public static final String PLUGIN_PAYLOAD_BASE64_KEY = "pluginPayloadBase64";
+    public static final String SOUT_FILE_KEY = "SOUT";
+    public static final String SERR_FILE_KEY = "SERR";
+
     private final WorkerConfiguration workerConfig;
 
     public PluginStarter(WorkerConfiguration workerConfiguration) {
@@ -53,22 +61,21 @@ public class PluginStarter implements PluginContext {
     public static void main(String[] args) {
         String mainClass = System.getProperty(MAIN_CLASS_KEY);
         String pluginId = System.getProperty(PLUGIN_ID_KEY);
-        String profileId = System.getProperty(PROFILE_ID_KEY);
 
-        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64);
+        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
         Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
         WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
 
-        String payloadBase64 = System.getProperty(PLUGIN_PAYLOAD_BASE64);
+        String payloadBase64 = System.getProperty(PLUGIN_PAYLOAD_BASE64_KEY);
         String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
         Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
 
         PrintStream outStream = null;
         PrintStream errStream = null;
         try {
-            outStream = createPrintStream(System.getProperty(SOUT_FILE));
-            errStream = createPrintStream(System.getProperty(SERR_FILE));
+            outStream = createPrintStream(System.getProperty(SOUT_FILE_KEY));
+            errStream = createPrintStream(System.getProperty(SERR_FILE_KEY));
             System.setErr(errStream);
             System.setOut(outStream);
             setDefaultLoggingIfNecessary();
@@ -137,7 +144,7 @@ public class PluginStarter implements PluginContext {
 
     private static void runPlugin(String pluginId, String mainClass, Map<String, String> pluginPayload, WorkerConfiguration workerConfig)
             throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerConfig.get(PLUGIN_PATH)), pluginId);
+        ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerConfig.get(PLUGIN_PATH_KEY)), pluginId);
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(loader);

@@ -1,0 +1,17 @@
+[
+  {
+    "profileId": "testPlugin1-big",
+    "jvmArgs": [
+      "-Xms1g",
+      "-Xmx32g"
+    ]
+  },
+  {
+    "profileId": "testPlugin1-small",
+    "jvmArgs": [
+      "-Xms1g",
+      "-Xmx4g"
+    ]
+  }
+]
+

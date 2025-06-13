@@ -64,42 +64,46 @@ public final class PluginsLoader {
         if (pluginsDirDirs == null){
             return result;
         }
-
         for (File pluginDir : pluginsDirDirs) {
             URLClassLoader pluginClassLoader = createPluginClassLoader(pluginDir);
-
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
-                // Get the JAR file from which the plugin was loaded
-                CodeSource codeSource = plugin.getClass().getProtectionDomain().getCodeSource();
-                File pluginJar;
-                if (codeSource != null && codeSource.getLocation() != null) {
-                    URI uri;
-                    try {
-                        uri = codeSource.getLocation().toURI();
-                    } catch (URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-                    pluginJar = new File(uri);  // This should be the actual JAR file
-                } else {
-                    throw new IllegalStateException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
-                }
-                File profilesDir = new File(pluginDir, "profiles"); // TODO
-                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, profilesDir);
+                File pluginJar = getPluginJar(plugin);
+                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, pluginDir);
                 result.add(pluginInfo);
             }
         }
-
         return result;
     }
 
-    private static PluginInfo resolvePlugin(ProcessPlugin pluginInstance, File pluginJar, File profilesDir) {
-        String pluginId = pluginInstance.getPluginId();
-        String description = pluginInstance.getDescription();
-        String mainClass = pluginInstance.getMainClass();
-        Map<String, PayloadFieldSpec> payloadSpec = pluginInstance.getPayloadSpec();
+    private static File getPluginJar(ProcessPlugin plugin) {
+        CodeSource codeSource = plugin.getClass().getProtectionDomain().getCodeSource();
+        File pluginJar;
+        if (codeSource != null && codeSource.getLocation() != null) {
+            URI uri;
+            try {
+                uri = codeSource.getLocation().toURI();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            pluginJar = new File(uri);
+        } else {
+            throw new IllegalStateException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
+        }
+        return pluginJar;
+    }
 
-        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, profilesDir, pluginId);
+    private static PluginInfo resolvePlugin(ProcessPlugin plugin, File pluginJar, File pluginDir) {
+        String pluginId = plugin.getPluginId();
+        String description = plugin.getDescription();
+        String mainClass = plugin.getMainClass();
+        Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
+
+        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
+        if(profiles.isEmpty()){
+            PluginProfile defaultProfile = new PluginProfile(pluginId, new ArrayList<>());
+            profiles.add(defaultProfile);
+        }
 
         return new PluginInfo(pluginId, description, mainClass, payloadSpec, profiles);
     }

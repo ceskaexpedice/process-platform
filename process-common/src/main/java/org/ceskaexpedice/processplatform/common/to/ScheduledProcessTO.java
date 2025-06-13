@@ -27,23 +27,20 @@ import java.util.UUID;
 public class ScheduledProcessTO {
     private UUID processId;
     private String pluginId;
-    private String profileId;
     private String mainClass;
+    private Map<String, String> payload;
     private List<String> jvmArgs;
-    private Map<String, String> payload;  // JSON payload varies by plugin
-    // importDir: c:\pavel
 
     public ScheduledProcessTO() {
     }
 
-    public ScheduledProcessTO(UUID processId, String pluginId, String profileId, String mainClass, List<String> jvmArgs,
-                              Map<String, String> payload) {
+    public ScheduledProcessTO(UUID processId, String pluginId, String mainClass,
+                              Map<String, String> payload, List<String> jvmArgs) {
         this.processId = processId;
         this.pluginId = pluginId;
-        this.profileId = profileId;
         this.mainClass = mainClass;
-        this.jvmArgs = jvmArgs;
         this.payload = payload;
+        this.jvmArgs = jvmArgs;
     }
 
     public UUID getProcessId() {
@@ -52,10 +49,6 @@ public class ScheduledProcessTO {
 
     public String getPluginId() {
         return pluginId;
-    }
-
-    public String getProfileId() {
-        return profileId;
     }
 
     public String getMainClass() {
