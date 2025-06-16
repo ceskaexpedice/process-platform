@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
  * WorkerEndpoint
  * @author ppodsednik
  */
-@Path("/worker")
+@Path("/agent")
 public class AgentEndpoint {
 
     private final AgentService agentService;
