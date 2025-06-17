@@ -32,6 +32,9 @@ public class PluginInfoTO {
     private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
     private List<PluginProfileTO> profiles;
 
+    public PluginInfoTO() {
+    }
+
     public PluginInfoTO(String pluginId, String description, String mainClass,
                         Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfileTO> profiles) {
         this.pluginId = pluginId;

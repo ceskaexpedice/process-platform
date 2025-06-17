@@ -20,11 +20,12 @@ import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
-import org.ceskaexpedice.processplatform.worker.utils.ManagerClient;
-import org.ceskaexpedice.processplatform.worker.utils.Utils;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
 import java.util.List;
+
+import static org.ceskaexpedice.processplatform.worker.utils.Utils.toTO;
 
 /**
  * WorkerMain
@@ -66,27 +67,6 @@ public class WorkerMain {
 
     public void shutdown() {
         workerLoop.stop();
-    }
-
-    private static PluginInfoTO toTO(PluginInfo pluginInfo) {
-        /* TODO
-        List<PluginProfileTO> profiles = pluginInfo.getProfiles().stream()
-                .map(profile -> new PluginProfileTO(
-                        profile.getProfileId(),
-                        pluginInfo.getPluginId(),
-                        profile.getStaticParams(),
-                        profile.getJvmArgs()
-                ))
-                .collect(Collectors.toList());
-
-        return new PluginInfoTO(
-                pluginInfo.getPluginId(),
-                pluginInfo.getDescription(),
-                pluginInfo.getMainClass(),
-                profiles
-        );
-
-         */ return null;
     }
 
 

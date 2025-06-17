@@ -14,31 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.utils;
+package org.ceskaexpedice.processplatform.worker.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.logging.Level;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * ManagerClient
@@ -53,14 +55,14 @@ public class ManagerClient {
 
         //int connectTimeout = KConfiguration.getInstance().getConfiguration().getInt("cdk.forward.apache.client.connect_timeout", CONNECT_TIMEOUT);
         //int responseTimeout = KConfiguration.getInstance().getConfiguration().getInt("cdk.forward.apache.client.response_timeout", RESPONSE_TIMEOUT);
-        PoolingHttpClientConnectionManager poolConnectionManager  = new PoolingHttpClientConnectionManager();
+        PoolingHttpClientConnectionManager poolConnectionManager = new PoolingHttpClientConnectionManager();
         //poolConnectionManager.setMaxTotal(maxConnections);
         //poolConnectionManager.setDefaultMaxPerRoute(maxRoute);
 
         RequestConfig requestConfig = RequestConfig.custom()
-               // .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-              //  .setConnectTimeout(Timeout.ofSeconds(connectTimeout))
-              //  .setResponseTimeout(Timeout.ofSeconds(responseTimeout))
+                // .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
+                //  .setConnectTimeout(Timeout.ofSeconds(connectTimeout))
+                //  .setResponseTimeout(Timeout.ofSeconds(responseTimeout))
                 .build();
 
         this.closeableHttpClient = HttpClients.custom()
@@ -75,21 +77,45 @@ public class ManagerClient {
     }
 
     public void registerPlugin(PluginInfoTO pluginInfoTO) {
-        /*
-        Response response = client
-                .target(managerBaseUrl)
-                .path("/plugins/register")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(pluginInfoTO));
+        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/register-plugin";
+        HttpPost post = new HttpPost(url);
 
-        if (response.getStatus() != 200) {
-            throw new RuntimeException("Failed to register plugin: " + response.getStatus());
-        }*/
+        String json;
+        try {
+            json = mapper.writeValueAsString(pluginInfoTO);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+        post.setEntity(entity);
+
+        try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
+            int statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 204) {
+                throw new IOException("Failed to register plugin. HTTP status: " + statusCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ScheduledProcessTO getNextProcess() {
-        String url = "http://localhost:9998/process-manager/api/agent/next-process";
-        HttpGet get = apacheGet(url, false);
+        URIBuilder uriBuilder;
+        HttpGet get;
+        try {
+            uriBuilder = new URIBuilder(workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/next-process");
+            List<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_TAGS_KEY).split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+            for (String tag : tags) {
+                uriBuilder.addParameter("tags", tag);
+            }
+            URI uri = uriBuilder.build();
+            get = new HttpGet(uri);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
             if (code == 200) {
@@ -193,6 +219,20 @@ public class ManagerClient {
         }*/
     }
 
+    public void updateProcessPid(String uuid, String pid) {
+        String url = String.format("%sagent/pid/%s?pid=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), uuid, pid);
+        HttpPut httpPut = new HttpPut(url);
+
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
+            int statusCode = response.getCode();
+            if (statusCode != 200) {
+                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected HttpGet apacheGet(String url, boolean headers) {
         //LOGGER.fine(String.format("Requesting %s", url));
         HttpGet get = new HttpGet(url);
@@ -204,77 +244,5 @@ public class ManagerClient {
         }*/
         return get;
     }
-
-    // ManagerClient(WorkerConfiguration workerConfiguration) {
-        /*
-        services:
-  process-worker:
-    image: your-image-name
-    environment:
-      - MANAGER_BASE_URL=http://manager:8080/api
-      - WORKER_ID=worker-1
-      - MAX_TASKS=5
-         */
-    //String baseUrl = workerConfiguration.get("MANAGER_BASE_URL");
-    //int maxTasks = workerConfiguration.getInt("MAX_TASKS", 1);
-
-        /*
-        for (Map.Entry<String, String> entry : env.entrySet()) {
-    String key = entry.getKey().toLowerCase().replace('_', '.'); // e.g. MANAGER_BASE_URL → manager.base.url
-    props.setProperty(key, entry.getValue());
-}
-config.get("manager.base.url")
-         */
-    //  }
-
-    /*
-    public List<Task> fetchTasks() {
-        // Fake for demo. Replace with HTTP client call to manager REST endpoint.
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task("import", "{ \"file\": \"data.csv\" }"));
-        return tasks;
-    }*/
-
-    /*
-    public Optional<TaskDto> fetchTask() {
-        try {
-            URL url = new URL("http://manager-service:8080/tasks/next");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            if (conn.getResponseCode() == 200) {
-                ObjectMapper mapper = new ObjectMapper();
-                TaskDto task = mapper.readValue(conn.getInputStream(), TaskDto.class);
-                return Optional.of(task);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
-
-     */
-
-    /*
-    ProcessTask nextProcessTask() {
-        try {
-            String url = "http://manager-host:8080/api/get-process/" + "uuid";
-            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-
-            if (conn.getResponseCode() != 200) {
-                throw new IOException("Failed to get process: HTTP " + conn.getResponseCode());
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            try (InputStream is = conn.getInputStream()) {
-                return mapper.readValue(is, ProcessTask.class);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
 
 }

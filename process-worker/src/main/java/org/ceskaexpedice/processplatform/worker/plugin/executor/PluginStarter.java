@@ -20,8 +20,9 @@ import org.ceskaexpedice.processplatform.api.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 import org.ceskaexpedice.processplatform.api.ProcessState;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.utils.logging.LoggingLoader;
+import org.ceskaexpedice.processplatform.worker.plugin.logging.LoggingLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 
 import java.io.*;
@@ -53,14 +54,17 @@ public class PluginStarter implements PluginContext {
     public static final String SERR_FILE_KEY = "SERR";
 
     private final WorkerConfiguration workerConfig;
+    private final ManagerClient managerClient;
 
     public PluginStarter(WorkerConfiguration workerConfiguration) {
         this.workerConfig = workerConfiguration;
+        this.managerClient = new ManagerClient(workerConfiguration);
     }
 
     public static void main(String[] args) {
         String mainClass = System.getProperty(MAIN_CLASS_KEY);
         String pluginId = System.getProperty(PLUGIN_ID_KEY);
+        String uuid = System.getProperty(UUID_KEY);
 
         String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
@@ -83,7 +87,7 @@ public class PluginStarter implements PluginContext {
             LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
 
             String pid = getPID();
-            updatePID(pid);
+            updatePID(pid, uuid, workerConfig);
 
             PluginContextHolder.setContext(new PluginStarter(workerConfig));
             runPlugin(pluginId, mainClass, pluginPayload, workerConfig);
@@ -208,7 +212,9 @@ public class PluginStarter implements PluginContext {
         return pid;
     }
 
-    private static void updatePID(String pid) {
+    private static void updatePID(String pid, String processId, WorkerConfiguration workerConfig) {
+        ManagerClient managerClient = new ManagerClient(workerConfig);
+        managerClient.updateProcessPid(pid, processId);
         // TODO call worker PluginAgent to pass the pid to the manager
 
         /*

@@ -21,7 +21,9 @@ import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * WorkerEndpoint
@@ -44,7 +46,8 @@ public class AgentEndpoint {
 
     @GET
     @Path("/next-process")
-    public ScheduledProcessTO getNextProcess() {
+    @Produces(MediaType.APPLICATION_JSON)
+    public ScheduledProcessTO getNextProcess(@QueryParam("tags") List<String> tags) {
         return agentService.getNextScheduledProcess();
         /*
                 // Implementation: fetch next process from DB

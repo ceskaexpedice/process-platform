@@ -36,5 +36,16 @@ public class PluginProfileTO {
         this.jvmArgs = jvmArgs;
     }
 
-    // Getters and setters
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public String getPluginId() {
+        return pluginId;
+    }
+
+    public List<String> getJvmArgs() {
+        return jvmArgs;
+    }
+// Getters and setters
 }

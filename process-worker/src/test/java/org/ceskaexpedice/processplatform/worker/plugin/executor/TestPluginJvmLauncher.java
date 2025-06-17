@@ -15,15 +15,23 @@
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
+import static org.ceskaexpedice.processplatform.worker.client.TestManagerClient.BASE_URI;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -33,6 +41,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author ppodsednik
  */
 public class TestPluginJvmLauncher {
+
+    private HttpServer server;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        server.start();
+    }
+
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        server.shutdownNow();
+    }
 
     @Test
     public void testPlugin1JvmLauncher() {
@@ -44,6 +67,7 @@ public class TestPluginJvmLauncher {
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
         String starterClasspath = System.getProperty("java.class.path");
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, BASE_URI);
 
         List<String> jvmArgs = new ArrayList<>();
         jvmArgs.add("-Xmx1024m");
