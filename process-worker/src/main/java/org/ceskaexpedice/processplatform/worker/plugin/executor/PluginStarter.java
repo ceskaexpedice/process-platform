@@ -21,6 +21,7 @@ import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 import org.ceskaexpedice.processplatform.api.ProcessState;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.logging.LoggingLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
@@ -47,24 +48,24 @@ public class PluginStarter implements PluginContext {
 
     public static final String MAIN_CLASS_KEY = "mainClass";
     public static final String PLUGIN_ID_KEY = "pluginId";
-    public static final String UUID_KEY = "uuid";
+    public static final String PROCESS_ID_KEY = "processId";
     public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
     public static final String PLUGIN_PAYLOAD_BASE64_KEY = "pluginPayloadBase64";
     public static final String SOUT_FILE_KEY = "SOUT";
     public static final String SERR_FILE_KEY = "SERR";
 
-    private final WorkerConfiguration workerConfig;
+    private final WorkerConfiguration workerConfiguration;
     private final ManagerClient managerClient;
 
     public PluginStarter(WorkerConfiguration workerConfiguration) {
-        this.workerConfig = workerConfiguration;
-        this.managerClient = new ManagerClient(workerConfiguration);
+        this.workerConfiguration = workerConfiguration;
+        this.managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
     }
 
     public static void main(String[] args) {
         String mainClass = System.getProperty(MAIN_CLASS_KEY);
         String pluginId = System.getProperty(PLUGIN_ID_KEY);
-        String uuid = System.getProperty(UUID_KEY);
+        String processId = System.getProperty(PROCESS_ID_KEY);
 
         String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
@@ -85,11 +86,12 @@ public class PluginStarter implements PluginContext {
             setDefaultLoggingIfNecessary();
             LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
             LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
+            PluginContext pluginContext = PluginContextFactory.createPluginContext(workerConfig);
+            PluginContextHolder.setContext(pluginContext);
 
             String pid = getPID();
-            updatePID(pid, uuid, workerConfig);
+            updatePID(pid, processId, ((PluginStarter)pluginContext).managerClient);
 
-            PluginContextHolder.setContext(new PluginStarter(workerConfig));
             runPlugin(pluginId, mainClass, pluginPayload, workerConfig);
             checkErrorFile();
             PluginContextHolder.getContext().updateProcessState(ProcessState.FINISHED);
@@ -176,7 +178,7 @@ public class PluginStarter implements PluginContext {
 
     @Override
     public void updateProcessName(String name) {
-
+        //managerClient.
     }
 
     @Override
@@ -212,8 +214,7 @@ public class PluginStarter implements PluginContext {
         return pid;
     }
 
-    private static void updatePID(String pid, String processId, WorkerConfiguration workerConfig) {
-        ManagerClient managerClient = new ManagerClient(workerConfig);
+    private static void updatePID(String pid, String processId, ManagerClient managerClient) {
         managerClient.updateProcessPid(pid, processId);
         // TODO call worker PluginAgent to pass the pid to the manager
 

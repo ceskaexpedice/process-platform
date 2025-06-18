@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
@@ -57,7 +58,7 @@ public class WorkerMain {
         if(pluginsList.isEmpty()){
             throw new IllegalStateException("No plugins found");
         }
-        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        ManagerClient managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
         for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + pluginInfo);
             PluginInfoTO pluginInfoTO = toTO(pluginInfo);

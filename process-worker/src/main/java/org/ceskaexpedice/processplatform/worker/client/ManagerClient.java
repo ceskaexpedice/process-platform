@@ -51,7 +51,7 @@ public class ManagerClient {
     private final CloseableHttpClient closeableHttpClient;
     ObjectMapper mapper = new ObjectMapper();
 
-    public ManagerClient(WorkerConfiguration workerConfiguration) {
+    ManagerClient(WorkerConfiguration workerConfiguration) {
 
         //int connectTimeout = KConfiguration.getInstance().getConfiguration().getInt("cdk.forward.apache.client.connect_timeout", CONNECT_TIMEOUT);
         //int responseTimeout = KConfiguration.getInstance().getConfiguration().getInt("cdk.forward.apache.client.response_timeout", RESPONSE_TIMEOUT);

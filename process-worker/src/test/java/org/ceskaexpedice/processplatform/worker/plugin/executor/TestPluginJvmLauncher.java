@@ -58,7 +58,7 @@ public class TestPluginJvmLauncher {
     }
 
     @Test
-    public void testPlugin1JvmLauncher() {
+    public void testLaunchPlugin1() {
         URL resource = getClass().getClassLoader().getResource("plugins");
         assertNotNull(resource, "Plugins directory not found in test resources");
 
@@ -90,7 +90,7 @@ public class TestPluginJvmLauncher {
     }
 
     @Test
-    public void testPlugin2JvmLauncher() {
+    public void testLaunchPlugin2() {
         URL resource = getClass().getClassLoader().getResource("plugins");
         assertNotNull(resource, "Plugins directory not found in test resources");
 

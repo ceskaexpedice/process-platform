@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.plugin.executor.PluginStarter.*;
+import static org.ceskaexpedice.processplatform.worker.utils.Utils.*;
 
 /**
  * PluginJvmLauncher
@@ -73,6 +74,12 @@ public final class PluginJvmLauncher {
         String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
         command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
 
+        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcessTO.getProcessId() + "");
+        File standardStreamFile = standardOutFile(processWorkingDir);
+        File errStreamFile = errorOutFile(processWorkingDir);
+        command.add("-D" + SOUT_FILE_KEY + "=" + standardStreamFile.getAbsolutePath());
+        command.add("-D" + SERR_FILE_KEY + "=" + errStreamFile.getAbsolutePath());
+
         command.add("-cp");
         String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
         command.add(starterClasspath);
@@ -88,46 +95,10 @@ public final class PluginJvmLauncher {
         }
         command.add("-D" + MAIN_CLASS_KEY + "="  + scheduledProcessTO.getMainClass());
         command.add("-D" + PLUGIN_ID_KEY + "="  + scheduledProcessTO.getPluginId());
-        command.add("-D" + UUID_KEY + "="  + scheduledProcessTO.getProcessId());
+        command.add("-D" + PROCESS_ID_KEY + "="  + scheduledProcessTO.getProcessId());
         String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
         String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
         command.add("-D" + PLUGIN_PAYLOAD_BASE64_KEY + "=" + encodedPayload);
-        File processWorkingDir = processWorkingDirectory(scheduledProcessTO.getProcessId());
-        File standardStreamFile = standardOutFile(processWorkingDir);
-        File errStreamFile = errorOutFile(processWorkingDir);
-        command.add("-D" + SOUT_FILE_KEY + "=" + standardStreamFile.getAbsolutePath());
-        command.add("-D" + SERR_FILE_KEY + "=" + errStreamFile.getAbsolutePath());
-    }
-
-    private static File processWorkingDirectory(UUID processId) {
-        String value = WorkerConfiguration.DEFAULT_WORKER_WORKDIR + File.separator + processId;
-        File processWorkingDir = new File(value);
-        if (!processWorkingDir.exists()) {
-            boolean mkdirs = processWorkingDir.mkdirs();
-            if (!mkdirs){
-                throw new RuntimeException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
-            }
-        }
-        return processWorkingDir;
-    }
-
-    private static File errorOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgErr"),"sterr.err");
-    }
-
-    private static File standardOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"),"stout.out");
-    }
-
-    private static File createFolderIfNotExists(String folder) {
-        File fldr = new File(folder);
-        if (!fldr.exists()) {
-            boolean mkdirs = fldr.mkdirs();
-            if (!mkdirs){
-                throw new RuntimeException("cannot create directory '" + fldr.getAbsolutePath() + "'");
-            }
-        }
-        return fldr;
     }
 
 }

@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
@@ -35,7 +36,7 @@ class WorkerLoop {
     private volatile boolean running = true;
 
     WorkerLoop(WorkerConfiguration workerConfiguration) {
-        this.managerClient = new ManagerClient(workerConfiguration);
+        this.managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
         this.workerConfiguration = workerConfiguration;
     }
 

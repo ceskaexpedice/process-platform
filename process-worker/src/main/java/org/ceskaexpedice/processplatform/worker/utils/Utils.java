@@ -70,4 +70,36 @@ public final class Utils {
         );
     }
 
+    public static File prepareProcessWorkingDirectory(String processId) {
+        String value = WorkerConfiguration.DEFAULT_WORKER_WORKDIR + File.separator + processId;
+        File processWorkingDir = new File(value);
+        if (!processWorkingDir.exists()) {
+            boolean mkdirs = processWorkingDir.mkdirs();
+            if (!mkdirs){
+                throw new RuntimeException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
+            }
+        }
+        return processWorkingDir;
+    }
+
+    public static File errorOutFile(File processWorkingDir) {
+        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgErr"),"sterr.err");
+    }
+
+    public static File standardOutFile(File processWorkingDir) {
+        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"),"stout.out");
+    }
+
+    private static File createFolderIfNotExists(String folder) {
+        File fldr = new File(folder);
+        if (!fldr.exists()) {
+            boolean mkdirs = fldr.mkdirs();
+            if (!mkdirs){
+                throw new RuntimeException("cannot create directory '" + fldr.getAbsolutePath() + "'");
+            }
+        }
+        return fldr;
+    }
+
+
 }
