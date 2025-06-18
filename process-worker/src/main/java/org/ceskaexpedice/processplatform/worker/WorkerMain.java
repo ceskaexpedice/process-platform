@@ -36,14 +36,16 @@ public class WorkerMain {
 
     private WorkerLoop workerLoop;
     private WorkerConfiguration workerConfiguration;
+    private ManagerClient managerClient;
 
     public WorkerMain() {
     }
 
     public void initialize(WorkerConfiguration workerConfiguration) {
         this.workerConfiguration = workerConfiguration;
+        managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
         registerPlugins();
-        this.workerLoop = new WorkerLoop(workerConfiguration);
+        this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
         workerLoop.start();
     }
 
@@ -58,7 +60,6 @@ public class WorkerMain {
         if(pluginsList.isEmpty()){
             throw new IllegalStateException("No plugins found");
         }
-        ManagerClient managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
         for (PluginInfo pluginInfo : pluginsList) {
             System.out.println("Discovered plugin: " + pluginInfo);
             PluginInfoTO pluginInfoTO = toTO(pluginInfo);

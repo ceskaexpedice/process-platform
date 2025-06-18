@@ -35,8 +35,8 @@ class WorkerLoop {
     private final WorkerConfiguration workerConfiguration;
     private volatile boolean running = true;
 
-    WorkerLoop(WorkerConfiguration workerConfiguration) {
-        this.managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
+    WorkerLoop(WorkerConfiguration workerConfiguration, ManagerClient managerClient) {
+        this.managerClient = managerClient;
         this.workerConfiguration = workerConfiguration;
     }
 
