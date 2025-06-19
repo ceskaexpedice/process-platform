@@ -19,6 +19,9 @@ package org.ceskaexpedice.processplatform.worker.utils;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 public final class ProcessDirUtils {
 
@@ -42,6 +45,10 @@ public final class ProcessDirUtils {
 
     public static File standardOutFile(File processWorkingDir) {
         return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"),"stout.out");
+    }
+
+    public static PrintStream createPrintStream(String file) throws FileNotFoundException {
+        return new PrintStream(new FileOutputStream(file));
     }
 
     private static File createFolderIfNotExists(String folder) {

@@ -17,9 +17,13 @@
 package org.ceskaexpedice.processplatform.worker.config;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
 /**
  * WorkerConfiguration
@@ -92,4 +96,13 @@ public class WorkerConfiguration {
     public String getOrDefault(String key, String defaultValue) {
         return props.getProperty(key, defaultValue);
     }
+
+    public static WorkerConfiguration getWorkerConfig() {
+        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
+        String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
+        Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
+        WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
+        return workerConfig;
+    }
+
 }

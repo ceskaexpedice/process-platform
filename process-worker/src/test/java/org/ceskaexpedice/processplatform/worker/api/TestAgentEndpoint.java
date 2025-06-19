@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.api.service.AgentControlService;
+import org.ceskaexpedice.processplatform.worker.api.service.AgentService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
  * TestManagerEndpoint
  * @author ppodsednik
  */
-public class TestAgentControlEndpoint extends JerseyTest {
+public class TestAgentEndpoint extends JerseyTest {
 
     public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -46,9 +46,9 @@ public class TestAgentControlEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        AgentControlService agentControlServiceMock = mock(AgentControlService.class);
+        AgentService agentServiceMock = mock(AgentService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new AgentControlEndpoint(agentControlServiceMock));
+        resourceConfig.register(new AgentEndpoint(agentServiceMock));
         return resourceConfig;
     }
 

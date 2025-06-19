@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils;
 
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,5 +43,21 @@ public final class Utils {
         }
         return map;
     }
+
+    /**
+     * Returns PID of process
+     *
+     * @return
+     */
+    public static String getPid() {
+        String pid = null;
+        String name = ManagementFactory.getRuntimeMXBean().getName();
+        String[] split = name.split("@");
+        if ((split != null) && (split.length > 1)) {
+            pid = split[0];
+        }
+        return pid;
+    }
+
 
 }

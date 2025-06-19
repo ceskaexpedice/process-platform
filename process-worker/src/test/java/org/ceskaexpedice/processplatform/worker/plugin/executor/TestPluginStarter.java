@@ -96,6 +96,7 @@ public class TestPluginStarter {
         verify(managerClientMock, times(1)).updateProcessPid(any(), eq("testPlugin1ProcessId"));
         verify(pluginContextMock, times(1)).scheduleProcess(any());
         verify(pluginContextMock, times(1)).updateProcessName(eq("NewProcessName-PetrHarasil"));
+        // TODO
         //verify(pluginContextMock, times(1)).updateProcessState(ProcessState.WARNING);
         //verify(pluginContextMock, times(1)).updateProcessState(ProcessState.RUNNING);
         //verify(pluginContextMock, times(1)).updateProcessState(ProcessState.FINISHED);

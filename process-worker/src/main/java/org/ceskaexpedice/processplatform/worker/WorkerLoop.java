@@ -48,13 +48,10 @@ class WorkerLoop {
                     if (taskOpt.isPresent()) {
                         ScheduledProcess scheduledProcess = taskOpt.get();
                         PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
-                       // int exitCode = process.waitFor();
-                       // reportProcessResult(processTask, exitCode);
                     } else {
                         System.out.println("No task available. Sleeping...");
                         Thread.sleep(10_000); // sleep before polling again
                     }
-
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -63,10 +60,8 @@ class WorkerLoop {
                     e.printStackTrace();
                 }
             }
-
             System.out.println("Worker loop exited.");
         }, "WorkerPollingThread");
-
         pollingThread.setDaemon(true); // optional
         pollingThread.start();
     }
@@ -77,9 +72,7 @@ class WorkerLoop {
 
     private Optional<ScheduledProcess> pollManagerForTask() {
         try {
-            // ProcessTask processTask = managerClient.nextProcessTask();
             ScheduledProcess processTask = managerClient.getNextProcess();
-
             if(processTask != null){
                 return Optional.of(processTask);
             }else{

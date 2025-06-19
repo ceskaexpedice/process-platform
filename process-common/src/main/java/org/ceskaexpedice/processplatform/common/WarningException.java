@@ -1,4 +1,4 @@
-package org.ceskaexpedice.processplatform.api;
+package org.ceskaexpedice.processplatform.common;
 
 /**
  * Warning signal. The system change the process state to WARNING

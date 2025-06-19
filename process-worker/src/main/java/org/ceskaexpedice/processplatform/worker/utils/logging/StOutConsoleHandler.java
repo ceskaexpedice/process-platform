@@ -1,29 +1,47 @@
 /*
- * Copyright (C) 2025 Inovatika
- *
+ * Copyright (C) 2010 Pavel Stastny
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.worker.api.service;
+package org.ceskaexpedice.processplatform.worker.utils.logging;
 
-import org.ceskaexpedice.processplatform.worker.WorkerMain;
+import java.util.logging.*;
 
 /**
- * ManagerEndpointService
- * @author ppodsednik
+ * Redirect default consoleHandler to <code>System.out.println</code>
+ * @see ConsoleHandler
  */
-public class AgentControlService {
+public class StOutConsoleHandler extends StreamHandler  {
 
-    public AgentControlService(WorkerMain workerMain) {
+    private void configure() {
+    setLevel(Level.ALL);
+    setFilter(null);
+    setFormatter(new SimpleFormatter());
     }
+
+    
+    public StOutConsoleHandler() {
+        super();
+        configure();
+        setOutputStream(System.out);
+    }
+
+    @Override
+    public void publish(LogRecord record) {
+        super.publish(record);
+        this.flush();
+    }
+
+    
 }

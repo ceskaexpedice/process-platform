@@ -17,9 +17,13 @@
 package org.ceskaexpedice.processplatform.worker.config;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
 /**
  * ProcessConfiguration
@@ -80,4 +84,20 @@ public class ProcessConfiguration {
     public String getOrDefault(String key, String defaultValue) {
         return props.getProperty(key, defaultValue);
     }
+
+    public static Map<String, String> getPluginPayload(ProcessConfiguration processConfig) {
+        String payloadBase64 = processConfig.get(PLUGIN_PAYLOAD_BASE64_KEY);
+        String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
+        Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
+        return pluginPayload;
+    }
+
+    public static ProcessConfiguration getProcessConfig() {
+        String processConfigBase64 = System.getProperty(PROCESS_CONFIG_BASE64_KEY);
+        String processConfigJson = new String(Base64.getDecoder().decode(processConfigBase64), StandardCharsets.UTF_8);
+        Map<String, String> processProps = parseSimpleJson(processConfigJson);
+        ProcessConfiguration processConfig = new ProcessConfiguration(processProps);
+        return processConfig;
+    }
+
 }
