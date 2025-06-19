@@ -14,8 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -37,11 +37,11 @@ public class TestPluginsLoader {
         assertNotNull(resource, "Plugins directory not found in test resources");
 
         File pluginDir = new File(resource.getFile());
-        List<PluginInfoTO> pluginInfos = PluginsLoader.load(pluginDir);
+        List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
         assertEquals(2, pluginInfos.size());
-        PluginInfoTO testPlugin1 = null;
-        PluginInfoTO testPlugin2 = null;
-        for (PluginInfoTO pluginInfo : pluginInfos) {
+        PluginInfo testPlugin1 = null;
+        PluginInfo testPlugin2 = null;
+        for (PluginInfo pluginInfo : pluginInfos) {
             if(pluginInfo.getPluginId().equals("testPlugin1")){
                 testPlugin1 = pluginInfo;
             }else{
@@ -51,8 +51,8 @@ public class TestPluginsLoader {
         assertNotNull(testPlugin1);
         assertNotNull(testPlugin2);
         assertEquals(3, testPlugin1.getProfiles().size());
-        PluginProfileTO profileBiggest = null;
-        for (PluginProfileTO profile : testPlugin1.getProfiles()) {
+        PluginProfile profileBiggest = null;
+        for (PluginProfile profile : testPlugin1.getProfiles()) {
             if(profile.getProfileId().equals("testPlugin1-big")){
                 profileBiggest = profile;
             }

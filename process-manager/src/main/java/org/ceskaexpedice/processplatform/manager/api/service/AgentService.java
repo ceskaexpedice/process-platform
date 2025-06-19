@@ -16,9 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 
 /**
  * WorkerService
@@ -26,18 +26,18 @@ import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
  */
 public class AgentService {
 
-    public void registerPlugin(PluginInfoTO pluginInfoTO) {
+    public void registerPlugin(PluginInfo pluginInfo) {
         // Save plugin to 'plugins' table
         // For example:
         // pluginRepository.save(new PluginEntity(pluginInfoDto.getPluginId(), pluginInfoDto.getDescription(), pluginInfoDto.getMainClass()));
 
         // Save profiles to 'plugin_profiles' table
-        for (PluginProfileTO profile : pluginInfoTO.getProfiles()) {
+        for (PluginProfile profile : pluginInfo.getProfiles()) {
             // pluginProfilesRepository.save(new PluginProfileEntity(profile.getProfileId(), profile.getPluginId(), ...));
         }
     }
 
-    public ScheduledProcessTO getNextScheduledProcess() {
+    public ScheduledProcess getNextScheduledProcess() {
         return null;
     }
 

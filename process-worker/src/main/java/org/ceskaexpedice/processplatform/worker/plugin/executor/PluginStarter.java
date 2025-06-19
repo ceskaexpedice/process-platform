@@ -19,7 +19,8 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 import org.ceskaexpedice.processplatform.api.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
-import org.ceskaexpedice.processplatform.api.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
@@ -148,8 +149,8 @@ public class PluginStarter implements PluginContext {
     }
 
     @Override
-    public void scheduleProcess(String processDefinition) {
-        System.out.println("TestPlugin1.scheduleProcess:" + processDefinition);
+    public void scheduleProcess(ScheduleProcess scheduleProcess) {
+        System.out.println("TestPlugin1.scheduleProcess:" + scheduleProcess.getProfileId());
     }
 
     private static Map<String, String> getPluginPayload(ProcessConfiguration processConfig) {

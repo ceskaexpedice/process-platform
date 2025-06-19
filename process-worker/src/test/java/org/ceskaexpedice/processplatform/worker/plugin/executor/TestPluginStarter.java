@@ -15,22 +15,17 @@
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.api.ProcessState;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
-import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -38,13 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.client.TestManagerClient.BASE_URI;
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.PROCESS_CONFIG_BASE64_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
-import static org.ceskaexpedice.processplatform.worker.plugin.executor.PluginStarter.*;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -102,7 +94,7 @@ public class TestPluginStarter {
             PluginStarter.main(new String[]{});
         }
         verify(managerClientMock, times(1)).updateProcessPid(any(), eq("testPlugin1ProcessId"));
-        //verify(pluginContextMock, times(1)).scheduleProcess(eq("SomeProcess"));
+        verify(pluginContextMock, times(1)).scheduleProcess(any());
         verify(pluginContextMock, times(1)).updateProcessName(eq("PetrHarasil"));
         //verify(pluginContextMock, times(1)).updateProcessState(ProcessState.WARNING);
         //verify(pluginContextMock, times(1)).updateProcessState(ProcessState.RUNNING);

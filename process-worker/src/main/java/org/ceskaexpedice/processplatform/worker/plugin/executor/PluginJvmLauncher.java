@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
@@ -33,9 +33,7 @@ import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
-import static org.ceskaexpedice.processplatform.worker.plugin.executor.PluginStarter.*;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
-import static org.ceskaexpedice.processplatform.worker.utils.Utils.*;
 
 /**
  * PluginJvmLauncher
@@ -47,9 +45,9 @@ public final class PluginJvmLauncher {
     private PluginJvmLauncher() {
     }
 
-    public static void launchJvm(ScheduledProcessTO scheduledProcessTO, WorkerConfiguration workerConfiguration) {
+    public static void launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
-            List<String> command = createCommand(scheduledProcessTO, workerConfiguration);
+            List<String> command = createCommand(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             Process processR = pb.start();
             int val = processR.waitFor();
@@ -66,12 +64,12 @@ public final class PluginJvmLauncher {
         }
     }
 
-    private static List<String> createCommand(ScheduledProcessTO scheduledProcessTO, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
+    private static List<String> createCommand(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-Duser.home=" + System.getProperty("user.home"));
         command.add("-Dfile.encoding=UTF-8" );
-        List<String> javaProcessParameters = scheduledProcessTO.getJvmArgs();
+        List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
         for (String jpParam : javaProcessParameters) {
             command.add(jpParam);
         }
@@ -81,8 +79,8 @@ public final class PluginJvmLauncher {
         command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
 
         ProcessConfiguration processConfiguration = new ProcessConfiguration();
-        convert(scheduledProcessTO, processConfiguration);
-        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcessTO.getProcessId() + "");
+        convert(scheduledProcess, processConfiguration);
+        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcess.getProcessId() + "");
         File standardStreamFile = standardOutFile(processWorkingDir);
         File errStreamFile = errorOutFile(processWorkingDir);
         processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
@@ -99,11 +97,11 @@ public final class PluginJvmLauncher {
         return command;
     }
 
-    private static void convert(ScheduledProcessTO scheduledProcessTO, ProcessConfiguration processConfiguration) throws JsonProcessingException {
-        processConfiguration.set(MAIN_CLASS_KEY, scheduledProcessTO.getMainClass());
-        processConfiguration.set(PLUGIN_ID_KEY, scheduledProcessTO.getPluginId());
-        processConfiguration.set(PROCESS_ID_KEY, scheduledProcessTO.getProcessId());
-        String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
+    private static void convert(ScheduledProcess scheduledProcess, ProcessConfiguration processConfiguration) throws JsonProcessingException {
+        processConfiguration.set(MAIN_CLASS_KEY, scheduledProcess.getMainClass());
+        processConfiguration.set(PLUGIN_ID_KEY, scheduledProcess.getPluginId());
+        processConfiguration.set(PROCESS_ID_KEY, scheduledProcess.getProcessId());
+        String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcess.getPayload());
         String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
         processConfiguration.set(PLUGIN_PAYLOAD_BASE64_KEY, encodedPayload);
     }

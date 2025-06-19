@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginProfileService;
 
 import javax.ws.rs.*;
@@ -39,24 +39,24 @@ public class PluginProfileEndpoint {
     }
 
     @GET
-    public List<PluginProfileTO> getAllProfiles() {
+    public List<PluginProfile> getAllProfiles() {
         return pluginProfileService.getAllProfiles();
     }
 
     @GET
     @Path("/{profileId}")
-    public PluginProfileTO getProfile(@PathParam("profileId") String profileId) {
+    public PluginProfile getProfile(@PathParam("profileId") String profileId) {
         return pluginProfileService.getProfile(profileId);
     }
 
     @POST
-    public void createProfile(PluginProfileTO profile) {
+    public void createProfile(PluginProfile profile) {
         pluginProfileService.createProfile(profile);
     }
 
     @PUT
     @Path("/{profileId}")
-    public void updateProfile(@PathParam("profileId") String profileId, PluginProfileTO profile) {
+    public void updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
         pluginProfileService.updateProfile(profileId, profile);
     }
 

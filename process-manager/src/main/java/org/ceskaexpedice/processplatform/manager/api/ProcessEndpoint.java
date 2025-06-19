@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.json.JSONObject;
 
@@ -38,7 +39,7 @@ public class ProcessEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response scheduleProcess(JSONObject processDefinition) {
+    public Response scheduleProcess(ScheduleProcess scheduleProcess) {
         return Response.ok().entity("{}").build();
     }
 

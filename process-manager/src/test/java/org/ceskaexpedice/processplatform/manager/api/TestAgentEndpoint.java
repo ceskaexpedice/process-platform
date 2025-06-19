@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -47,7 +47,7 @@ public class TestAgentEndpoint extends JerseyTest {
     public void testNext() {
         Response response = target("worker/nextProcess").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
-        ScheduledProcessTO entity = response.readEntity(ScheduledProcessTO.class);
+        ScheduledProcess entity = response.readEntity(ScheduledProcess.class);
         System.out.println(entity);
     }
 

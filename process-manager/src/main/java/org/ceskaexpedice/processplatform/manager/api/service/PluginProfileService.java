@@ -16,37 +16,37 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 
 import java.util.List;
 
 public class PluginProfileService {
     
-    public List<PluginProfileTO> getAllProfiles() {
+    public List<PluginProfile> getAllProfiles() {
         return null;
     }
 
-    public PluginProfileTO getProfile(String profileId) {
+    public PluginProfile getProfile(String profileId) {
         return null;
     }
 
-    public void createProfile(PluginProfileTO profile) {
+    public void createProfile(PluginProfile profile) {
     }
 
-    public void updateProfile(String profileId, PluginProfileTO profile) {
+    public void updateProfile(String profileId, PluginProfile profile) {
     }
 
     public void deleteProfile(String profileId) {
     }
 
-    public void registerPluginInfo(PluginInfoTO pluginInfoDTO) {
-        for (PluginProfileTO profile : pluginInfoDTO.getProfiles()) {
+    public void registerPluginInfo(PluginInfo pluginInfoDTO) {
+        for (PluginProfile profile : pluginInfoDTO.getProfiles()) {
             upsertProfile(profile); // insert or update logic
         }
     }
 
-    public void upsertProfile(PluginProfileTO profileDTO) {
+    public void upsertProfile(PluginProfile profileDTO) {
         // checks: does this profile already exist?
         // yes → update; no → insert.
     }

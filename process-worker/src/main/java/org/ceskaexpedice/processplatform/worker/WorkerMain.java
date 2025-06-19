@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
@@ -46,20 +46,20 @@ public class WorkerMain {
         workerLoop.start();
     }
 
-    private List<PluginInfoTO> scanPlugins() {
+    private List<PluginInfo> scanPlugins() {
         File pluginsDir = new File(workerConfiguration.get("pluginPath"));
-        List<PluginInfoTO> pluginsList = PluginsLoader.load(pluginsDir);
+        List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
     private void registerPlugins() {
-        List<PluginInfoTO> pluginsList = scanPlugins();
+        List<PluginInfo> pluginsList = scanPlugins();
         if(pluginsList.isEmpty()){
             throw new IllegalStateException("No plugins found");
         }
-        for (PluginInfoTO pluginInfoTO : pluginsList) {
-            System.out.println("Discovered plugin: " + pluginInfoTO);
-            managerClient.registerPlugin(pluginInfoTO);
+        for (PluginInfo pluginInfo : pluginsList) {
+            System.out.println("Discovered plugin: " + pluginInfo);
+            managerClient.registerPlugin(pluginInfo);
         }
     }
 

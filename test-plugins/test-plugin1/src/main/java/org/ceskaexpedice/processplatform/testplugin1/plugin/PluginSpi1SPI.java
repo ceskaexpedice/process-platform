@@ -16,13 +16,13 @@
  */
 package org.ceskaexpedice.processplatform.testplugin1.plugin;
 
-import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.api.ProcessPlugin;
+import org.ceskaexpedice.processplatform.api.PluginSpi;
+import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Plugin1SPI implements ProcessPlugin {
+public class PluginSpi1SPI implements PluginSpi {
 
     @Override
     public String getPluginId() {

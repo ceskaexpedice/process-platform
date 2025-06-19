@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.api;
+package org.ceskaexpedice.processplatform.common.entity;
 
 public class PayloadFieldSpec {
     private String type;    // e.g., "string", "boolean", "number"

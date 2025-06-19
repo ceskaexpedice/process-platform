@@ -17,8 +17,7 @@
 package org.ceskaexpedice.processplatform.worker;
 
 
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
-import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
@@ -44,11 +43,11 @@ class WorkerLoop {
         Thread pollingThread = new Thread(() -> {
             while (running) {
                 try {
-                    Optional<ScheduledProcessTO> taskOpt = pollManagerForTask();
+                    Optional<ScheduledProcess> taskOpt = pollManagerForTask();
 
                     if (taskOpt.isPresent()) {
-                        ScheduledProcessTO scheduledProcessTO = taskOpt.get();
-                        PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
+                        ScheduledProcess scheduledProcess = taskOpt.get();
+                        PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
                        // int exitCode = process.waitFor();
                        // reportProcessResult(processTask, exitCode);
                     } else {
@@ -76,10 +75,10 @@ class WorkerLoop {
         running = false;
     }
 
-    private Optional<ScheduledProcessTO> pollManagerForTask() {
+    private Optional<ScheduledProcess> pollManagerForTask() {
         try {
             // ProcessTask processTask = managerClient.nextProcessTask();
-            ScheduledProcessTO processTask = managerClient.getNextProcess();
+            ScheduledProcess processTask = managerClient.getNextProcess();
 
             if(processTask != null){
                 return Optional.of(processTask);

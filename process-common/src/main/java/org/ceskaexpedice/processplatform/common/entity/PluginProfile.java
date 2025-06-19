@@ -14,53 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.to;
+package org.ceskaexpedice.processplatform.common.entity;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
- * ScheduledProcessTO
+ * PluginProfileTO
  * @author ppodsednik
  */
-public class ScheduledProcessTO {
-    private String processId;
+public class PluginProfile {
+    private String profileId;
     private String pluginId;
-    private String mainClass;
-    private Map<String, String> payload;
     private List<String> jvmArgs;
 
-    public ScheduledProcessTO() {
+    public PluginProfile() {
     }
 
-    public ScheduledProcessTO(String processId, String pluginId, String mainClass,
-                              Map<String, String> payload, List<String> jvmArgs) {
-        this.processId = processId;
+    public PluginProfile(String profileId, String pluginId, List<String> jvmArgs) {
+        this.profileId = profileId;
         this.pluginId = pluginId;
-        this.mainClass = mainClass;
-        this.payload = payload;
         this.jvmArgs = jvmArgs;
     }
 
-    public String getProcessId() {
-        return processId;
+    public String getProfileId() {
+        return profileId;
     }
 
     public String getPluginId() {
         return pluginId;
     }
 
-    public String getMainClass() {
-        return mainClass;
-    }
-
     public List<String> getJvmArgs() {
         return jvmArgs;
     }
-
-    public Map<String, String> getPayload() {
-        return payload;
-    }
-
+// Getters and setters
 }

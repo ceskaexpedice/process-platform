@@ -15,8 +15,8 @@
 package org.ceskaexpedice.processplatform.worker.client;
 
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -39,14 +39,14 @@ public class ManagerAgentEndpoint {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Path("/register-plugin")
-  public void registerPlugin(PluginInfoTO pluginInfo) {
+  public void registerPlugin(PluginInfo pluginInfo) {
     System.out.println(pluginInfo);
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/next-process")
-  public ScheduledProcessTO getNextProcess(@QueryParam("tags") List<String> tags) {
+  public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
     //List<String> tagList = uriInfo.getQueryParameters().get("tags");
 
     List<String> jvmArgs = new ArrayList<>();
@@ -58,13 +58,13 @@ public class ManagerAgentEndpoint {
     payload.put("name","Petr");
     payload.put("surname","Harasil");
 
-    ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+    ScheduledProcess scheduledProcess = new ScheduledProcess(
             UUID.randomUUID() + "",
             "testPlugin1",
             "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
             payload,
             jvmArgs);
-    return scheduledProcessTO;
+    return scheduledProcess;
     //return agentService.getNextScheduledProcess();
         /*
                 // Implementation: fetch next process from DB

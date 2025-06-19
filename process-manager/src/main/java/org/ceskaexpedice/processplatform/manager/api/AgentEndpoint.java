@@ -16,8 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 
 import javax.ws.rs.*;
@@ -40,14 +40,14 @@ public class AgentEndpoint {
 
     @POST
     @Path("/register-plugin")
-    public void registerPlugin(PluginInfoTO pluginInfo) {
+    public void registerPlugin(PluginInfo pluginInfo) {
         agentService.registerPlugin(pluginInfo);
     }
 
     @GET
     @Path("/next-process")
     @Produces(MediaType.APPLICATION_JSON)
-    public ScheduledProcessTO getNextProcess(@QueryParam("tags") List<String> tags) {
+    public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
         return agentService.getNextScheduledProcess();
         /*
                 // Implementation: fetch next process from DB

@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -75,14 +75,14 @@ public class TestPluginJvmLauncher {
         payload.put("name","Petr");
         payload.put("surname","Harasil");
 
-        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
+        ScheduledProcess scheduledProcess = new ScheduledProcess(
                 UUID.randomUUID() + "",
                 "testPlugin1",
                 "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
                 payload,
                 jvmArgs);
 
-        PluginJvmLauncher.launchJvm(scheduledProcessTO, workerConfiguration);
+        PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
         // TODO add asserts
     }
 

@@ -32,8 +32,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
@@ -76,13 +76,13 @@ public class ManagerClient {
         this.workerConfiguration = workerConfiguration;
     }
 
-    public void registerPlugin(PluginInfoTO pluginInfoTO) {
+    public void registerPlugin(PluginInfo pluginInfo) {
         String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/register-plugin";
         HttpPost post = new HttpPost(url);
 
         String json;
         try {
-            json = mapper.writeValueAsString(pluginInfoTO);
+            json = mapper.writeValueAsString(pluginInfo);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -99,7 +99,7 @@ public class ManagerClient {
         }
     }
 
-    public ScheduledProcessTO getNextProcess() {
+    public ScheduledProcess getNextProcess() {
         URIBuilder uriBuilder;
         HttpGet get;
         try {
@@ -126,7 +126,7 @@ public class ManagerClient {
 
                 // Deserialize JSON to ScheduledProcessTO
                 String json = EntityUtils.toString(entity);
-                ScheduledProcessTO process = mapper.readValue(json, ScheduledProcessTO.class);
+                ScheduledProcess process = mapper.readValue(json, ScheduledProcess.class);
 
                 return process;
 

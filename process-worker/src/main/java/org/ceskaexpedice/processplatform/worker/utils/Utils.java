@@ -16,13 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class Utils {
 

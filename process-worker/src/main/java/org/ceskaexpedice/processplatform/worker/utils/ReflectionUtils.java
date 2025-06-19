@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.utils;
 
 import org.ceskaexpedice.processplatform.api.annotations.ParameterName;
-import org.ceskaexpedice.processplatform.api.annotations.ProcessPlugin;
+import org.ceskaexpedice.processplatform.api.annotations.ProcessMethod;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -109,7 +109,7 @@ public final class ReflectionUtils {
     private static Method annotatedMethod(Class clz) {
         Method annotatedMethod = null;
         for (Method m : clz.getMethods()) {
-            if (m.isAnnotationPresent(ProcessPlugin.class)) {
+            if (m.isAnnotationPresent(ProcessMethod.class)) {
                 if (Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers())) {
                     annotatedMethod = m;
                     break;

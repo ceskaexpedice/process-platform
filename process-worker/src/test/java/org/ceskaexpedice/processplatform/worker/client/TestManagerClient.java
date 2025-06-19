@@ -14,11 +14,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
-import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
-import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
-import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -75,7 +74,7 @@ public class TestManagerClient {
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, BASE_URI);
         workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, "testPlugin1-big,testPlugin1-small");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        ScheduledProcessTO nextProcess = managerClient.getNextProcess();
+        ScheduledProcess nextProcess = managerClient.getNextProcess();
         System.out.println("entity");
     }
 
@@ -87,10 +86,10 @@ public class TestManagerClient {
         URL resource = getClass().getClassLoader().getResource("plugins");
 
         File pluginDir = new File(resource.getFile());
-        List<PluginInfoTO> pluginInfos = PluginsLoader.load(pluginDir);
+        List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
         assertEquals(2, pluginInfos.size());
-        PluginInfoTO testPlugin1 = null;
-        for (PluginInfoTO pluginInfo : pluginInfos) {
+        PluginInfo testPlugin1 = null;
+        for (PluginInfo pluginInfo : pluginInfos) {
             if(pluginInfo.getPluginId().equals("testPlugin1")){
                 testPlugin1 = pluginInfo;
                 break;

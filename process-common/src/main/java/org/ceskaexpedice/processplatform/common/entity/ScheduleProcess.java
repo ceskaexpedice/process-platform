@@ -14,35 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.testplugin2.plugin;
+package org.ceskaexpedice.processplatform.common.entity;
 
-import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.api.ProcessPlugin;
-
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class Plugin2SPI implements ProcessPlugin {
+/**
+ * ScheduleProcess
+ * @author ppodsednik
+ */
+public class ScheduleProcess {
+    private String profileId;
+    private String pluginId;
+    private Map<String, String> payload;
 
-    @Override
+    public ScheduleProcess() {
+    }
+
+    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload) {
+        this.profileId = profileId;
+        this.pluginId = pluginId;
+        this.payload = payload;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
     public String getPluginId() {
-        return "testPlugin2";
+        return pluginId;
     }
 
-    @Override
-    public String getDescription() {
-        return "Testing plugin 2";
-    }
-
-    @Override
-    public String getMainClass() {
-        return "org.ceskaexpedice.processplatform.testplugin2.TestPlugin2";
-    }
-
-    @Override
-    public Map<String, PayloadFieldSpec> getPayloadSpec() {
-        Map<String, PayloadFieldSpec>  map = new HashMap<>();
-        return map;
+    public Map<String, String> getPayload() {
+        return payload;
     }
 
 }

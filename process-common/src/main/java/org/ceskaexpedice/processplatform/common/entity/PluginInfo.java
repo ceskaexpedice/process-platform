@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.to;
-
-import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
+package org.ceskaexpedice.processplatform.common.entity;
 
 import java.util.List;
 import java.util.Map;
@@ -25,18 +23,18 @@ import java.util.Map;
  * PluginInfoTO
  * @author ppodsednik
  */
-public class PluginInfoTO {
+public class PluginInfo {
     private String pluginId;
     private String description;
     private String mainClass;
     private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
-    private List<PluginProfileTO> profiles;
+    private List<PluginProfile> profiles;
 
-    public PluginInfoTO() {
+    public PluginInfo() {
     }
 
-    public PluginInfoTO(String pluginId, String description, String mainClass,
-                        Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfileTO> profiles) {
+    public PluginInfo(String pluginId, String description, String mainClass,
+                      Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfile> profiles) {
         this.pluginId = pluginId;
         this.description = description;
         this.mainClass = mainClass;
@@ -60,7 +58,7 @@ public class PluginInfoTO {
         return payloadFieldSpecMap;
     }
 
-    public List<PluginProfileTO> getProfiles() {
+    public List<PluginProfile> getProfiles() {
         return profiles;
     }
 

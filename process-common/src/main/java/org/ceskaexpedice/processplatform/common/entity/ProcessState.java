@@ -1,4 +1,4 @@
-package org.ceskaexpedice.processplatform.api;
+package org.ceskaexpedice.processplatform.common.entity;
 
 import java.util.List;
 

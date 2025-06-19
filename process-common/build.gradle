@@ -1,5 +1,26 @@
 plugins {
     id 'java'
+    id 'maven-publish'
+}
+
+publishing {
+
+    publications {
+        myLibrary(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/ceskaexpedice/akubra"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 repositories {
@@ -8,7 +29,6 @@ repositories {
 }
 
 dependencies {
-    implementation project(':process-api')
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
