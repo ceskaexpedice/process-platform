@@ -7,13 +7,16 @@ import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 public class TestPlugin2 {
 
     @ProcessMethod
-    public static void process() {
-        System.out.println("TestPlugin2.process");
+    public static void foo() {
+        System.out.println("TestPlugin2.foo");
 
-        PluginContext pluginContext = PluginContextHolder.getContext();
+        // TODO PluginContext pluginContext = PluginContextHolder.getContext();
     }
 
+    /*
     private static boolean isInputValid(String input) {
         return !StringUtils.isBlank(input);
     }
+
+     */
 }

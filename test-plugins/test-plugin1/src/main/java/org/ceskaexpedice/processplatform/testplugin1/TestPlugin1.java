@@ -11,12 +11,14 @@ import java.util.HashMap;
 public class TestPlugin1 {
 
     @ProcessMethod
-    public static void process(@ParameterName("name") String name, @ParameterName("surname") String surname) {
-        System.out.println("TestPlugin1.process:" + name + "," + surname);
-        String joined = join(name, surname);
+    public static void createFullName(@ParameterName("name") String name, @ParameterName("surname") String surname) {
+        System.out.println("TestPlugin1.createFullName:name-" + name + ",surname-" + surname);
+        String fullName = join(name, surname);
+        // we might do something with "fullName" here like write it to the index
 
+        // we can use the context too...
         PluginContext pluginContext = PluginContextHolder.getContext();
-        pluginContext.updateProcessName(joined);
+        pluginContext.updateProcessName("NewProcessName-" + fullName);
         ScheduleProcess scheduleProcess = new ScheduleProcess("testPlugin2", "testPlugin2", new HashMap<>());
         pluginContext.scheduleProcess(scheduleProcess);
     }
