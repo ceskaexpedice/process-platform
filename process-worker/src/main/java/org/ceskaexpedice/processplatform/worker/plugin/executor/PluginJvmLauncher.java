@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
+import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.File;
@@ -30,7 +31,10 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
 import static org.ceskaexpedice.processplatform.worker.plugin.executor.PluginStarter.*;
+import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
 import static org.ceskaexpedice.processplatform.worker.utils.Utils.*;
 
 /**
@@ -67,18 +71,25 @@ public final class PluginJvmLauncher {
         command.add("java");
         command.add("-Duser.home=" + System.getProperty("user.home"));
         command.add("-Dfile.encoding=UTF-8" );
-
-        convert(scheduledProcessTO, command);
+        List<String> javaProcessParameters = scheduledProcessTO.getJvmArgs();
+        for (String jpParam : javaProcessParameters) {
+            command.add(jpParam);
+        }
 
         String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
         String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
         command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
 
+        ProcessConfiguration processConfiguration = new ProcessConfiguration();
+        convert(scheduledProcessTO, processConfiguration);
         File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcessTO.getProcessId() + "");
         File standardStreamFile = standardOutFile(processWorkingDir);
         File errStreamFile = errorOutFile(processWorkingDir);
-        command.add("-D" + SOUT_FILE_KEY + "=" + standardStreamFile.getAbsolutePath());
-        command.add("-D" + SERR_FILE_KEY + "=" + errStreamFile.getAbsolutePath());
+        processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
+        processConfiguration.set(SERR_FILE_KEY, errStreamFile.getAbsolutePath());
+        String processConfigJson = new ObjectMapper().writeValueAsString(processConfiguration.getAll());
+        String encodedProcessConfig = Base64.getEncoder().encodeToString(processConfigJson.getBytes(StandardCharsets.UTF_8));
+        command.add("-D" + PROCESS_CONFIG_BASE64_KEY + "=" + encodedProcessConfig);
 
         command.add("-cp");
         String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
@@ -88,17 +99,13 @@ public final class PluginJvmLauncher {
         return command;
     }
 
-    private static void convert(ScheduledProcessTO scheduledProcessTO, List<String> command) throws JsonProcessingException {
-        List<String> javaProcessParameters = scheduledProcessTO.getJvmArgs();
-        for (String jpParam : javaProcessParameters) {
-            command.add(jpParam);
-        }
-        command.add("-D" + MAIN_CLASS_KEY + "="  + scheduledProcessTO.getMainClass());
-        command.add("-D" + PLUGIN_ID_KEY + "="  + scheduledProcessTO.getPluginId());
-        command.add("-D" + PROCESS_ID_KEY + "="  + scheduledProcessTO.getProcessId());
+    private static void convert(ScheduledProcessTO scheduledProcessTO, ProcessConfiguration processConfiguration) throws JsonProcessingException {
+        processConfiguration.set(MAIN_CLASS_KEY, scheduledProcessTO.getMainClass());
+        processConfiguration.set(PLUGIN_ID_KEY, scheduledProcessTO.getPluginId());
+        processConfiguration.set(PROCESS_ID_KEY, scheduledProcessTO.getProcessId());
         String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcessTO.getPayload());
         String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
-        command.add("-D" + PLUGIN_PAYLOAD_BASE64_KEY + "=" + encodedPayload);
+        processConfiguration.set(PLUGIN_PAYLOAD_BASE64_KEY, encodedPayload);
     }
 
 }

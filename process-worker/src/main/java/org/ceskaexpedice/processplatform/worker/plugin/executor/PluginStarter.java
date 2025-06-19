@@ -22,9 +22,11 @@ import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 import org.ceskaexpedice.processplatform.api.ProcessState;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
+import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.logging.LoggingLoader;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
+import org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -33,8 +35,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 
+import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.ceskaexpedice.processplatform.worker.plugin.executor.ReflectionUtils.annotatedMethodType;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
+import static org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils.annotatedMethodType;
 import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
 /**
@@ -46,59 +50,44 @@ public class PluginStarter implements PluginContext {
     private static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
     private static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";
 
-    public static final String MAIN_CLASS_KEY = "mainClass";
-    public static final String PLUGIN_ID_KEY = "pluginId";
-    public static final String PROCESS_ID_KEY = "processId";
-    public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
-    public static final String PLUGIN_PAYLOAD_BASE64_KEY = "pluginPayloadBase64";
-    public static final String SOUT_FILE_KEY = "SOUT";
-    public static final String SERR_FILE_KEY = "SERR";
-
     private final WorkerConfiguration workerConfiguration;
+    private final ProcessConfiguration processConfiguration;
     private final ManagerClient managerClient;
 
-    public PluginStarter(WorkerConfiguration workerConfiguration) {
+    public PluginStarter(WorkerConfiguration workerConfiguration, ProcessConfiguration processConfiguration) {
         this.workerConfiguration = workerConfiguration;
+        this.processConfiguration = processConfiguration;
         this.managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
     }
 
     public static void main(String[] args) {
-        String mainClass = System.getProperty(MAIN_CLASS_KEY);
-        String pluginId = System.getProperty(PLUGIN_ID_KEY);
-        String processId = System.getProperty(PROCESS_ID_KEY);
-
-        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
-        String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
-        Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
-        WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
-
-        String payloadBase64 = System.getProperty(PLUGIN_PAYLOAD_BASE64_KEY);
-        String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
-        Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
+        ProcessConfiguration processConfig = getProcessConfig();
+        WorkerConfiguration workerConfig = getWorkerConfig();
 
         PrintStream outStream = null;
         PrintStream errStream = null;
         try {
-            outStream = createPrintStream(System.getProperty(SOUT_FILE_KEY));
-            errStream = createPrintStream(System.getProperty(SERR_FILE_KEY));
+            outStream = createPrintStream(processConfig.get(SOUT_FILE_KEY));
+            errStream = createPrintStream(processConfig.get(SERR_FILE_KEY));
             System.setErr(errStream);
             System.setOut(outStream);
             setDefaultLoggingIfNecessary();
             LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
             LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
-            PluginContext pluginContext = PluginContextFactory.createPluginContext(workerConfig);
+
+            PluginContext pluginContext = PluginContextFactory.createPluginContext(workerConfig, processConfig);
             PluginContextHolder.setContext(pluginContext);
+            ManagerClient managerClient = ManagerClientFactory.createManagerClient(workerConfig);
+            updatePID(processConfig, managerClient);
 
-            String pid = getPID();
-            updatePID(pid, processId, ((PluginStarter)pluginContext).managerClient);
-
-            runPlugin(pluginId, mainClass, pluginPayload, workerConfig);
+            updateProcessState(ProcessState.RUNNING);
+            runPlugin(processConfig, workerConfig);
             checkErrorFile();
-            PluginContextHolder.getContext().updateProcessState(ProcessState.FINISHED);
+            updateProcessState(ProcessState.FINISHED);
         } catch (WarningException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             try {
-                PluginContextHolder.getContext().updateProcessState(ProcessState.WARNING);
+                updateProcessState(ProcessState.WARNING);
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -119,7 +108,7 @@ public class PluginStarter implements PluginContext {
         } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             try {
-                PluginContextHolder.getContext().updateProcessState(ProcessState.FAILED);
+                updateProcessState(ProcessState.FAILED);
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
@@ -148,8 +137,49 @@ public class PluginStarter implements PluginContext {
         }
     }
 
-    private static void runPlugin(String pluginId, String mainClass, Map<String, String> pluginPayload, WorkerConfiguration workerConfig)
+    private static void updateProcessState(ProcessState processState) {
+        //managerClient.updateProcessState(processConfiguration.get(PROCESS_ID_KEY));
+        // TODO: Implement REST call to worker's PluginEndpoint
+    }
+
+    @Override
+    public void updateProcessName(String name) {
+        //managerClient.
+    }
+
+    @Override
+    public void scheduleProcess(String processDefinition) {
+        System.out.println("TestPlugin1.scheduleProcess:" + processDefinition);
+    }
+
+    private static Map<String, String> getPluginPayload(ProcessConfiguration processConfig) {
+        String payloadBase64 = processConfig.get(PLUGIN_PAYLOAD_BASE64_KEY);
+        String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
+        Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
+        return pluginPayload;
+    }
+
+    private static WorkerConfiguration getWorkerConfig() {
+        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
+        String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
+        Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
+        WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
+        return workerConfig;
+    }
+
+    private static ProcessConfiguration getProcessConfig() {
+        String processConfigBase64 = System.getProperty(PROCESS_CONFIG_BASE64_KEY);
+        String processConfigJson = new String(Base64.getDecoder().decode(processConfigBase64), StandardCharsets.UTF_8);
+        Map<String, String> processProps = parseSimpleJson(processConfigJson);
+        ProcessConfiguration processConfig = new ProcessConfiguration(processProps);
+        return processConfig;
+    }
+
+    private static void runPlugin(ProcessConfiguration processConfig, WorkerConfiguration workerConfig)
             throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Map<String, String> pluginPayload = getPluginPayload(processConfig);
+        String pluginId = processConfig.get(PLUGIN_ID_KEY);
+        String mainClass = processConfig.get(MAIN_CLASS_KEY);
         ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerConfig.get(PLUGIN_PATH_KEY)), pluginId);
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {
@@ -169,21 +199,6 @@ public class PluginStarter implements PluginContext {
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);
         }
-    }
-
-    @Override
-    public void updateProcessState(ProcessState processState) {
-        // TODO: Implement REST call to worker's PluginEndpoint
-    }
-
-    @Override
-    public void updateProcessName(String name) {
-        //managerClient.
-    }
-
-    @Override
-    public void scheduleProcess(String processDefinition) {
-        System.out.println("TestPlugin1.scheduleProcess:" + processDefinition);
     }
 
     private static PrintStream createPrintStream(String file) throws FileNotFoundException {
@@ -214,9 +229,9 @@ public class PluginStarter implements PluginContext {
         return pid;
     }
 
-    private static void updatePID(String pid, String processId, ManagerClient managerClient) {
-        managerClient.updateProcessPid(pid, processId);
-        // TODO call worker PluginAgent to pass the pid to the manager
+    private static void updatePID(ProcessConfiguration processConfiguration, ManagerClient managerClient) {
+        String pid = getPID();
+        managerClient.updateProcessPid(pid, processConfiguration.get(PROCESS_ID_KEY));
 
         /*
         try {

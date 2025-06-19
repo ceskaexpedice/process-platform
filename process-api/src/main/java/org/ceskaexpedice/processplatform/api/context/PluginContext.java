@@ -24,8 +24,6 @@ import org.ceskaexpedice.processplatform.api.ProcessState;
  */
 public interface PluginContext {
 
-    void updateProcessState(ProcessState processState);
-
     void updateProcessName(String name);
 
     void scheduleProcess(String processDefinition);

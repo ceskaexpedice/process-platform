@@ -59,7 +59,7 @@ public class ManagerAgentEndpoint {
     payload.put("surname","Harasil");
 
     ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
-            UUID.randomUUID(),
+            UUID.randomUUID() + "",
             "testPlugin1",
             "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
             payload,

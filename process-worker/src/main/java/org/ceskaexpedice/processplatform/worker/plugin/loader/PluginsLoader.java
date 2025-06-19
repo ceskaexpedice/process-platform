@@ -18,8 +18,8 @@ package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.api.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.ProcessPlugin;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginProfile;
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
+import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
 
 import java.io.File;
 import java.net.*;
@@ -58,8 +58,8 @@ public final class PluginsLoader {
         return createPluginClassLoader(pluginDir);
     }
 
-    public static List<PluginInfo> load(File pluginsDir) {
-        List<PluginInfo> result = new ArrayList<>();
+    public static List<PluginInfoTO> load(File pluginsDir) {
+        List<PluginInfoTO> result = new ArrayList<>();
         File[] pluginsDirDirs = pluginsDir.listFiles(File::isDirectory);
         if (pluginsDirDirs == null){
             return result;
@@ -69,7 +69,7 @@ public final class PluginsLoader {
             ServiceLoader<ProcessPlugin> loader = ServiceLoader.load(ProcessPlugin.class, pluginClassLoader);
             for (ProcessPlugin plugin : loader) {
                 File pluginJar = getPluginJar(plugin);
-                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, pluginDir);
+                PluginInfoTO pluginInfo = resolvePlugin(plugin, pluginJar, pluginDir);
                 result.add(pluginInfo);
             }
         }
@@ -93,19 +93,19 @@ public final class PluginsLoader {
         return pluginJar;
     }
 
-    private static PluginInfo resolvePlugin(ProcessPlugin plugin, File pluginJar, File pluginDir) {
+    private static PluginInfoTO resolvePlugin(ProcessPlugin plugin, File pluginJar, File pluginDir) {
         String pluginId = plugin.getPluginId();
         String description = plugin.getDescription();
         String mainClass = plugin.getMainClass();
         Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
 
-        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
+        List<PluginProfileTO> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
         if(profiles.isEmpty()){
-            PluginProfile defaultProfile = new PluginProfile(pluginId, new ArrayList<>());
+            PluginProfileTO defaultProfile = new PluginProfileTO(pluginId, pluginId, new ArrayList<>());
             profiles.add(defaultProfile);
         }
 
-        return new PluginInfo(pluginId, description, mainClass, payloadSpec, profiles);
+        return new PluginInfoTO(pluginId, description, mainClass, payloadSpec, profiles);
     }
 
 }

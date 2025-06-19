@@ -25,7 +25,7 @@ import java.util.UUID;
  * @author ppodsednik
  */
 public class ScheduledProcessTO {
-    private UUID processId;
+    private String processId;
     private String pluginId;
     private String mainClass;
     private Map<String, String> payload;
@@ -34,7 +34,7 @@ public class ScheduledProcessTO {
     public ScheduledProcessTO() {
     }
 
-    public ScheduledProcessTO(UUID processId, String pluginId, String mainClass,
+    public ScheduledProcessTO(String processId, String pluginId, String mainClass,
                               Map<String, String> payload, List<String> jvmArgs) {
         this.processId = processId;
         this.pluginId = pluginId;
@@ -43,7 +43,7 @@ public class ScheduledProcessTO {
         this.jvmArgs = jvmArgs;
     }
 
-    public UUID getProcessId() {
+    public String getProcessId() {
         return processId;
     }
 

@@ -19,14 +19,11 @@ package org.ceskaexpedice.processplatform.worker;
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
 import java.util.List;
-
-import static org.ceskaexpedice.processplatform.worker.utils.Utils.toTO;
 
 /**
  * WorkerMain
@@ -49,20 +46,19 @@ public class WorkerMain {
         workerLoop.start();
     }
 
-    private List<PluginInfo> scanPlugins() {
+    private List<PluginInfoTO> scanPlugins() {
         File pluginsDir = new File(workerConfiguration.get("pluginPath"));
-        List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
+        List<PluginInfoTO> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
     private void registerPlugins() {
-        List<PluginInfo> pluginsList = scanPlugins();
+        List<PluginInfoTO> pluginsList = scanPlugins();
         if(pluginsList.isEmpty()){
             throw new IllegalStateException("No plugins found");
         }
-        for (PluginInfo pluginInfo : pluginsList) {
-            System.out.println("Discovered plugin: " + pluginInfo);
-            PluginInfoTO pluginInfoTO = toTO(pluginInfo);
+        for (PluginInfoTO pluginInfoTO : pluginsList) {
+            System.out.println("Discovered plugin: " + pluginInfoTO);
             managerClient.registerPlugin(pluginInfoTO);
         }
     }

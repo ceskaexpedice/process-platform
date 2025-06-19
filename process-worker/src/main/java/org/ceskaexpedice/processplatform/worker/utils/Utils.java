@@ -18,11 +18,7 @@ package org.ceskaexpedice.processplatform.worker.utils;
 
 import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.PluginProfileTO;
-import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 
-import javax.servlet.ServletContextEvent;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,55 +47,5 @@ public final class Utils {
         }
         return map;
     }
-
-    public static PluginInfoTO toTO(PluginInfo pluginInfo) {
-        List<PluginProfileTO> profiles = pluginInfo.getProfiles().stream()
-                .map(profile -> new PluginProfileTO(
-                        profile.getProfileId(),
-                        pluginInfo.getPluginId(),
-                        profile.getJvmArgs()
-                ))
-                .collect(Collectors.toList());
-
-        return new PluginInfoTO(
-                pluginInfo.getPluginId(),
-                pluginInfo.getDescription(),
-                pluginInfo.getMainClass(),
-                pluginInfo.getPayloadFieldSpecMap(),
-                profiles
-        );
-    }
-
-    public static File prepareProcessWorkingDirectory(String processId) {
-        String value = WorkerConfiguration.DEFAULT_WORKER_WORKDIR + File.separator + processId;
-        File processWorkingDir = new File(value);
-        if (!processWorkingDir.exists()) {
-            boolean mkdirs = processWorkingDir.mkdirs();
-            if (!mkdirs){
-                throw new RuntimeException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
-            }
-        }
-        return processWorkingDir;
-    }
-
-    public static File errorOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgErr"),"sterr.err");
-    }
-
-    public static File standardOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"),"stout.out");
-    }
-
-    private static File createFolderIfNotExists(String folder) {
-        File fldr = new File(folder);
-        if (!fldr.exists()) {
-            boolean mkdirs = fldr.mkdirs();
-            if (!mkdirs){
-                throw new RuntimeException("cannot create directory '" + fldr.getAbsolutePath() + "'");
-            }
-        }
-        return fldr;
-    }
-
 
 }

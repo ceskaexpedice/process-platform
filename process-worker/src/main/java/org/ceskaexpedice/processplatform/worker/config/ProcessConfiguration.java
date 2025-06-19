@@ -22,37 +22,25 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * WorkerConfiguration
+ * ProcessConfiguration
  * @author ppodsednik
  */
-public class WorkerConfiguration {
-    public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
-    public static final String DEFAULT_WORKER_WORKDIR = WORKING_DIR + File.separator + "worker";
-    public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
-
-    public static final String PLUGIN_PATH_KEY = "plugin.path";
-    public static final String STARTER_CLASSPATH_KEY = "starter.classpath";
-    public static final String MANAGER_BASE_URL_KEY = "manager.base.url";
-    public static final String WORKER_TAGS_KEY = "worker.tags";
+public class ProcessConfiguration {
+    public static final String PROCESS_CONFIG_BASE64_KEY = "processConfigBase64";
+    public static final String MAIN_CLASS_KEY = "mainClass";
+    public static final String PLUGIN_ID_KEY = "pluginId";
+    public static final String PROCESS_ID_KEY = "processId";
+    public static final String PLUGIN_PAYLOAD_BASE64_KEY = "pluginPayloadBase64";
+    public static final String SOUT_FILE_KEY = "SOUT";
+    public static final String SERR_FILE_KEY = "SERR";
 
     private final Properties props = new Properties();
 
-    public WorkerConfiguration(Properties fileProps) {
-        // Load from environment first
-        Map<String, String> env = System.getenv();
-        for (Map.Entry<String, String> entry : env.entrySet()) {
-            props.setProperty(entry.getKey(), entry.getValue());
-        }
-
-        // Add properties from file (only if not already set by env)
-        for (String name : fileProps.stringPropertyNames()) {
-            props.putIfAbsent(name, fileProps.getProperty(name));
-        }
-
+    public ProcessConfiguration() {
     }
 
     // Overloaded constructor for Map-based initialization
-    public WorkerConfiguration(Map<String, String> directProps) {
+    public ProcessConfiguration(Map<String, String> directProps) {
         props.putAll(directProps);
     }
 

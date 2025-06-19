@@ -14,13 +14,12 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
+import org.ceskaexpedice.processplatform.common.to.PluginInfoTO;
 import org.ceskaexpedice.processplatform.common.to.ScheduledProcessTO;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.AfterEach;
@@ -88,10 +87,10 @@ public class TestManagerClient {
         URL resource = getClass().getClassLoader().getResource("plugins");
 
         File pluginDir = new File(resource.getFile());
-        List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
+        List<PluginInfoTO> pluginInfos = PluginsLoader.load(pluginDir);
         assertEquals(2, pluginInfos.size());
-        PluginInfo testPlugin1 = null;
-        for (PluginInfo pluginInfo : pluginInfos) {
+        PluginInfoTO testPlugin1 = null;
+        for (PluginInfoTO pluginInfo : pluginInfos) {
             if(pluginInfo.getPluginId().equals("testPlugin1")){
                 testPlugin1 = pluginInfo;
                 break;
@@ -100,7 +99,7 @@ public class TestManagerClient {
 
         workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, "testPlugin1-big,testPlugin1-small");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.registerPlugin(Utils.toTO(testPlugin1));
+        managerClient.registerPlugin(testPlugin1);
         System.out.println("entity");
     }
 
