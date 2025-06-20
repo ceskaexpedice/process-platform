@@ -16,6 +16,8 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.Constants;
 
@@ -90,6 +92,29 @@ public class ManagerAgentEndpoint {
     // Store OS process ID of the spawned JVM
     System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
     return Response.ok().build();
+  }
+
+  @PUT
+  @Path("/state/{processId}")
+  public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
+    // Store OS process ID of the spawned JVM
+    System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
+    return Response.ok().build();
+  }
+
+  @PUT
+  @Path("/name/{processId}")
+  public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
+    // Store OS process ID of the spawned JVM
+    System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+    return Response.ok().build();
+  }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Path("/schedule-process")
+  public void scheduleProcess(ScheduleProcess scheduleProcess) {
+    System.out.println("ManagerAgentEndpoint: scheduleProcess: " + scheduleProcess.getProfileId() + ",plugin-" + scheduleProcess.getPluginId());
   }
 
 }

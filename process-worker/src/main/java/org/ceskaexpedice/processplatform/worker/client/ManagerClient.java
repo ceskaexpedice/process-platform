@@ -101,6 +101,29 @@ public class ManagerClient {
         }
     }
 
+    public void scheduleProcess(ScheduleProcess scheduleProcess) {
+        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/schedule-process";
+        HttpPost post = new HttpPost(url);
+
+        String json;
+        try {
+            json = mapper.writeValueAsString(scheduleProcess);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+        post.setEntity(entity);
+
+        try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
+            int statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 204) {
+                throw new IOException("Failed to register plugin. HTTP status: " + statusCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public ScheduledProcess getNextProcess() {
         URIBuilder uriBuilder;
         HttpGet get;
@@ -237,16 +260,33 @@ public class ManagerClient {
     }
 
     public void updateProcessName(String processId, String name) {
-        // TODO
+        String url = String.format("%sagent/name/%s?name=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, name);
+        HttpPut httpPut = new HttpPut(url);
+
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
+            int statusCode = response.getCode();
+            if (statusCode != 200) {
+                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void updateProcessState(String processId, ProcessState state) {
-        // TODO
+        String url = String.format("%sagent/state/%s?state=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, state);
+        HttpPut httpPut = new HttpPut(url);
+
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
+            int statusCode = response.getCode();
+            if (statusCode != 200) {
+                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void scheduleProcess(ScheduleProcess scheduleProcess) {
-        // TODO
-    }
 
     private HttpGet apacheGet(String url, boolean headers) {
         //LOGGER.fine(String.format("Requesting %s", url));

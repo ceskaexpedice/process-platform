@@ -15,6 +15,8 @@
 package org.ceskaexpedice.processplatform.worker.client;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.Constants;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -29,9 +31,9 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
+import static org.ceskaexpedice.processplatform.worker.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -98,6 +100,42 @@ public class TestManagerClient {
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.updateProcessPid("uuid1", "333");
+        System.out.println("entity");
+    }
+
+    @Test
+    public void testUpdateProcessState() {
+        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.updateProcessState("uuid1", ProcessState.FINISHED);
+        System.out.println("entity");
+    }
+
+    @Test
+    public void testUpdateProcessName() {
+        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.updateProcessName("uuid1", "newName");
+        System.out.println("entity");
+    }
+
+    @Test
+    public void testScheduleProcess() {
+        Map<String,String> payload = new HashMap<>();
+        payload.put("name","Petr");
+        payload.put("surname","Harasil");
+
+        ScheduleProcess scheduleProcess = new ScheduleProcess(
+                PLUGIN1_PROFILE_BIG,
+                PLUGIN1_ID,
+                payload);
+
+        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.scheduleProcess(scheduleProcess);
         System.out.println("entity");
     }
 
