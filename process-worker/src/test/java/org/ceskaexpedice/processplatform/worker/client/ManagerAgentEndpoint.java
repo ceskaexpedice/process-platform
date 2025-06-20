@@ -17,6 +17,7 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.worker.Constants;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -30,6 +31,7 @@ import java.util.*;
 @Path("/agent")
 public class ManagerAgentEndpoint {
   //private final AgentService agentService;
+  private static int counter;
 
   /*
   public ManagerAgentEndpoint(AgentService agentService) {
@@ -40,55 +42,53 @@ public class ManagerAgentEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @Path("/register-plugin")
   public void registerPlugin(PluginInfo pluginInfo) {
-    System.out.println(pluginInfo);
+    System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/next-process")
   public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
-    //List<String> tagList = uriInfo.getQueryParameters().get("tags");
+    System.out.print("ManagerAgentEndpoint: getNextProcess:");
+    counter++;
+    if(counter == 1){
+      List<String> jvmArgs = new ArrayList<>();
+      jvmArgs.add("-Xmx1024m");
+      jvmArgs.add("-Xms256m");
+      //jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
 
-    List<String> jvmArgs = new ArrayList<>();
-    jvmArgs.add("-Xmx1024m");
-    jvmArgs.add("-Xms256m");
-    jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
+      Map<String,String> payload = new HashMap<>();
+      payload.put("name","Petr");
+      payload.put("surname","Harasil");
 
-    Map<String,String> payload = new HashMap<>();
-    payload.put("name","Petr");
-    payload.put("surname","Harasil");
-
-    ScheduledProcess scheduledProcess = new ScheduledProcess(
-            UUID.randomUUID() + "",
-            "testPlugin1",
-            "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
-            payload,
-            jvmArgs);
-    return scheduledProcess;
-    //return agentService.getNextScheduledProcess();
-        /*
-                // Implementation: fetch next process from DB
-        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
-                UUID.randomUUID(),
-                "pluginInfo.getPluginId()",
-                "profileId",
-                "pluginInfo.getMainClass()",
-                null,
-                null,
-                null);
-        if (scheduledProcessTO != null) {
-            return Response.ok(scheduledProcessTO).build();
-        } else {
-            return Response.status(Response.Status.NO_CONTENT).build();
-        }
-
-         */
+      ScheduledProcess scheduledProcess = new ScheduledProcess(
+              Constants.PLUGIN1_PROCESS_ID,
+              Constants.PLUGIN1_ID,
+              Constants.PLUGIN1_MAIN_CLASS,
+              payload,
+              jvmArgs);
+      System.out.println(scheduledProcess.getProcessId());
+      return scheduledProcess;
+    }else if(counter == 2){
+      ScheduledProcess scheduledProcess = new ScheduledProcess(
+              Constants.PLUGIN2_PROCESS_ID,
+              Constants.PLUGIN2_ID,
+              Constants.PLUGIN2_MAIN_CLASS,
+              new HashMap<>(),
+              new ArrayList<>());
+      System.out.println(scheduledProcess.getProcessId());
+      return scheduledProcess;
+    }else{
+      System.out.println("null");
+      return null;
+    }
   }
 
   @PUT
-  @Path("/pid/{uuid}")
-  public Response updateProcessPID(@PathParam("uuid") String uuid, @QueryParam("pid") String pid) {
+  @Path("/pid/{processId}")
+  public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
     // Store OS process ID of the spawned JVM
+    System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
     return Response.ok().build();
   }
 

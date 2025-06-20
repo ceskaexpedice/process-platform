@@ -23,12 +23,14 @@ import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLaunche
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * WorkerLoop
  * @author ppodsednik
  */
 class WorkerLoop {
+    public static final Logger LOGGER = Logger.getLogger(WorkerLoop.class.getName());
 
     private final ManagerClient managerClient;
     private final WorkerConfiguration workerConfiguration;
@@ -44,23 +46,23 @@ class WorkerLoop {
             while (running) {
                 try {
                     Optional<ScheduledProcess> taskOpt = pollManagerForTask();
-
                     if (taskOpt.isPresent()) {
                         ScheduledProcess scheduledProcess = taskOpt.get();
-                        PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
+                        int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
+                        if (exitCode != 0) {
+                            throw new IllegalStateException("Failed to launch JVM");
+                        }
                     } else {
-                        System.out.println("No task available. Sleeping...");
-                        Thread.sleep(10_000); // sleep before polling again
+                        int sleepSec = Integer.parseInt(workerConfiguration.get(WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY));
+                        LOGGER.info("No process from the manager. Sleeping " + sleepSec + " seconds...");
+                        Thread.sleep(sleepSec * 1000);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
-                } catch (Exception e) {
-                    System.err.println("Worker error: " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
-            System.out.println("Worker loop exited.");
+            LOGGER.info("Worker loop exited.");
         }, "WorkerPollingThread");
         pollingThread.setDaemon(true); // optional
         pollingThread.start();
@@ -73,13 +75,13 @@ class WorkerLoop {
     private Optional<ScheduledProcess> pollManagerForTask() {
         try {
             ScheduledProcess processTask = managerClient.getNextProcess();
-            if(processTask != null){
+            if (processTask != null) {
                 return Optional.of(processTask);
-            }else{
+            } else {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            System.err.println("Polling error: " + e.getMessage());
+            LOGGER.severe("Polling error: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

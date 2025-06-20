@@ -14,12 +14,25 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.utils.Utils;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.Properties;
 
-import static org.mockito.Mockito.mock;
+import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY;
 
 /**
  * TestWorkerMain
@@ -28,15 +41,40 @@ import static org.mockito.Mockito.mock;
  */
 public class TestWorkerMain {
 
-    @Test
-    public void testMain() {
-        Properties props = new Properties();
-        props.put("pluginPath", "C:\\projects\\process-platform\\process-worker\\src\\test\\resources\\plugins");
-        props.put("processApiPath", "c:\\Users\\petr\\.m2\\repository\\org\\ceskaexpedice\\process-api\\1.0-SNAPSHOT\\process-api-1.0-SNAPSHOT.jar");
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(props);
+    private WorkerConfiguration workerConfiguration;
+    private HttpServer server;
 
+    @BeforeEach
+    public void setUp() throws Exception {
+        URL resource = getClass().getClassLoader().getResource("plugins");
+        workerConfiguration = new WorkerConfiguration(new Properties());
+        workerConfiguration.set(PLUGIN_PATH_KEY, resource.getFile());
+        String starterClasspath = System.getProperty("java.class.path");
+        workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
+        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
+        workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
+
+        final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
+        server.start();
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        server.shutdownNow();
+    }
+
+    @Test
+    public void testWorkerMain() {
         WorkerMain workerMain = new WorkerMain();
         workerMain.initialize(workerConfiguration);
+        System.out.println("***Test*** First sleep 5 sec to wait until 2 processes finishes");
+        Utils.sleep(5000);
+        workerMain.shutdown();
+        System.out.println("***Test*** Shutting down WorkerMain. Second sleep 15 sec");
+        Utils.sleep(15000);
     }
 
 }

@@ -33,6 +33,8 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
@@ -118,10 +120,11 @@ public class ManagerClient {
         }
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
-            if (code == 200) {
+            if (code == 200 || code == 204) {
                 HttpEntity entity = response.getEntity();
                 if (entity == null) {
-                    throw new IOException("Empty response body");
+                    return null;
+                    //throw new IOException("Empty response body");
                 }
 
                 // Deserialize JSON to ScheduledProcessTO
@@ -219,8 +222,8 @@ public class ManagerClient {
         }*/
     }
 
-    public void updateProcessPid(String uuid, String pid) {
-        String url = String.format("%sagent/pid/%s?pid=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), uuid, pid);
+    public void updateProcessPid(String processId, String pid) {
+        String url = String.format("%sagent/pid/%s?pid=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, pid);
         HttpPut httpPut = new HttpPut(url);
 
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
@@ -233,7 +236,19 @@ public class ManagerClient {
         }
     }
 
-    protected HttpGet apacheGet(String url, boolean headers) {
+    public void updateProcessName(String processId, String name) {
+        // TODO
+    }
+
+    public void updateProcessState(String processId, ProcessState state) {
+        // TODO
+    }
+
+    public void scheduleProcess(ScheduleProcess scheduleProcess) {
+        // TODO
+    }
+
+    private HttpGet apacheGet(String url, boolean headers) {
         //LOGGER.fine(String.format("Requesting %s", url));
         HttpGet get = new HttpGet(url);
         /*

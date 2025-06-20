@@ -16,6 +16,7 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.worker.Constants;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -36,32 +37,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestRest Description
+ * TestManagerClient
  *
  * @author ppodsednik
  */
 public class TestManagerClient {
 
-    public static final String BASE_URI = "http://localhost:9998/process-manager/api/";
     private HttpServer server;
-
 
     @BeforeEach
     public void setUp() throws Exception {
         final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
-        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
         server.start();
     }
-
-    /*
-    @Override
-    protected Application configure() {
-        MockitoAnnotations.openMocks(this);
-        ProcessService processServiceMock = mock(ProcessService.class);
-        ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProcessEndpoint(processServiceMock));
-        return resourceConfig;
-    }*/
 
     @AfterEach
     public void tearDown() throws Exception {
@@ -71,8 +60,9 @@ public class TestManagerClient {
     @Test
     public void testGetNextProcess() {
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, BASE_URI);
-        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, "testPlugin1-big,testPlugin1-small");
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         ScheduledProcess nextProcess = managerClient.getNextProcess();
         System.out.println("entity");
@@ -81,7 +71,7 @@ public class TestManagerClient {
     @Test
     public void testRegisterPlugin() {
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, BASE_URI);
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
 
         URL resource = getClass().getClassLoader().getResource("plugins");
 
@@ -105,7 +95,7 @@ public class TestManagerClient {
     @Test
     public void testUpdateProcessPid() {
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, BASE_URI);
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.updateProcessPid("uuid1", "333");
         System.out.println("entity");

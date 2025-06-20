@@ -14,6 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
+import org.ceskaexpedice.processplatform.worker.Constants;
 import org.ceskaexpedice.processplatform.worker.api.service.AgentService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -27,21 +28,10 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestManagerEndpoint
+ * TestAgentEndpoint
  * @author ppodsednik
  */
 public class TestAgentEndpoint extends JerseyTest {
-
-    public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
-    //private HttpServer server;
-
-  /*
-  @BeforeEach
-  public void setUp() throws Exception {
-    final ResourceConfig rc = new ResourceConfig(ProcessResource.class);
-    server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-    server.start();
-  }*/
 
     @Override
     protected Application configure() {
@@ -52,15 +42,10 @@ public class TestAgentEndpoint extends JerseyTest {
         return resourceConfig;
     }
 
-  /*
-  @AfterEach
-  public void tearDown() throws Exception {
-    //server.shutdownNow();
-  }*/
 
     @Test
     public void testGetLogs() {
-        Response response = target("manager/logs/blaf")
+        Response response = target("agent/logs/" + Constants.PLUGIN1_PROCESS_ID)
                 .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
         String entity = response.readEntity(String.class);

@@ -40,15 +40,16 @@ import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
  * @author ppodsednik
  */
 public final class PluginJvmLauncher {
-    public static final Logger LOGGER = java.util.logging.Logger.getLogger(PluginJvmLauncher.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(PluginJvmLauncher.class.getName());
 
     private PluginJvmLauncher() {
     }
 
-    public static void launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
+    public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
             List<String> command = createCommand(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
+            LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));
             Process processR = pb.start();
             int val = processR.waitFor();
             if (val != 0) {
@@ -56,11 +57,11 @@ public final class PluginJvmLauncher {
                 String s = IOUtils.toString(errorStream, "UTF-8");
                 LOGGER.info(s);
             }
-            LOGGER.info("return value exiting process '" + val + "'");
-        } catch (IOException e) {
+            LOGGER.info(String.format("Return value of the exiting process %s:%d'", scheduledProcess.getProcessId(), val));
+            return val;
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            return -1;
         }
     }
 
@@ -68,7 +69,7 @@ public final class PluginJvmLauncher {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-Duser.home=" + System.getProperty("user.home"));
-        command.add("-Dfile.encoding=UTF-8" );
+        command.add("-Dfile.encoding=UTF-8");
         List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
         for (String jpParam : javaProcessParameters) {
             command.add(jpParam);

@@ -16,6 +16,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.worker.Constants;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -34,15 +35,15 @@ public class TestPluginsLoader {
     @Test
     public void testPluginsLoader() {
         URL resource = getClass().getClassLoader().getResource("plugins");
-        assertNotNull(resource, "Plugins directory not found in test resources");
-
         File pluginDir = new File(resource.getFile());
         List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
+
+        // check both plugins were loaded
         assertEquals(2, pluginInfos.size());
         PluginInfo testPlugin1 = null;
         PluginInfo testPlugin2 = null;
         for (PluginInfo pluginInfo : pluginInfos) {
-            if(pluginInfo.getPluginId().equals("testPlugin1")){
+            if(pluginInfo.getPluginId().equals(Constants.PLUGIN1_ID)){
                 testPlugin1 = pluginInfo;
             }else{
                 testPlugin2 = pluginInfo;
@@ -50,10 +51,38 @@ public class TestPluginsLoader {
         }
         assertNotNull(testPlugin1);
         assertNotNull(testPlugin2);
+
+        // check profiles were merged:
+        // testPlugin1.json from jar:
+        /*
+        [
+          {
+            "profileId": "testPlugin1-big",
+            "jvmArgs": ["-Xms1g","-Xmx32g"]
+          },
+          {
+            "profileId": "testPlugin1-small",
+            "jvmArgs": ["-Xms1g", "-Xmx4g"]
+          }
+        ]
+         */
+        // testPlugin1.json from test/resources/plugins/testPlugin1:
+        /*
+        [
+          {
+            "profileId": "testPlugin1-big",
+            "jvmArgs": ["-Xms1g", "-Xmx64g"]
+          },
+          {
+            "profileId": "testPlugin1-smallest",
+            "jvmArgs": ["-Xms1g","-Xmx2g"]
+          }
+        ]
+         */
         assertEquals(3, testPlugin1.getProfiles().size());
         PluginProfile profileBiggest = null;
         for (PluginProfile profile : testPlugin1.getProfiles()) {
-            if(profile.getProfileId().equals("testPlugin1-big")){
+            if(profile.getProfileId().equals(Constants.PLUGIN1_PROFILE_BIG)){
                 profileBiggest = profile;
             }
         }
@@ -64,7 +93,7 @@ public class TestPluginsLoader {
                 biggestXmx = true;
             }
         }
-        assertTrue(biggestXmx); // make sure it was overriden in the process
+        assertTrue(biggestXmx); // make sure it has been overridden in the process
 
         assertEquals(1, testPlugin2.getProfiles().size());
     }

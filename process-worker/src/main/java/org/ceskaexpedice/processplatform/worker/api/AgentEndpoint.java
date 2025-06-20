@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * ManagerEndpoint
+ * AgentEndpoint
  * @author ppodsednik
  */
 @Path("/agent")
@@ -34,15 +34,14 @@ public class AgentEndpoint {
     public AgentEndpoint(AgentService agentService) {
     }
 
-    // === Get Process Logs (stdout or stderr) ===
     @GET
-    @Path("/logs/{uuid}")
+    @Path("/logs/{processId}")
     public Response getLogs(
-            @PathParam("uuid") String uuid,
+            @PathParam("processId") String processId,
             @QueryParam("stream") @DefaultValue("stdout") String streamType) {
         // streamType can be "stdout" or "stderr"
         // You can return logs as plain text or application/octet-stream if binary
-        return Response.ok(/* logs as text or file */).entity("{\"uuid\":\"" + uuid + "\" }").build();
+        return Response.ok(/* logs as text or file */).entity("{\"uuid\":\"" + processId + "\" }").build();
     }
 
     // === Check Process Status (alive, exit code) ===

@@ -24,12 +24,14 @@ import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * WorkerMain
  * @author ppodsednik
  */
 public class WorkerMain {
+    public static final Logger LOGGER = Logger.getLogger(WorkerMain.class.getName());
 
     private WorkerLoop workerLoop;
     private WorkerConfiguration workerConfiguration;
@@ -39,15 +41,17 @@ public class WorkerMain {
     }
 
     public void initialize(WorkerConfiguration workerConfiguration) {
+        LOGGER.info("Initializing...");
         this.workerConfiguration = workerConfiguration;
         managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
         registerPlugins();
         this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
         workerLoop.start();
+        LOGGER.info("Initialized");
     }
 
     private List<PluginInfo> scanPlugins() {
-        File pluginsDir = new File(workerConfiguration.get("pluginPath"));
+        File pluginsDir = new File(workerConfiguration.get(WorkerConfiguration.PLUGIN_PATH_KEY));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
@@ -58,7 +62,7 @@ public class WorkerMain {
             throw new IllegalStateException("No plugins found");
         }
         for (PluginInfo pluginInfo : pluginsList) {
-            System.out.println("Discovered plugin: " + pluginInfo);
+            LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());
             managerClient.registerPlugin(pluginInfo);
         }
     }

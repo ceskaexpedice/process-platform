@@ -32,6 +32,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
@@ -45,7 +46,7 @@ import static org.ceskaexpedice.processplatform.worker.utils.logging.LoggingUtil
  * @author ppodsednik
  */
 public class PluginStarter implements PluginContext {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(PluginStarter.class.getName());
+    private static final java.util.logging.Logger LOGGER = Logger.getLogger(PluginStarter.class.getName());
 
     private final WorkerConfiguration workerConfiguration;
     private final ProcessConfiguration processConfiguration;
@@ -137,23 +138,21 @@ public class PluginStarter implements PluginContext {
 
     @Override
     public void updateProcessName(String name) {
-        // TODO managerClient.getNextProcess();
+        managerClient.updateProcessName(processConfiguration.get(PROCESS_ID_KEY), name);
     }
 
     @Override
     public void scheduleProcess(ScheduleProcess scheduleProcess) {
-        System.out.println("TestPlugin1.scheduleProcess:" + scheduleProcess.getProfileId());
-        // TODO managerClient.getNextProcess();
+        managerClient.scheduleProcess(scheduleProcess);
     }
 
     private static void updateProcessState(ProcessState processState, ManagerClient managerClient, ProcessConfiguration processConfig) {
-        //managerClient.updateProcessState(processConfiguration.get(PROCESS_ID_KEY));
-        // TODO: Implement REST call to worker's PluginEndpoint
+        managerClient.updateProcessState(processConfig.get(PROCESS_ID_KEY), processState);
     }
 
     private static void updatePID(ProcessConfiguration processConfiguration, ManagerClient managerClient) {
         String pid = getPid();
-        managerClient.updateProcessPid(pid, processConfiguration.get(PROCESS_ID_KEY));
+        managerClient.updateProcessPid(processConfiguration.get(PROCESS_ID_KEY), pid);
 
         /*
         try {

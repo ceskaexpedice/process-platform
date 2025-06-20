@@ -12,36 +12,46 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.worker.plugin.executor;
+package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginContextFactory;
+import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
+import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.*;
+import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
+import static org.ceskaexpedice.processplatform.worker.Constants.PLUGIN1_PROCESS_ID;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 /**
- * TestPluginJvmLauncher
+ * TestWorkerMain
  *
  * @author ppodsednik
  */
-public class TestPluginJvmLauncher {
+public class TestWorkerLoop {
 
-    private HttpServer server;
     private WorkerConfiguration workerConfiguration;
+    private HttpServer server;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -51,6 +61,9 @@ public class TestPluginJvmLauncher {
         String starterClasspath = System.getProperty("java.class.path");
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
+        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
+        workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
 
         final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
@@ -63,25 +76,15 @@ public class TestPluginJvmLauncher {
     }
 
     @Test
-    public void testLaunchPlugin1() {
-        List<String> jvmArgs = new ArrayList<>();
-        jvmArgs.add("-Xmx1024m");
-        jvmArgs.add("-Xms256m");
-        //jvmArgs.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=58001");
-
-        Map<String,String> payload = new HashMap<>();
-        payload.put("name","Petr");
-        payload.put("surname","Harasil");
-
-        ScheduledProcess scheduledProcess = new ScheduledProcess(
-                PLUGIN1_PROCESS_ID,
-                PLUGIN1_ID,
-                PLUGIN1_MAIN_CLASS,
-                payload,
-                jvmArgs);
-
-        int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
-        Assertions.assertEquals(0, exitCode);
+    public void testWorkerLoop() {
+        ManagerClient managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
+        WorkerLoop workerLoop = new WorkerLoop(workerConfiguration, managerClient);
+        workerLoop.start();
+        System.out.println("First sleep 5 sec to wait until 2 processes finishes");
+        Utils.sleep(5000);
+        workerLoop.stop();
+        System.out.println("Stopping workerLoopThread. Second sleep 15 sec");
+        Utils.sleep(15000);
     }
 
 }
