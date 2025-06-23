@@ -130,7 +130,8 @@ public class TestManagerClient {
         ScheduleProcess scheduleProcess = new ScheduleProcess(
                 PLUGIN1_PROFILE_BIG,
                 PLUGIN1_ID,
-                payload);
+                payload,
+                false);
 
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);

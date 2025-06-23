@@ -27,14 +27,16 @@ public class ScheduleProcess {
     private String profileId;
     private String pluginId;
     private Map<String, String> payload;
+    private boolean pending = false;
 
     public ScheduleProcess() {
     }
 
-    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload) {
+    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload, boolean pending) {
         this.profileId = profileId;
         this.pluginId = pluginId;
         this.payload = payload;
+        this.pending = pending;
     }
 
     public String getProfileId() {
@@ -49,4 +51,7 @@ public class ScheduleProcess {
         return payload;
     }
 
+    public boolean isPending() {
+        return pending;
+    }
 }

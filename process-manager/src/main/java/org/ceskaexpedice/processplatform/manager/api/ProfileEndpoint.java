@@ -17,52 +17,52 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginProfileService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/admin/plugin-profiles")
+@Path("/profile")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PluginProfileEndpoint {
+public class ProfileEndpoint {
     /*
     /pluginProfiles/{pluginId}/{profileType}/payloadSpec → returns JSON spec
     /pluginProfiles/{pluginId}/{profileType}/validatePayload → accepts payload, returns 200/400
      */
 
-    private final PluginProfileService pluginProfileService;
+    private final ProfileService profileService;
 
-    public PluginProfileEndpoint(PluginProfileService pluginProfileService) {
-        this.pluginProfileService = pluginProfileService;
+    public ProfileEndpoint(ProfileService profileService) {
+        this.profileService = profileService;
     }
 
     @GET
     public List<PluginProfile> getAllProfiles() {
-        return pluginProfileService.getAllProfiles();
+        return profileService.getAllProfiles();
     }
 
     @GET
     @Path("/{profileId}")
     public PluginProfile getProfile(@PathParam("profileId") String profileId) {
-        return pluginProfileService.getProfile(profileId);
+        return profileService.getProfile(profileId);
     }
 
     @POST
     public void createProfile(PluginProfile profile) {
-        pluginProfileService.createProfile(profile);
+        profileService.createProfile(profile);
     }
 
     @PUT
     @Path("/{profileId}")
     public void updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
-        pluginProfileService.updateProfile(profileId, profile);
+        profileService.updateProfile(profileId, profile);
     }
 
     @DELETE
     @Path("/{profileId}")
     public void deleteProfile(@PathParam("profileId") String profileId) {
-        pluginProfileService.deleteProfile(profileId);
+        profileService.deleteProfile(profileId);
     }
 }

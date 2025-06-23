@@ -17,13 +17,20 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * WorkerEndpoint
@@ -31,6 +38,7 @@ import java.util.List;
  */
 @Path("/agent")
 public class AgentEndpoint {
+    private static final Logger LOGGER = Logger.getLogger(AgentEndpoint.class.getName());
 
     private final AgentService agentService;
 
@@ -39,17 +47,64 @@ public class AgentEndpoint {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/register-plugin")
     public void registerPlugin(PluginInfo pluginInfo) {
-        agentService.registerPlugin(pluginInfo);
+        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/next-process")
+    public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
+        try {
+            ScheduledProcess scheduledProcess = new ScheduledProcess();
+            return scheduledProcess;
+        } catch (WebApplicationException e) {
+            throw e;
+        } catch (Throwable e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @PUT
+    @Path("/pid/{processId}")
+    public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/state/{processId}")
+    public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/name/{processId}")
+    public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/schedule-process")
+    public void scheduleProcess(ScheduleProcess scheduleProcess) {
+        System.out.println("ManagerAgentEndpoint: scheduleProcess: " + scheduleProcess.getProfileId() + ",plugin-" + scheduleProcess.getPluginId());
+    }
+
+        /*
     @GET
     @Path("/next-process")
     @Produces(MediaType.APPLICATION_JSON)
     public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
         return agentService.getNextScheduledProcess();
-        /*
                 // Implementation: fetch next process from DB
         ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
                 UUID.randomUUID(),
@@ -65,55 +120,9 @@ public class AgentEndpoint {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
 
-         */
-    }
 
-    /*
-    @POST
-    @Path("/process/{processId}/status")
-    public void updateProcessStatus(@PathParam("processId") String processId, ProcessStatusUpdateTO statusUpdate) {
-        workerService.updateProcessStatus(processId, statusUpdate);
     }*/
 
-
-
-    // === Update Process State (e.g., running, completed, failed) ===
-    @PUT
-    @Path("/state/{uuid}")
-    public Response updateProcessState(@PathParam("uuid") String uuid, @QueryParam("state") String newState) {
-        // Update status in the processes table
-        return Response.ok().build();
-    }
-
-    // === Update Worker PID ===
-    @PUT
-    @Path("/pid/{uuid}")
-    public Response updateProcessPID(@PathParam("uuid") String uuid, @QueryParam("pid") int pid) {
-        // Store OS process ID of the spawned JVM
-        return Response.ok().build();
-    }
-
-    // === Update Human-Readable Name ===
-    @PUT
-    @Path("/name/{uuid}")
-    public Response updateProcessName(@PathParam("uuid") String uuid, @QueryParam("name") String name) {
-        // Update name in the processes table for display
-        return Response.ok().build();
-    }
-
-    /*
-    @GET
-    @Path("next")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response nextProcess(@Context UriInfo uriInfo) {
-        List<String> tagList = uriInfo.getQueryParameters().get("tags");
-
-        uriInfo.getQueryParameters().forEach((key, value) -> {});
-        return Response.ok().entity("result Owners".toString()).build();
-    }
-
-
-     */
     /*
     @GET
     @Path("/get-process/{uuid}")
@@ -129,63 +138,6 @@ public class AgentEndpoint {
 
      */
 
-    /*
-    @PUT
-    @Path("/{id}/state")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProcessState(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
-
-        String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        ProcessState processState = ProcessState.valueOf(taskStateS);
-
-        if (StringUtilities.isEmpty(type)) {
-            throw new IllegalArgumentException("Missing type parameter");
-        }
-        try {
-            return QueueSAO.QueueEntryType.valueOf(type);
-        }
-
-        return Response.ok().entity("result Owners".toString()).build();
-    }
-    */
-
-    /*
-    @PUT
-    @Path("/{id}/pid")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProcessPid(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
-
-        String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        ProcessState processState = ProcessState.valueOf(taskStateS);
-
-        if (StringUtilities.isEmpty(type)) {
-            throw new IllegalArgumentException("Missing type parameter");
-        }
-        try {
-            return QueueSAO.QueueEntryType.valueOf(type);
-        }
-
-        return Response.ok().entity("result Owners".toString()).build();
-    }*/
-
-    /*
-    @PUT
-    @Path("/{id}/name")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProcessName(@PathParam("id") String taskId, @Context UriInfo uriInfo) {
-
-        String taskStateS = uriInfo.getQueryParameters().getFirst("taskState");
-        ProcessState processState = ProcessState.valueOf(taskStateS);
-
-        if (StringUtilities.isEmpty(type)) {
-            throw new IllegalArgumentException("Missing type parameter");
-        }
-        try {
-            return QueueSAO.QueueEntryType.valueOf(type);
-        }
-
-        return Response.ok().entity("result Owners".toString()).build();
-    }*/
 /*
     public ProcessDefinition buildProcessFromDatabase(Connection conn, String uuid) throws SQLException {
         ProcessDefinition processDefinition = new ProcessDefinition();

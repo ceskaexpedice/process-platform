@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
  * AdminEndpoint
  * @author ppodsednik
  */
-@Path("/admin/processes")
+@Path("/process")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProcessEndpoint {
@@ -41,6 +41,12 @@ public class ProcessEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scheduleProcess(ScheduleProcess scheduleProcess) {
         return Response.ok().entity("{}").build();
+    }
+
+    @PUT
+    @Path("/{processId}/approve")
+    public Response approveProcess(@PathParam("processId") String processId) {
+        return Response.ok().build();
     }
 
     @GET

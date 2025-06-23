@@ -21,7 +21,7 @@ import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 
 import java.util.List;
 
-public class PluginProfileService {
+public class ProfileService {
     
     public List<PluginProfile> getAllProfiles() {
         return null;

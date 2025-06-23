@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'war'
 }
 
 repositories {
@@ -8,10 +8,13 @@ repositories {
 }
 
 dependencies {
-    api project(':process-common')
+    implementation project(':process-api')
+    implementation project(':process-common')
 
     implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
     implementation "javax.inject:javax.inject:1"
+
+    providedCompile 'jakarta.servlet:jakarta.servlet-api:5.0.0'
 
     implementation 'org.glassfish.jersey.containers:jersey-container-servlet:2.39'
     implementation 'org.glassfish.jersey.containers:jersey-container-servlet-core:2.39'
