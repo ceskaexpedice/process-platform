@@ -4,7 +4,7 @@ import org.ceskaexpedice.processplatform.api.annotations.ParameterName;
 import org.ceskaexpedice.processplatform.api.annotations.ProcessMethod;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
 
 import java.util.HashMap;
 
@@ -19,8 +19,8 @@ public class TestPlugin1 {
         // we can use the context too...
         PluginContext pluginContext = PluginContextHolder.getContext();
         pluginContext.updateProcessName("NewProcessName-" + fullName);
-        ScheduleProcess scheduleProcess = new ScheduleProcess("testPlugin2", "testPlugin2", new HashMap<>());
-        pluginContext.scheduleProcess(scheduleProcess);
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess("testPlugin2", "testPlugin2", new HashMap<>());
+        pluginContext.scheduleSubProcess(scheduleSubProcess);
     }
 
     private static String join(String name, String surname) {

@@ -15,7 +15,7 @@
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ManagersAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -52,7 +52,7 @@ public class TestPluginJvmLauncher {
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
 
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ManagersAgentEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }
@@ -78,7 +78,8 @@ public class TestPluginJvmLauncher {
                 PLUGIN1_ID,
                 PLUGIN1_MAIN_CLASS,
                 payload,
-                jvmArgs);
+                jvmArgs,
+                "batchId");
 
         int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
         Assertions.assertEquals(0, exitCode);

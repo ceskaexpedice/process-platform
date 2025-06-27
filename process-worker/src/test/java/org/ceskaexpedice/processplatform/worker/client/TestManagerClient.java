@@ -14,10 +14,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.ceskaexpedice.processplatform.common.entity.*;
 import org.ceskaexpedice.processplatform.worker.Constants;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
@@ -49,7 +49,7 @@ public class TestManagerClient {
 
     @BeforeEach
     public void setUp() throws Exception {
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ManagersAgentEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
         server.start();
     }
@@ -82,7 +82,7 @@ public class TestManagerClient {
         assertEquals(2, pluginInfos.size());
         PluginInfo testPlugin1 = null;
         for (PluginInfo pluginInfo : pluginInfos) {
-            if(pluginInfo.getPluginId().equals("testPlugin1")){
+            if (pluginInfo.getPluginId().equals("testPlugin1")) {
                 testPlugin1 = pluginInfo;
                 break;
             }
@@ -122,21 +122,33 @@ public class TestManagerClient {
     }
 
     @Test
-    public void testScheduleProcess() {
-        Map<String,String> payload = new HashMap<>();
-        payload.put("name","Petr");
-        payload.put("surname","Harasil");
+    public void testScheduleSubProcess() throws JsonProcessingException {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Petr");
+        payload.put("surname", "Harasil");
 
-        ScheduleProcess scheduleProcess = new ScheduleProcess(
+        ObjectMapper mapper = new ObjectMapper();
+        // Build arbitrary context JSON
+        ObjectNode context = mapper.createObjectNode();
+        context.put("env", "production");
+        context.put("retries", 3);
+        ObjectNode metadata = mapper.createObjectNode();
+        metadata.put("owner", "team-a");
+        metadata.putArray("features").add("fast").add("secure");
+        context.set("metadata", metadata);
+
+
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(
                 PLUGIN1_PROFILE_BIG,
                 PLUGIN1_ID,
-                payload,
-                false);
+                payload
+        );
+        scheduleSubProcess.setBatchId("batchId");
 
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.scheduleProcess(scheduleProcess);
+        managerClient.scheduleSubProcess(scheduleSubProcess);
         System.out.println("entity");
     }
 

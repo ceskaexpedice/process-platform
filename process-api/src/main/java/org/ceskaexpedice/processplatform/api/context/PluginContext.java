@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.api.context;
 
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
 
 /**
  * PluginContext
@@ -27,6 +28,6 @@ public interface PluginContext {
 
     void updateProcessName(String name);
 
-    void scheduleProcess(ScheduleProcess scheduleProcess);
+    void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess);
 
 }

@@ -24,30 +24,18 @@ import java.util.Map;
  * ScheduleProcess
  * @author ppodsednik
  */
-public class ScheduleProcess {
-    private String profileId;
-    private String pluginId;
-    private Map<String, String> payload;
+public class ScheduleMainProcess extends ScheduleProcess{
+    private String ownerId;
 
-    public ScheduleProcess() {
+    public ScheduleMainProcess() {
     }
 
-    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload) {
-        this.profileId = profileId;
-        this.pluginId = pluginId;
-        this.payload = payload;
+    public ScheduleMainProcess(String profileId, String pluginId, Map<String, String> payload, String ownerId) {
+        super(profileId, pluginId, payload);
+        this.ownerId = ownerId;
     }
 
-    public String getProfileId() {
-        return profileId;
+    public String getOwnerId() {
+        return ownerId;
     }
-
-    public String getPluginId() {
-        return pluginId;
-    }
-
-    public Map<String, String> getPayload() {
-        return payload;
-    }
-
 }

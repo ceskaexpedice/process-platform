@@ -21,6 +21,7 @@ import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 import org.ceskaexpedice.processplatform.common.entity.ProcessState;
 import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
@@ -142,8 +143,10 @@ public class PluginStarter implements PluginContext {
     }
 
     @Override
-    public void scheduleProcess(ScheduleProcess scheduleProcess) {
-        managerClient.scheduleProcess(scheduleProcess);
+    public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        scheduleSubProcess.setBatchId(processConfiguration.get(BATCH_ID_KEY));
+        scheduleSubProcess.setPending(true);
+        managerClient.scheduleSubProcess(scheduleSubProcess);
     }
 
     private static void updateProcessState(ProcessState processState, ManagerClient managerClient, ProcessConfiguration processConfig) {

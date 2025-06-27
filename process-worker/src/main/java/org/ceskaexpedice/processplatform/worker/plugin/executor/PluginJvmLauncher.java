@@ -102,6 +102,7 @@ public final class PluginJvmLauncher {
         processConfiguration.set(MAIN_CLASS_KEY, scheduledProcess.getMainClass());
         processConfiguration.set(PLUGIN_ID_KEY, scheduledProcess.getPluginId());
         processConfiguration.set(PROCESS_ID_KEY, scheduledProcess.getProcessId());
+        processConfiguration.set(BATCH_ID_KEY, scheduledProcess.getBatchId());
         String payloadJson = new ObjectMapper().writeValueAsString(scheduledProcess.getPayload());
         String encodedPayload = Base64.getEncoder().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
         processConfiguration.set(PLUGIN_PAYLOAD_BASE64_KEY, encodedPayload);

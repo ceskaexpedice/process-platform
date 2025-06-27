@@ -34,6 +34,7 @@ public class ProcessConfiguration {
     public static final String MAIN_CLASS_KEY = "mainClass";
     public static final String PLUGIN_ID_KEY = "pluginId";
     public static final String PROCESS_ID_KEY = "processId";
+    public static final String BATCH_ID_KEY = "batchId";
     public static final String PLUGIN_PAYLOAD_BASE64_KEY = "pluginPayloadBase64";
     public static final String SOUT_FILE_KEY = "SOUT";
     public static final String SERR_FILE_KEY = "SERR";

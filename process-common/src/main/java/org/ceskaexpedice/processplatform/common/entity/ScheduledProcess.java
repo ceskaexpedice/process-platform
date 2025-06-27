@@ -29,17 +29,19 @@ public class ScheduledProcess {
     private String mainClass;
     private Map<String, String> payload;
     private List<String> jvmArgs;
+    private String batchId;
 
     public ScheduledProcess() {
     }
 
     public ScheduledProcess(String processId, String pluginId, String mainClass,
-                            Map<String, String> payload, List<String> jvmArgs) {
+                            Map<String, String> payload, List<String> jvmArgs, String batchId) {
         this.processId = processId;
         this.pluginId = pluginId;
         this.mainClass = mainClass;
         this.payload = payload;
         this.jvmArgs = jvmArgs;
+        this.batchId = batchId;
     }
 
     public String getProcessId() {
@@ -60,6 +62,10 @@ public class ScheduledProcess {
 
     public Map<String, String> getPayload() {
         return payload;
+    }
+
+    public String getBatchId() {
+        return batchId;
     }
 
 }

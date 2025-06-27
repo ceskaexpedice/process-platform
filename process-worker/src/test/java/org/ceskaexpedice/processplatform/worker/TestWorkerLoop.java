@@ -14,13 +14,10 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.worker.client.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ManagersAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginContextFactory;
-import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -28,20 +25,16 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
 import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
-import static org.ceskaexpedice.processplatform.worker.Constants.PLUGIN1_PROCESS_ID;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 /**
  * TestWorkerMain
@@ -65,7 +58,7 @@ public class TestWorkerLoop {
         workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
         workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
 
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ManagersAgentEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }

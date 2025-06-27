@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.common.entity.ProcessState;
 import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
@@ -93,7 +94,7 @@ public class TestPluginStarter {
         verify(managerClientMock, times(1)).updateProcessState(eq(PLUGIN1_PROCESS_ID), eq(ProcessState.FINISHED));
 
         // check TestPlugin1.createFullName to understand the following
-        verify(pluginContextMock, times(1)).scheduleProcess(isA(ScheduleProcess.class));
+        verify(pluginContextMock, times(1)).scheduleSubProcess(isA(ScheduleSubProcess.class));
         verify(pluginContextMock, times(1)).updateProcessName(eq("NewProcessName-PetrHarasil"));
     }
 

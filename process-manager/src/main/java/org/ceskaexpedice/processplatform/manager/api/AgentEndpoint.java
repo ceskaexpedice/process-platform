@@ -16,19 +16,14 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
+import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,17 +35,20 @@ import java.util.logging.Logger;
 public class AgentEndpoint {
     private static final Logger LOGGER = Logger.getLogger(AgentEndpoint.class.getName());
 
-    private final AgentService agentService;
+    private final ProfileService profileService;
+    private final ProcessService processService;
 
-    public AgentEndpoint(AgentService agentService) {
-        this.agentService = agentService;
+    public AgentEndpoint(ProfileService profileService, ProcessService processService) {
+        this.profileService = profileService;
+        this.processService = processService;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/register-plugin")
-    public void registerPlugin(PluginInfo pluginInfo) {
+    public Response registerPlugin(PluginInfo pluginInfo) {
         System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+        return Response.ok().build();
     }
 
     @GET
@@ -94,9 +92,10 @@ public class AgentEndpoint {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/schedule-process")
-    public void scheduleProcess(ScheduleProcess scheduleProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleProcess: " + scheduleProcess.getProfileId() + ",plugin-" + scheduleProcess.getPluginId());
+    @Path("/schedule-sub-process")
+    public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() + ",plugin-" +
+                scheduleSubProcess.getPluginId() + ",batchId-" + scheduleSubProcess.getBatchId());
     }
 
         /*

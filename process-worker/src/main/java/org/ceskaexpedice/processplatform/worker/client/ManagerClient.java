@@ -32,10 +32,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.entity.*;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
@@ -101,13 +98,13 @@ public class ManagerClient {
         }
     }
 
-    public void scheduleProcess(ScheduleProcess scheduleProcess) {
-        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/schedule-process";
+    public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/schedule-sub-process";
         HttpPost post = new HttpPost(url);
 
         String json;
         try {
-            json = mapper.writeValueAsString(scheduleProcess);
+            json = mapper.writeValueAsString(scheduleSubProcess);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

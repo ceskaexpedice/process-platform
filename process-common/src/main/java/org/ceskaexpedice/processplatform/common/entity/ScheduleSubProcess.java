@@ -24,30 +24,30 @@ import java.util.Map;
  * ScheduleProcess
  * @author ppodsednik
  */
-public class ScheduleProcess {
-    private String profileId;
-    private String pluginId;
-    private Map<String, String> payload;
+public class ScheduleSubProcess extends ScheduleProcess{
+    private String batchId;
+    private boolean pending = false;
 
-    public ScheduleProcess() {
+    public ScheduleSubProcess() {
     }
 
-    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload) {
-        this.profileId = profileId;
-        this.pluginId = pluginId;
-        this.payload = payload;
+    public ScheduleSubProcess(String profileId, String pluginId, Map<String, String> payload) {
+        super(profileId, pluginId, payload);
     }
 
-    public String getProfileId() {
-        return profileId;
+    public String getBatchId() {
+        return batchId;
     }
 
-    public String getPluginId() {
-        return pluginId;
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
     }
 
-    public Map<String, String> getPayload() {
-        return payload;
+    public boolean isPending() {
+        return pending;
     }
 
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
 }

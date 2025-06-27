@@ -15,7 +15,8 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.manager.api.service.AgentService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -38,9 +39,10 @@ public class TestAgentEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        AgentService agentService = mock(AgentService.class);
+        ProfileService profileService = mock(ProfileService.class);
+        ProcessService processService = mock(ProcessService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new AgentEndpoint(agentService));
+        resourceConfig.register(new AgentEndpoint(profileService, processService));
         return resourceConfig;
     }
 
