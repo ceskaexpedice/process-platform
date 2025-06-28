@@ -18,12 +18,15 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * ProcessEndpoint
@@ -41,87 +44,65 @@ public class ProcessEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scheduleProcess(ScheduleMainProcess scheduleProcess) {
+        String ownerId = scheduleProcess.getOwnerId(); // ownerId must be sent from Kramerius ProcessResource
+        // batch id is created here because this is main process
+        String batchId = UUID.randomUUID().toString();
+        // ownerId + batchId will be persisted to pcp-processes
+
         return Response.ok().entity("{}").build();
     }
 
-    @PUT
-    @Path("/{processId}/approve")
-    public Response approveProcess(@PathParam("processId") String processId) {
+    @GET
+    @Path("{processId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProcess(@PathParam("processId") String processId) {
         return Response.ok().build();
     }
 
     @GET
     @Path("owners")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
         return Response.ok().build();
     }
 
     @GET
-    @Path("by_process_id/{process_id}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getProcessByProcessId(@PathParam("process_id") String processId) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("by_process_uuid/{process_uuid}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getProcessByProcessUuid(@PathParam("process_uuid") String processUuid) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("by_process_uuid/{process_uuid}/logs/out")
+    @Path("{processId}/logs/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsOutByProcessUuid(@PathParam("process_uuid") String processUuid,
+    public Response getProcessLogsOut(@PathParam("processId") String processId,
                                                    @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
         return Response.ok().build();
     }
 
     @GET
-    @Path("by_process_uuid/{process_uuid}/logs/err")
+    @Path("{processId}/logs/err")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsErrByProcessUuid(@PathParam("process_uuid") String processUuid,
+    public Response getProcessLogsErr(@PathParam("processId") String processId,
                                                    @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
         return Response.ok().build();
     }
 
     @GET
-    @Path("by_process_uuid/{process_uuid}/logs/out/lines")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getProcessLogsOutLinesByProcessUuid(@PathParam("process_uuid") String processUuid,
+    @Path("{processId}/logs/out/lines")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProcessLogsOutLines(@PathParam("processId") String processId,
                                                         @QueryParam("offset") String offsetStr,
                                                         @QueryParam("limit") String limitStr) {
         return Response.ok().build();
     }
 
     @GET
-    @Path("by_process_uuid/{process_uuid}/logs/err/lines")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getProcessLogsErrLinesByProcessUuid(@PathParam("process_uuid") String processUuid,
+    @Path("{processId}/logs/err/lines")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProcessLogsErrLines(@PathParam("processId") String processId,
                                                         @QueryParam("offset") String offsetStr,
                                                         @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("batches/by_first_process_id/{process_id}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response deleteBatch(@PathParam("process_id") String processId) {
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("batches/by_first_process_id/{process_id}/execution")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response killBatch(@PathParam("process_id") String processId) {
         return Response.ok().build();
     }
 
     @GET
     @Path("batches")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getBatches(
             @QueryParam("offset") String offsetStr,
             @QueryParam("limit") String limitStr,
@@ -132,6 +113,21 @@ public class ProcessEndpoint {
     ) {
         return Response.ok().build();
     }
+
+    @DELETE
+    @Path("batches/by_first_process_id/{processId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteBatch(@PathParam("processId") String processId) {
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("batches/by_first_process_id/{processId}/execution")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response killBatch(@PathParam("processId") String processId) {
+        return Response.ok().build();
+    }
+
 
 
 }

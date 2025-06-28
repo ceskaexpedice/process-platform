@@ -145,7 +145,6 @@ public class PluginStarter implements PluginContext {
     @Override
     public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         scheduleSubProcess.setBatchId(processConfiguration.get(BATCH_ID_KEY));
-        scheduleSubProcess.setPending(true);
         managerClient.scheduleSubProcess(scheduleSubProcess);
     }
 

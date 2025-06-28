@@ -140,7 +140,6 @@ public class TestManagerClient {
 
         ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(
                 PLUGIN1_PROFILE_BIG,
-                PLUGIN1_ID,
                 payload
         );
         scheduleSubProcess.setBatchId("batchId");

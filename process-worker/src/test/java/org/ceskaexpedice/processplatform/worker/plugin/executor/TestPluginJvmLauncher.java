@@ -79,7 +79,8 @@ public class TestPluginJvmLauncher {
                 PLUGIN1_MAIN_CLASS,
                 payload,
                 jvmArgs,
-                "batchId");
+                "batchId",
+                "ownerId");
 
         int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
         Assertions.assertEquals(0, exitCode);

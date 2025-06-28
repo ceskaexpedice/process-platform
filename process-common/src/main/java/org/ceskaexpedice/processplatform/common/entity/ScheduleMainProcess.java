@@ -30,8 +30,8 @@ public class ScheduleMainProcess extends ScheduleProcess{
     public ScheduleMainProcess() {
     }
 
-    public ScheduleMainProcess(String profileId, String pluginId, Map<String, String> payload, String ownerId) {
-        super(profileId, pluginId, payload);
+    public ScheduleMainProcess(String profileId, Map<String, String> payload, String ownerId) {
+        super(profileId, payload);
         this.ownerId = ownerId;
     }
 

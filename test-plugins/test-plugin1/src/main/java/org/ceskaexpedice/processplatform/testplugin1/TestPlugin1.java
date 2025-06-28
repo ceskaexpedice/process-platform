@@ -19,7 +19,7 @@ public class TestPlugin1 {
         // we can use the context too...
         PluginContext pluginContext = PluginContextHolder.getContext();
         pluginContext.updateProcessName("NewProcessName-" + fullName);
-        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess("testPlugin2", "testPlugin2", new HashMap<>());
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess("testPlugin2", new HashMap<>());
         pluginContext.scheduleSubProcess(scheduleSubProcess);
     }
 

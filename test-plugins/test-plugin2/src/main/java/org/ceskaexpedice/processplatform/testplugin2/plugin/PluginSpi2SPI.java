@@ -21,6 +21,7 @@ import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class PluginSpi2SPI implements PluginSpi {
 
@@ -43,6 +44,11 @@ public class PluginSpi2SPI implements PluginSpi {
     public Map<String, PayloadFieldSpec> getPayloadSpec() {
         Map<String, PayloadFieldSpec>  map = new HashMap<>();
         return map;
+    }
+
+    @Override
+    public Set<String> getScheduledProfiles() {
+        return Set.of();
     }
 
 }

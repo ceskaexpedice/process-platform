@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.api;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ProcessPlugin
@@ -33,4 +34,6 @@ public interface PluginSpi {
     String getMainClass();       // e.g., "cz.kramerius.plugin.importer.Main"
 
     Map<String, PayloadFieldSpec> getPayloadSpec();
+
+    Set<String> getScheduledProfiles();
 }

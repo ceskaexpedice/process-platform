@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.common.entity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * PluginInfoTO
@@ -28,17 +29,20 @@ public class PluginInfo {
     private String description;
     private String mainClass;
     private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
+    private Set<String> scheduledProfiles;
     private List<PluginProfile> profiles;
 
     public PluginInfo() {
     }
 
     public PluginInfo(String pluginId, String description, String mainClass,
-                      Map<String, PayloadFieldSpec> payloadFieldSpecMap, List<PluginProfile> profiles) {
+                      Map<String, PayloadFieldSpec> payloadFieldSpecMap,
+                      Set<String> scheduledProfiles, List<PluginProfile> profiles) {
         this.pluginId = pluginId;
         this.description = description;
         this.mainClass = mainClass;
         this.payloadFieldSpecMap = payloadFieldSpecMap;
+        this.scheduledProfiles = scheduledProfiles;
         this.profiles = profiles;
     }
 
@@ -60,6 +64,10 @@ public class PluginInfo {
 
     public List<PluginProfile> getProfiles() {
         return profiles;
+    }
+
+    public Set<String> getScheduledProfiles() {
+        return scheduledProfiles;
     }
 
 }

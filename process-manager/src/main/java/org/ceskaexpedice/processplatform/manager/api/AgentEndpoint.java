@@ -54,10 +54,11 @@ public class AgentEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/next-process")
-    public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("tags") List<String> tags) {
         try {
             ScheduledProcess scheduledProcess = new ScheduledProcess();
-            return scheduledProcess;
+            // batchId
+            return  Response.ok(scheduledProcess).build();
         } catch (WebApplicationException e) {
             throw e;
         } catch (Throwable e) {
@@ -93,9 +94,10 @@ public class AgentEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/schedule-sub-process")
-    public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() + ",plugin-" +
                 scheduleSubProcess.getPluginId() + ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
     }
 
         /*

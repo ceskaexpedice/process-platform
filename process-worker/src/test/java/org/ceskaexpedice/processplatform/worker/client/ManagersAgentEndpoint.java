@@ -50,7 +50,7 @@ public class ManagersAgentEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/next-process")
-    public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("tags") List<String> tags) {
         System.out.print("ManagerAgentEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
@@ -69,9 +69,10 @@ public class ManagersAgentEndpoint {
                     Constants.PLUGIN1_MAIN_CLASS,
                     payload,
                     jvmArgs,
-                    "batchId");
+                    "batchId",
+                    "ownerId");
             System.out.println(scheduledProcess.getProcessId());
-            return scheduledProcess;
+            return Response.ok(scheduledProcess).build();
         } else if (counter == 2) {
             ScheduledProcess scheduledProcess = new ScheduledProcess(
                     Constants.PLUGIN2_PROCESS_ID,
@@ -79,9 +80,10 @@ public class ManagersAgentEndpoint {
                     Constants.PLUGIN2_MAIN_CLASS,
                     new HashMap<>(),
                     new ArrayList<>(),
-                    "batchId");
+                    "batchId",
+                    "ownerId");
             System.out.println(scheduledProcess.getProcessId());
-            return scheduledProcess;
+            return Response.ok(scheduledProcess).build();
         } else {
             System.out.println("null");
             return null;
@@ -115,9 +117,10 @@ public class ManagersAgentEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/schedule-sub-process")
-    public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() + ",plugin-" +
-                scheduleSubProcess.getPluginId() + ",batchId-" + scheduleSubProcess.getBatchId());
+    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
+                ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
     }
 
 

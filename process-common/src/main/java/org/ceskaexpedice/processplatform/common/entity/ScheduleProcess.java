@@ -26,24 +26,18 @@ import java.util.Map;
  */
 public class ScheduleProcess {
     private String profileId;
-    private String pluginId;
     private Map<String, String> payload;
 
     public ScheduleProcess() {
     }
 
-    public ScheduleProcess(String profileId, String pluginId, Map<String, String> payload) {
+    public ScheduleProcess(String profileId, Map<String, String> payload) {
         this.profileId = profileId;
-        this.pluginId = pluginId;
         this.payload = payload;
     }
 
     public String getProfileId() {
         return profileId;
-    }
-
-    public String getPluginId() {
-        return pluginId;
     }
 
     public Map<String, String> getPayload() {

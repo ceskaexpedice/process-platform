@@ -26,13 +26,12 @@ import java.util.Map;
  */
 public class ScheduleSubProcess extends ScheduleProcess{
     private String batchId;
-    private boolean pending = false;
 
     public ScheduleSubProcess() {
     }
 
-    public ScheduleSubProcess(String profileId, String pluginId, Map<String, String> payload) {
-        super(profileId, pluginId, payload);
+    public ScheduleSubProcess(String profileId, Map<String, String> payload) {
+        super(profileId, payload);
     }
 
     public String getBatchId() {
@@ -43,11 +42,4 @@ public class ScheduleSubProcess extends ScheduleProcess{
         this.batchId = batchId;
     }
 
-    public boolean isPending() {
-        return pending;
-    }
-
-    public void setPending(boolean pending) {
-        this.pending = pending;
-    }
 }

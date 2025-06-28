@@ -97,6 +97,7 @@ public final class PluginsLoader {
         String pluginId = plugin.getPluginId();
         String description = plugin.getDescription();
         String mainClass = plugin.getMainClass();
+        Set<String> scheduledProfiles = plugin.getScheduledProfiles();
         Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
 
         List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
@@ -105,7 +106,7 @@ public final class PluginsLoader {
             profiles.add(defaultProfile);
         }
 
-        return new PluginInfo(pluginId, description, mainClass, payloadSpec, profiles);
+        return new PluginInfo(pluginId, description, mainClass, payloadSpec, scheduledProfiles, profiles);
     }
 
 }
