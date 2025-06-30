@@ -14,8 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author ppodsednik
  */
-public class TestProfileEndpoint extends JerseyTest {
+public class TestPluginEndpoint extends JerseyTest {
 
     //public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
     //private HttpServer server;
@@ -48,9 +47,9 @@ public class TestProfileEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        ProfileService profileServiceMock = mock(ProfileService.class);
+        PluginService pluginServiceMock = mock(PluginService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProfileEndpoint(profileServiceMock));
+        resourceConfig.register(new PluginEndpoint(pluginServiceMock));
         return resourceConfig;
     }
 

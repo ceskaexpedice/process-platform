@@ -17,8 +17,9 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,101 +29,100 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * WorkerEndpoint
+ * ManagerAgentEndpoint
  * @author ppodsednik
  */
 @Path("/agent")
-public class AgentEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(AgentEndpoint.class.getName());
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class ManagerAgentEndpoint {
+    private static final Logger LOGGER = Logger.getLogger(ManagerAgentEndpoint.class.getName());
 
-    private final ProfileService profileService;
+    private final PluginService pluginService;
     private final ProcessService processService;
 
-    public AgentEndpoint(ProfileService profileService, ProcessService processService) {
-        this.profileService = profileService;
+    public ManagerAgentEndpoint(PluginService pluginService, ProcessService processService) {
+        this.pluginService = pluginService;
         this.processService = processService;
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/register-plugin")
-    public Response registerPlugin(PluginInfo pluginInfo) {
-        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
-        return Response.ok().build();
-    }
-
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/next-process")
-    public Response getNextProcess(@QueryParam("tags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("workerId") String workerId, @QueryParam("workerTags") List<String> tags) {
         try {
             ScheduledProcess scheduledProcess = new ScheduledProcess();
             // batchId
-            return  Response.ok(scheduledProcess).build();
-        } catch (WebApplicationException e) {
-            throw e;
-        } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new RuntimeException(e.getMessage());
+            if (scheduledProcess != null) {
+                return Response.ok(scheduledProcess).build();
+            } else {
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
+        }
+    }
+
+    @POST
+    @Path("/register-plugin")
+    public Response registerPlugin(PluginInfo pluginInfo) {
+        try {
+            System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+            return Response.ok().build();
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
+        }
+    }
+
+    @POST
+    @Path("/schedule-sub-process")
+    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        try {
+            System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
+                    + ",batchId-" + scheduleSubProcess.getBatchId());
+            return Response.ok().build();
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
         }
     }
 
     @PUT
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
-        return Response.ok().build();
+        try {
+            // Store OS process ID of the spawned JVM
+            System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
+        }
     }
 
     @PUT
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
-        return Response.ok().build();
+        try {
+            // Store OS process ID of the spawned JVM
+            System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
+        }
     }
 
     @PUT
     @Path("/name/{processId}")
     public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
-        return Response.ok().build();
+        try {
+            // Store OS process ID of the spawned JVM
+            System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+            return Response.ok().build();
+        } catch (Exception e) {
+            return APIRestUtilities.exceptionToErrorResponse(e);
+        }
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/schedule-sub-process")
-    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() + ",plugin-" +
-                scheduleSubProcess.getPluginId() + ",batchId-" + scheduleSubProcess.getBatchId());
-        return Response.ok().build();
-    }
 
         /*
-    @GET
-    @Path("/next-process")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ScheduledProcess getNextProcess(@QueryParam("tags") List<String> tags) {
-        return agentService.getNextScheduledProcess();
-                // Implementation: fetch next process from DB
-        ScheduledProcessTO scheduledProcessTO = new ScheduledProcessTO(
-                UUID.randomUUID(),
-                "pluginInfo.getPluginId()",
-                "profileId",
-                "pluginInfo.getMainClass()",
-                null,
-                null,
-                null);
-        if (scheduledProcessTO != null) {
-            return Response.ok(scheduledProcessTO).build();
-        } else {
-            return Response.status(Response.Status.NO_CONTENT).build();
-        }
-
-
-    }*/
 
     /*
     @GET

@@ -15,9 +15,6 @@
 package org.ceskaexpedice.processplatform.worker.client;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.entity.*;
 import org.ceskaexpedice.processplatform.worker.Constants;
 
@@ -31,7 +28,9 @@ import java.util.*;
  * @author ppodsednik
  */
 @Path("/agent")
-public class ManagersAgentEndpoint {
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class ManagerAgentTestEndpoint {
     //private final AgentService agentService;
     private static int counter;
 
@@ -40,17 +39,9 @@ public class ManagersAgentEndpoint {
     //this.agentService = agentService;
   }*/
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/register-plugin")
-    public void registerPlugin(PluginInfo pluginInfo) {
-        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
-    }
-
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/next-process")
-    public Response getNextProcess(@QueryParam("tags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("workerId") String workerId, @QueryParam("workerTags") List<String> tags) {
         System.out.print("ManagerAgentEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
@@ -90,6 +81,21 @@ public class ManagersAgentEndpoint {
         }
     }
 
+    @POST
+    @Path("/register-plugin")
+    public Response registerPlugin(PluginInfo pluginInfo) {
+        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/schedule-sub-process")
+    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
+                ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
+    }
+
     @PUT
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
@@ -111,15 +117,6 @@ public class ManagersAgentEndpoint {
     public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
         // Store OS process ID of the spawned JVM
         System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
-        return Response.ok().build();
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/schedule-sub-process")
-    public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
-                ",batchId-" + scheduleSubProcess.getBatchId());
         return Response.ok().build();
     }
 

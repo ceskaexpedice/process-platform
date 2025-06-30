@@ -126,12 +126,13 @@ public class ManagerClient {
         HttpGet get;
         try {
             uriBuilder = new URIBuilder(workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/next-process");
+            uriBuilder.addParameter(WorkerConfiguration.WORKER_ID_KEY, workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
             List<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_TAGS_KEY).split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
                     .toList();
             for (String tag : tags) {
-                uriBuilder.addParameter("tags", tag);
+                uriBuilder.addParameter(WorkerConfiguration.WORKER_TAGS_KEY, tag);
             }
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);

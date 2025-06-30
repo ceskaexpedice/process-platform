@@ -16,8 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import org.ceskaexpedice.processplatform.manager.api.AgentEndpoint;
-import org.ceskaexpedice.processplatform.manager.api.ProfileEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -25,20 +25,20 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.ws.rs.ApplicationPath;
 
 /**
- * WorkerApplication
+ * ManagerApplication
  * @author ppodsednik
  */
 @ApplicationPath("/api")
 public class ManagerApplication extends ResourceConfig {
 
     public ManagerApplication() {
-        register(AgentEndpoint.class);
+        register(ManagerAgentEndpoint.class);
 
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(AgentEndpointFactory.class).to(AgentEndpoint.class);
-                bindFactory(ProfileEndpointFactory.class).to(ProfileEndpoint.class);
+                bindFactory(ManagerAgentEndpointFactory.class).to(ManagerAgentEndpoint.class);
+                bindFactory(ProfileEndpointFactory.class).to(PluginEndpoint.class);
                 bindFactory(ProcessEndpointFactory.class).to(ProcessEndpoint.class);
             }
         });

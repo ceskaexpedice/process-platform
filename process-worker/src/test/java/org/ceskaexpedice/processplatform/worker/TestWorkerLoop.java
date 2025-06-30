@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.worker.client.ManagersAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ManagerAgentTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -58,7 +58,7 @@ public class TestWorkerLoop {
         workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
         workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
 
-        final ResourceConfig rc = new ResourceConfig(ManagersAgentEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }

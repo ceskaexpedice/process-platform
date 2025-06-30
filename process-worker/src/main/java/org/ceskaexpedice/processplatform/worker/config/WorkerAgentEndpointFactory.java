@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.config;
+package org.ceskaexpedice.processplatform.worker.config;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
-import org.ceskaexpedice.processplatform.manager.api.AgentEndpoint;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
+import org.ceskaexpedice.processplatform.worker.WorkerMain;
+import org.ceskaexpedice.processplatform.worker.api.WorkerAgentEndpoint;
+import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
@@ -29,19 +29,19 @@ import javax.inject.Inject;
  * ManagerEndpointFactory
  * @author ppodsednik
  */
-public class AgentEndpointFactory implements Factory<AgentEndpoint> {
+public class WorkerAgentEndpointFactory implements Factory<WorkerAgentEndpoint> {
 
     @Inject
     private HttpServletRequest request;
 
     @Override
-    public AgentEndpoint provide() {
+    public WorkerAgentEndpoint provide() {
         ServletContext ctx = request.getServletContext();
-       // WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new AgentEndpoint(new ProfileService(), new ProcessService());
+        WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
+        return new WorkerAgentEndpoint(new WorkerAgentService(workerMain));
     }
 
     @Override
-    public void dispose(AgentEndpoint t) {
+    public void dispose(WorkerAgentEndpoint t) {
     }
 }

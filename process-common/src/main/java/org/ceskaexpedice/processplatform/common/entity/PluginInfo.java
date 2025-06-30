@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * PluginInfoTO
+ * PluginInfo
  * @author ppodsednik
  */
 public class PluginInfo {

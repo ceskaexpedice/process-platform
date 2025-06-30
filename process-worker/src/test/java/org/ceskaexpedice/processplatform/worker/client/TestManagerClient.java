@@ -49,7 +49,7 @@ public class TestManagerClient {
 
     @BeforeEach
     public void setUp() throws Exception {
-        final ResourceConfig rc = new ResourceConfig(ManagersAgentEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
         server.start();
     }
@@ -65,6 +65,7 @@ public class TestManagerClient {
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
         String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
         workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
+        workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         ScheduledProcess nextProcess = managerClient.getNextProcess();
         System.out.println("entity");

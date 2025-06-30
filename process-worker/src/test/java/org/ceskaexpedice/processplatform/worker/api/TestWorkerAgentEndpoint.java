@@ -12,14 +12,12 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.manager.api;
+package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
+import org.ceskaexpedice.processplatform.worker.Constants;
+import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
@@ -30,27 +28,27 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestRest Description
- *
+ * TestAgentEndpoint
  * @author ppodsednik
  */
-public class TestAgentEndpoint extends JerseyTest {
+public class TestWorkerAgentEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        ProfileService profileService = mock(ProfileService.class);
-        ProcessService processService = mock(ProcessService.class);
+        WorkerAgentService agentServiceMock = mock(WorkerAgentService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new AgentEndpoint(profileService, processService));
+        resourceConfig.register(new WorkerAgentEndpoint(agentServiceMock));
         return resourceConfig;
     }
 
+
     @Test
-    public void testNextProcess() {
-        Response response = target("agent/next-process").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        Assertions.assertEquals(200, response.getStatus());
-        ScheduledProcess entity = response.readEntity(ScheduledProcess.class);
+    public void testGetLogs() {
+        Response response = target("agent/logs/" + Constants.PLUGIN1_PROCESS_ID)
+                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        //Assertions.assertEquals(200, response.getStatus());
+        String entity = response.readEntity(String.class);
         System.out.println(entity);
     }
 

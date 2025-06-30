@@ -39,6 +39,7 @@ public class WorkerConfiguration {
     public static final String STARTER_CLASSPATH_KEY = "starterClasspath";
     public static final String MANAGER_BASE_URL_KEY = "managerBaseUrl";
     public static final String WORKER_TAGS_KEY = "workerTags";
+    public static final String WORKER_ID_KEY = "workerId";
 
     private final Properties props = new Properties();
 
