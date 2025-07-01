@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 /**
- * AdminService
+ * ProcessService
  * @author ppodsednik
  */
 public class ProcessService {

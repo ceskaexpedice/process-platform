@@ -21,6 +21,10 @@ import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 
 import java.util.List;
 
+/**
+ * PluginService
+ * @author ppodsednik
+ */
 public class PluginService {
     
     public List<PluginProfile> getProfiles() {

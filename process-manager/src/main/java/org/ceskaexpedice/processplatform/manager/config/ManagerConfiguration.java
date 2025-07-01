@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
 /**
  * WorkerConfiguration

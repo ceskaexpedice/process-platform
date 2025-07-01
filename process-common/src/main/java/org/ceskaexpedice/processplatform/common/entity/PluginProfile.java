@@ -47,5 +47,16 @@ public class PluginProfile {
     public List<String> getJvmArgs() {
         return jvmArgs;
     }
-// Getters and setters
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
+
+    public void setJvmArgs(List<String> jvmArgs) {
+        this.jvmArgs = jvmArgs;
+    }
 }

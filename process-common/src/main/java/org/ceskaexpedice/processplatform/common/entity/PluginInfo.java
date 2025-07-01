@@ -70,4 +70,27 @@ public class PluginInfo {
         return scheduledProfiles;
     }
 
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setMainClass(String mainClass) {
+        this.mainClass = mainClass;
+    }
+
+    public void setPayloadFieldSpecMap(Map<String, PayloadFieldSpec> payloadFieldSpecMap) {
+        this.payloadFieldSpecMap = payloadFieldSpecMap;
+    }
+
+    public void setScheduledProfiles(Set<String> scheduledProfiles) {
+        this.scheduledProfiles = scheduledProfiles;
+    }
+
+    public void setProfiles(List<PluginProfile> profiles) {
+        this.profiles = profiles;
+    }
 }
