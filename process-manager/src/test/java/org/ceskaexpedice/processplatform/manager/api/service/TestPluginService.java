@@ -16,23 +16,22 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.manager.db.DatabaseProcessManager;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.manager.db.LRProcess;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * TestWorkerMain
  *
  * @author ppodsednik
  */
-public class TestToDelete {
+public class TestPluginService {
 
     @BeforeEach
     public void setUp() {
@@ -43,13 +42,12 @@ public class TestToDelete {
     }
 
     @Test
-    public void testDb() {
-        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(null);
-        Connection connection = dbConnectionProvider.get();
-        DatabaseProcessManager databaseProcessManager = new DatabaseProcessManager(dbConnectionProvider);
-        List<PluginProfile> profiles = databaseProcessManager.getProfiles("testPlugin1-big");
-        List<PluginInfo> plugins = databaseProcessManager.getPlugins("testPlugin1", profiles);
-        System.out.println("Profiles: " + profiles);
+    public void testGetProfile() {
+        ManagerConfiguration managerConfiguration = new ManagerConfiguration(new Properties());
+        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
+        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
+        PluginProfile profile = pluginService.getProfile("testPlugin1-big");
+        System.out.println("Profile: " + profile);
     }
 
 }

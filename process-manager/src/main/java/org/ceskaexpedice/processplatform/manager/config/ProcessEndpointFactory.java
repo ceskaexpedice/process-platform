@@ -37,7 +37,8 @@ public class ProcessEndpointFactory implements Factory<ProcessEndpoint> {
     public ProcessEndpoint provide() {
         ServletContext ctx = request.getServletContext();
        // WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new ProcessEndpoint(new ProcessService());
+        //return new ProcessEndpoint(new ProcessService());
+        return null;
     }
 
     @Override

@@ -38,7 +38,8 @@ public class ManagerAgentEndpointFactory implements Factory<ManagerAgentEndpoint
     public ManagerAgentEndpoint provide() {
         ServletContext ctx = request.getServletContext();
        // WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new ManagerAgentEndpoint(new PluginService(), new ProcessService());
+        //return new ManagerAgentEndpoint(new PluginService(), new ProcessService());
+        return null;
     }
 
     @Override

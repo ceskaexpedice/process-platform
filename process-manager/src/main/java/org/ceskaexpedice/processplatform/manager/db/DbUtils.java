@@ -4,9 +4,9 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DatabaseUtils {
+public class DbUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(DatabaseUtils.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DbUtils.class.getName());
 
 
     public static boolean isColumnNotNull(Connection con, String tableName, String colName) throws SQLException {

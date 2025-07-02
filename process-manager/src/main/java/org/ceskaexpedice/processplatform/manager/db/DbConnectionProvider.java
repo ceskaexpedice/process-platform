@@ -60,4 +60,9 @@ public class DbConnectionProvider {
         }
     }
 
+    public void close() {
+        if (dataSource instanceof HikariDataSource) {
+            ((HikariDataSource) dataSource).close();
+        }
+    }
 }

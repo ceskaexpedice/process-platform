@@ -18,6 +18,8 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.util.List;
 
@@ -26,12 +28,21 @@ import java.util.List;
  * @author ppodsednik
  */
 public class PluginService {
-    
-    public List<PluginProfile> getProfiles() {
-        return null;
+
+    private final ManagerConfiguration managerConfiguration;
+    private final PluginDao pluginDao;
+
+    public PluginService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider) {
+        this.managerConfiguration = managerConfiguration;
+        this.pluginDao = new PluginDao(dbConnectionProvider, managerConfiguration);
     }
 
     public PluginProfile getProfile(String profileId) {
+        List<PluginProfile> profiles = pluginDao.getProfiles(profileId);
+        return profiles.get(0);
+    }
+
+    public List<PluginProfile> getProfiles() {
         return null;
     }
 
@@ -55,5 +66,4 @@ public class PluginService {
         // yes → update; no → insert.
     }
 
-    // other CRUD methods
 }

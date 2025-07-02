@@ -16,9 +16,20 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+
 /**
  * ProcessService
  * @author ppodsednik
  */
 public class ProcessService {
+    private final ManagerConfiguration managerConfiguration;
+    private final DbConnectionProvider dbConnectionProvider;
+
+    public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider) {
+        this.managerConfiguration = managerConfiguration;
+        this.dbConnectionProvider = dbConnectionProvider;
+    }
+
 }

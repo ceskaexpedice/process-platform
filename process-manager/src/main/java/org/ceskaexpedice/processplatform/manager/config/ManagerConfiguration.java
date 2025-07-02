@@ -30,22 +30,74 @@ import java.util.stream.Collectors;
  * @author ppodsednik
  */
 public class ManagerConfiguration {
-    public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
-    public static final String DEFAULT_MANAGER_WORKDIR = WORKING_DIR + File.separator + "manager";
+    private static final String WORKER_URL_PREFIX = "worker.";
+    private static final String WORKER_URL_SUFFIX = ".url";
 
-    public static final String WORKER_URL_PREFIX = "worker.";
-    public static final String WORKER_URL_SUFFIX = ".url";
+    private final Properties props = new Properties();
 
-    private final Properties props;
+    public ManagerConfiguration(Properties fileProps) {
+        // Load from environment first
+        Map<String, String> env = System.getenv();
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            props.setProperty(entry.getKey(), entry.getValue());
+        }
 
-    public ManagerConfiguration(Properties props) {
-        this.props = props;
+        // Add properties from file (only if not already set by env)
+        for (String name : fileProps.stringPropertyNames()) {
+            props.putIfAbsent(name, fileProps.getProperty(name));
+        }
+    }
+
+    // Overloaded constructor for Map-based initialization
+    public ManagerConfiguration(Map<String, String> directProps) {
+        props.putAll(directProps);
+    }
+
+    public Map<String, String> getAll() {
+        Map<String, String> result = new HashMap<>();
+        for (String name : props.stringPropertyNames()) {
+            result.put(name, props.getProperty(name));
+        }
+        return result;
+    }
+
+    /**
+     * Gets a property value by key.
+     * @param key the property key
+     * @return the property value, or null if not found
+     */
+    public String get(String key) {
+        return props.getProperty(key);
+    }
+
+    /**
+     * Allows programmatic setting of a property.
+     * This is useful for tests or for dynamic overrides.
+     * @param key the property key
+     * @param value the property value
+     */
+    public void set(String key, String value) {
+        props.setProperty(key, value);
+    }
+
+    /**
+     * Convenience method to get a property with a default fallback.
+     * @param key the property key
+     * @param defaultValue the value to return if key is not found
+     * @return the property value or default
+     */
+    public String getOrDefault(String key, String defaultValue) {
+        return props.getProperty(key, defaultValue);
+    }
+
+    public String getWorkerUrl(String workerId) {
+        return getWorkerUrlMap().get(workerId);
     }
 
     /**
      * Returns a mapping of workerId to base URL
      */
-    public Map<String, String> getWorkerUrlMap() {
+    private Map<String, String> getWorkerUrlMap() {
         return props.entrySet().stream()
                 .filter(entry -> {
                     String key = entry.getKey().toString();
@@ -59,25 +111,12 @@ public class ManagerConfiguration {
 
     /**
      * Extracts workerId from key like "worker.worker-1.url"
+     * Example:
+     * worker.worker-1.url = http://localhost:8081
+     * worker.worker-2.url = http://10.0.0.5:8081
      */
     private String extractWorkerId(String key) {
         return key.substring(WORKER_URL_PREFIX.length(), key.length() - WORKER_URL_SUFFIX.length());
     }
 
-    public String getWorkerUrl(String workerId) {
-        return getWorkerUrlMap().get(workerId);
-    }
-
-    // Optional: default workdir if you want to use it for anything
-    public String getDefaultWorkdir() {
-        return DEFAULT_MANAGER_WORKDIR;
-    }
-    /*
-    worker.worker-1.url = http://localhost:8081
-worker.worker-2.url = http://10.0.0.5:8081
-
-ManagerConfiguration config = new ManagerConfiguration(loadProps());
-String url = config.getWorkerUrl("worker-1");
-
-     */
 }

@@ -60,7 +60,7 @@ public class ProcessDatabaseUtils {
             int r = prepareStatement.executeUpdate();
             LOGGER.log(Level.FINEST, "CREATE TABLE: updated rows {0}", r);
         } finally {
-            DatabaseUtils.tryClose(prepareStatement);
+            DbUtils.tryClose(prepareStatement);
         }
     }
 
@@ -71,7 +71,7 @@ public class ProcessDatabaseUtils {
             int r = prepareStatement.executeUpdate();
             LOGGER.log(Level.FINEST, "alter table {0}", r);
         } finally {
-            DatabaseUtils.tryClose(prepareStatement);
+            DbUtils.tryClose(prepareStatement);
         }
 
     }
@@ -149,7 +149,7 @@ public class ProcessDatabaseUtils {
             }.executeQuery("SELECT process_id FROM processes WHERE uuid = ?", lp.getUUID());
             return !list.isEmpty() ? list.get(0) : -1;
         } finally {
-            DatabaseUtils.tryClose(insertStatement);
+            DbUtils.tryClose(insertStatement);
         }
     }
 
@@ -178,7 +178,7 @@ public class ProcessDatabaseUtils {
             prepareStatement.setString(2, uuid);
             prepareStatement.executeUpdate();
         } finally {
-            DatabaseUtils.tryClose(prepareStatement);
+            DbUtils.tryClose(prepareStatement);
         }
     }
 
@@ -191,7 +191,7 @@ public class ProcessDatabaseUtils {
             prepareStatement.setString(2, uuid);
             prepareStatement.executeUpdate();
         } finally {
-            DatabaseUtils.tryClose(prepareStatement);
+            DbUtils.tryClose(prepareStatement);
         }
     }
 
@@ -217,7 +217,7 @@ public class ProcessDatabaseUtils {
             prepareStatement.setString(1, uuid);
             prepareStatement.executeUpdate();
         } finally {
-            DatabaseUtils.tryClose(prepareStatement);
+            DbUtils.tryClose(prepareStatement);
         }
     }
 

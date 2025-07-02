@@ -37,7 +37,8 @@ public class ProfileEndpointFactory implements Factory<PluginEndpoint> {
     public PluginEndpoint provide() {
         ServletContext ctx = request.getServletContext();
        // WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new PluginEndpoint(new PluginService());
+        //return new PluginEndpoint(new PluginService());
+        return null;
     }
 
     @Override

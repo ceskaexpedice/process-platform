@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.db;
+package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.common.entity.ProcessState;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.db.*;
 
 import java.sql.*;
 import java.util.*;
@@ -27,17 +29,18 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DatabaseProcessManager {
+public class PluginDao {
 
 
-    public static final Logger LOGGER = Logger.getLogger(DatabaseProcessManager.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());
     private final DbConnectionProvider dbConnectionProvider;
-
+    private final ManagerConfiguration managerConfiguration;
 
     private final Lock lock = new ReentrantLock();
 
-    public DatabaseProcessManager(DbConnectionProvider dbConnectionProvider) {
+    public PluginDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         this.dbConnectionProvider = dbConnectionProvider;
+        this.managerConfiguration = managerConfiguration;
     }
 
     public Connection getConnection() {

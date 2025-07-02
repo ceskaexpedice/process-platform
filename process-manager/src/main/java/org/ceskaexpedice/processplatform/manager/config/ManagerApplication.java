@@ -16,13 +16,17 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
+import jakarta.servlet.ServletContext;
 import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Context;
 
 /**
  * ManagerApplication
@@ -31,17 +35,13 @@ import javax.ws.rs.ApplicationPath;
 @ApplicationPath("/api")
 public class ManagerApplication extends ResourceConfig {
 
-    public ManagerApplication() {
-        register(ManagerAgentEndpoint.class);
+    public ManagerApplication(@Context ServletContext context) {
+        PluginService pluginService = (PluginService) context.getAttribute("pluginService");
+        ProcessService processService = (ProcessService) context.getAttribute("processService");
 
-        register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(ManagerAgentEndpointFactory.class).to(ManagerAgentEndpoint.class);
-                bindFactory(ProfileEndpointFactory.class).to(PluginEndpoint.class);
-                bindFactory(ProcessEndpointFactory.class).to(ProcessEndpoint.class);
-            }
-        });
+        register(new PluginEndpoint(pluginService));
+        register(new ProcessEndpoint(processService));
+        register(new ManagerAgentEndpoint(pluginService, processService));
     }
 
 }

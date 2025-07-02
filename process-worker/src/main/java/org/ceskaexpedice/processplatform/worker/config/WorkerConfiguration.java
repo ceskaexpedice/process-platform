@@ -54,7 +54,6 @@ public class WorkerConfiguration {
         for (String name : fileProps.stringPropertyNames()) {
             props.putIfAbsent(name, fileProps.getProperty(name));
         }
-
     }
 
     // Overloaded constructor for Map-based initialization
