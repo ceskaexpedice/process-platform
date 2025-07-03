@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.dao.PluginDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
@@ -38,8 +39,8 @@ public class PluginService {
     }
 
     public PluginProfile getProfile(String profileId) {
-        List<PluginProfile> profiles = pluginDao.getProfiles(profileId);
-        return profiles.get(0);
+        PluginProfile profile = pluginDao.getProfile(profileId);
+        return profile;
     }
 
     public List<PluginProfile> getProfiles() {

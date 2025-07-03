@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 public class DbConnectionProvider {
 
     private static final Logger LOGGER = Logger.getLogger(DbConnectionProvider.class.getName());
-//    private static DataSource dataSource = createDataSource();
     private DataSource dataSource;
 
     public DbConnectionProvider(ManagerConfiguration config) {
@@ -26,12 +25,9 @@ public class DbConnectionProvider {
     private static DataSource createDataSource(ManagerConfiguration config) {
         HikariDataSource ds = new HikariDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-//        ds.setJdbcUrl(KConfiguration.getInstance().getJdbcUrl());
-        ds.setJdbcUrl("jdbc:postgresql://localhost:15432/kramerius");
-        ds.setUsername("fedoraAdmin");
-//        ds.setUsername(KConfiguration.getInstance().getJdbcUserName());
-        ds.setPassword("fedoraAdmin");
-//        ds.setPassword(KConfiguration.getInstance().getJdbcUserPass());
+        ds.setJdbcUrl(config.get(ManagerConfiguration.JDBC_URL_KEY));
+        ds.setUsername(config.get(ManagerConfiguration.JDBC_USER_NAME_KEY));
+        ds.setPassword(config.get(ManagerConfiguration.JDBC_USER_PASSWORD_KEY));
 //        ds.setLeakDetectionThreshold(KConfiguration.getInstance().getConfiguration().getInt("jdbcLeakDetectionThreshold"));
 //        ds.setMaximumPoolSize(KConfiguration.getInstance().getConfiguration().getInt("jdbcMaximumPoolSize"));
 //

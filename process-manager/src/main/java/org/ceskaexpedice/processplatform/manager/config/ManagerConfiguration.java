@@ -16,9 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -30,8 +27,11 @@ import java.util.stream.Collectors;
  * @author ppodsednik
  */
 public class ManagerConfiguration {
-    private static final String WORKER_URL_PREFIX = "worker.";
-    private static final String WORKER_URL_SUFFIX = ".url";
+    private static final String WORKER_URL_KEY_PREFIX = "worker.";
+    private static final String WORKER_URL_KEY_SUFFIX = ".url";
+    public static final String JDBC_URL_KEY = "jdbcUrl";
+    public static final String JDBC_USER_NAME_KEY = "jdbcUsername";
+    public static final String JDBC_USER_PASSWORD_KEY = "jdbcPassword";
 
     private final Properties props = new Properties();
 
@@ -101,7 +101,7 @@ public class ManagerConfiguration {
         return props.entrySet().stream()
                 .filter(entry -> {
                     String key = entry.getKey().toString();
-                    return key.startsWith(WORKER_URL_PREFIX) && key.endsWith(WORKER_URL_SUFFIX);
+                    return key.startsWith(WORKER_URL_KEY_PREFIX) && key.endsWith(WORKER_URL_KEY_SUFFIX);
                 })
                 .collect(Collectors.toMap(
                         entry -> extractWorkerId(entry.getKey().toString()),
@@ -116,7 +116,7 @@ public class ManagerConfiguration {
      * worker.worker-2.url = http://10.0.0.5:8081
      */
     private String extractWorkerId(String key) {
-        return key.substring(WORKER_URL_PREFIX.length(), key.length() - WORKER_URL_SUFFIX.length());
+        return key.substring(WORKER_URL_KEY_PREFIX.length(), key.length() - WORKER_URL_KEY_SUFFIX.length());
     }
 
 }
