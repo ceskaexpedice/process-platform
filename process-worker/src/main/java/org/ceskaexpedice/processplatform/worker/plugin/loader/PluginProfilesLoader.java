@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 
 import java.io.File;
@@ -65,7 +66,7 @@ final class PluginProfilesLoader {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.toString(), e);
         }
     }
 
@@ -78,7 +79,7 @@ final class PluginProfilesLoader {
                 return profiles;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.toString(), e);
         }
     }
 }

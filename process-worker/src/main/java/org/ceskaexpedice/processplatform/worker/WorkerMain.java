@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -59,7 +60,7 @@ public class WorkerMain {
     private void registerPlugins() {
         List<PluginInfo> pluginsList = scanPlugins();
         if(pluginsList.isEmpty()){
-            throw new IllegalStateException("No plugins found");
+            throw new ApplicationException("No plugins found");
         }
         for (PluginInfo pluginInfo : pluginsList) {
             LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());

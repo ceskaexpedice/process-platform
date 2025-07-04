@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
@@ -155,17 +156,6 @@ public class PluginStarter implements PluginContext {
     private static void updatePID(ProcessConfiguration processConfiguration, ManagerClient managerClient) {
         String pid = getPid();
         managerClient.updateProcessPid(processConfiguration.get(PROCESS_ID_KEY), pid);
-
-        /*
-        try {
-            PID_UPDATED_BY_ME = ProcessUpdatingChannel.getChannel().updatePID(pid);
-        } catch (ClassNotFoundException e) {
-            throw new IOException(e);
-        } catch (IllegalAccessException e) {
-            throw new IOException(e);
-        } catch (InstantiationException e) {
-            throw new IOException(e);
-        }*/
     }
 
     private static void runPlugin(ProcessConfiguration processConfig, WorkerConfiguration workerConfig)
@@ -180,7 +170,7 @@ public class PluginStarter implements PluginContext {
             Class<?> clz = loader.loadClass(mainClass);
             ReflectionUtils.MethodType processMethod = annotatedMethodType(clz);
             if (processMethod == null) {
-                throw new IllegalStateException("Could not find process method for class: " + mainClass);
+                throw new ApplicationException("Could not find process method for class: " + mainClass);
             }
             String[] pluginArgs = {}; // TODO
             if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {

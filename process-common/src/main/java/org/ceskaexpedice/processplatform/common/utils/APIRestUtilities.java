@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.common.utils;
 
+import org.ceskaexpedice.processplatform.common.DataAccessException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -39,13 +41,10 @@ public final class APIRestUtilities {
             warn(e, id);
             return Response.status(Status.BAD_REQUEST).entity(jsonError(msg)).build();
         }
-        /*
-        if (e instanceof AspireException) {
-            error(logger, e, id);
+        if (e instanceof DataAccessException) {
+            error(e, id);
             return Response.serverError().entity(jsonError(msg)).build();
         }
-
-         */
 
         // Generic, some other not expected error
         // We need to hide any specific information

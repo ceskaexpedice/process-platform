@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.dao;
 
+import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.common.entity.ProcessState;
@@ -52,7 +53,7 @@ public class PluginDao {
             }.executeQuery("select " + "*" + " from PCP_PROFILE p  where PROFILE_ID = ?", profileId);
             return profiles.size() == 1 ? profiles.get(0) : null;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.toString(), e);
         }
     }
 

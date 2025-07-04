@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker.utils;
 
 import org.ceskaexpedice.processplatform.api.annotations.ParameterName;
 import org.ceskaexpedice.processplatform.api.annotations.ProcessMethod;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -64,7 +65,7 @@ public final class ReflectionUtils {
                 try {
                     params.add(instantiate(val, types[i]));
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new ApplicationException(e.toString(), e);
                 }
             } else {
                 params.add(val);

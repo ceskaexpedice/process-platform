@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.manager.config;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
@@ -37,7 +38,7 @@ public class ManagerStartupListener implements ServletContextListener {
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Cannot load manager.properties", e);
+            throw new ApplicationException("Cannot load manager.properties", e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
         DbConnectionProvider dbProvider = new DbConnectionProvider(config);

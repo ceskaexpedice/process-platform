@@ -32,6 +32,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.RemoteAgentException;
 import org.ceskaexpedice.processplatform.common.entity.*;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
@@ -83,18 +85,19 @@ public class ManagerClient {
         try {
             json = mapper.writeValueAsString(pluginInfo);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.toString(), e);
         }
         StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         post.setEntity(entity);
 
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
-            int statusCode = response.getCode();
+            statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
-                throw new IOException("Failed to register plugin. HTTP status: " + statusCode);
+                throw new RemoteAgentException("Failed to register plugin", "manager", statusCode, null);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
     }
 
@@ -106,18 +109,19 @@ public class ManagerClient {
         try {
             json = mapper.writeValueAsString(scheduleSubProcess);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.toString(), e);
         }
         StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
         post.setEntity(entity);
 
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
-            int statusCode = response.getCode();
+            statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
-                throw new IOException("Failed to register plugin. HTTP status: " + statusCode);
+                throw new RemoteAgentException("Failed to register plugin", "manager", statusCode, null);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
     }
 
@@ -137,8 +141,9 @@ public class ManagerClient {
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.toString(), e);
         }
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
             if (code == 200 || code == 204) {
@@ -156,10 +161,10 @@ public class ManagerClient {
 
             } else {
                 // Handle non-200 status
-                throw new IOException("Unexpected response code: " + code);
+                throw new RemoteAgentException("Unexpected response code", "manager", statusCode, null);
             }
         } catch (IOException | ParseException e) {
-            throw new RuntimeException("Failed to fetch next process", e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
 
 
@@ -247,13 +252,14 @@ public class ManagerClient {
         String url = String.format("%sagent/pid/%s?pid=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, pid);
         HttpPut httpPut = new HttpPut(url);
 
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
-            int statusCode = response.getCode();
+            statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+                throw new RemoteAgentException("Failed to update PID", "manager", statusCode, null);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
     }
 
@@ -261,13 +267,14 @@ public class ManagerClient {
         String url = String.format("%sagent/name/%s?name=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, name);
         HttpPut httpPut = new HttpPut(url);
 
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
-            int statusCode = response.getCode();
+            statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+                throw new RemoteAgentException("Failed to update PID", "manager", statusCode, null);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
     }
 
@@ -275,13 +282,14 @@ public class ManagerClient {
         String url = String.format("%sagent/state/%s?state=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, state);
         HttpPut httpPut = new HttpPut(url);
 
+        int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
-            int statusCode = response.getCode();
+            statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RuntimeException("Failed to update PID. HTTP code: " + statusCode);
+                throw new RemoteAgentException("Failed to update PID", "manager", statusCode, null);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
         }
     }
 

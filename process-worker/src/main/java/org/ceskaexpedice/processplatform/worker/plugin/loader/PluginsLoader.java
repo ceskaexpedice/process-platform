@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.PluginSpi;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
@@ -37,14 +38,14 @@ public final class PluginsLoader {
     public static URLClassLoader createPluginClassLoader(File pluginDir) {
         File[] jars = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jars == null || jars.length == 0) {
-            throw new IllegalStateException("No JAR files found in: " + pluginDir.getAbsolutePath());
+            throw new ApplicationException("No JAR files found in: " + pluginDir.getAbsolutePath());
         }
         URL[] urls = new URL[jars.length];
         for (int i = 0; i < jars.length; i++) {
             try {
                 urls[i] = jars[i].toURI().toURL();
             } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
+                throw new ApplicationException("Error loading JAR file: " + jars[i].getAbsolutePath(), e);
             }
         }
         return new URLClassLoader(urls, PluginsLoader.class.getClassLoader());
@@ -53,7 +54,7 @@ public final class PluginsLoader {
     public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
         File pluginDir = new File(pluginsDir, pluginId);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
-            throw new IllegalArgumentException("Plugin directory not found: " + pluginDir.getAbsolutePath());
+            throw new ApplicationException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
         return createPluginClassLoader(pluginDir);
     }
@@ -84,11 +85,11 @@ public final class PluginsLoader {
             try {
                 uri = codeSource.getLocation().toURI();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new ApplicationException(e.toString(), e);
             }
             pluginJar = new File(uri);
         } else {
-            throw new IllegalStateException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
+            throw new ApplicationException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
         }
         return pluginJar;
     }

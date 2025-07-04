@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.worker;
 
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
@@ -50,7 +51,7 @@ class WorkerLoop {
                         ScheduledProcess scheduledProcess = taskOpt.get();
                         int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
                         if (exitCode != 0) {
-                            throw new IllegalStateException("Failed to launch JVM");
+                            throw new ApplicationException("Failed to launch JVM");
                         }
                     } else {
                         int sleepSec = Integer.parseInt(workerConfiguration.get(WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY));
@@ -73,16 +74,11 @@ class WorkerLoop {
     }
 
     private Optional<ScheduledProcess> pollManagerForTask() {
-        try {
-            ScheduledProcess processTask = managerClient.getNextProcess();
-            if (processTask != null) {
-                return Optional.of(processTask);
-            } else {
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            LOGGER.severe("Polling error: " + e.getMessage());
-            throw new RuntimeException(e);
+        ScheduledProcess processTask = managerClient.getNextProcess();
+        if (processTask != null) {
+            return Optional.of(processTask);
+        } else {
+            return Optional.empty();
         }
     }
 

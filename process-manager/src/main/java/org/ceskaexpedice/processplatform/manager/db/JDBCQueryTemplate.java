@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.db;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+
 import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
@@ -127,7 +129,7 @@ public class JDBCQueryTemplate<T> {
                 setParam(i+j, Array.get(object, j), pstm);
             }
             return i+(length-1);
-        } else throw new IllegalArgumentException("unsupported type of argument "+object.getClass().getName());
+        } else throw new ApplicationException("unsupported type of argument "+object.getClass().getName());
         
     }
 

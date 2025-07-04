@@ -42,6 +42,7 @@ public class ManagerApplication extends ResourceConfig {
         register(new PluginEndpoint(pluginService));
         register(new ProcessEndpoint(processService));
         register(new ManagerAgentEndpoint(pluginService, processService));
+        // TODO register(GlobalExceptionMapper.class);
     }
 
 }

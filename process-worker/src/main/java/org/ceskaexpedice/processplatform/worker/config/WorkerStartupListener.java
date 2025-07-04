@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 
 import javax.servlet.ServletContextEvent;
@@ -39,7 +40,7 @@ public class WorkerStartupListener implements ServletContextListener {
                 fileProps.load(in);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error loading properties file", e);
+            throw new ApplicationException("Error loading properties file", e);
         }
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
         setStarterClasspath(sce, config);
