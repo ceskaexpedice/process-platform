@@ -57,8 +57,39 @@ public class PluginDao {
         }
     }
 
-    /*
-    public List<PluginInfo> getPlugins(String pluginId, List<PluginProfile> pluginProfiles) {
+    public List<PluginProfile> getProfiles() {
+        try (Connection connection = getConnection()) {
+            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
+                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    returnsList.add(pluginProfile);
+                    return false;
+                }
+            }.executeQuery("select " + "*" + " from PCP_PROFILE p");
+            return profiles;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public List<PluginProfile> getProfiles(String pluginId) {
+        try (Connection connection = getConnection()) {
+            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
+                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    returnsList.add(pluginProfile);
+                    return false;
+                }
+            }.executeQuery("select " + "*" + " from PCP_PROFILE p  where PLUGIN_ID = ?", pluginId);
+            return profiles;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public PluginInfo getPlugin(String pluginId, List<PluginProfile> pluginProfiles) {
         try (Connection connection = getConnection()) {
             List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
                 @Override
@@ -67,14 +98,12 @@ public class PluginDao {
                     returnsList.add(pluginProfile);
                     return true;
                 }
-            }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?",
-                    pluginId);
-            return processes;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            return Collections.EMPTY_LIST;
+            }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?", pluginId);
+            return processes.size() == 1 ? processes.get(0) : null;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
         }
-    }*/
+    }
 
 
     private Connection getConnection() {

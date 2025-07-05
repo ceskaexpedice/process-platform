@@ -44,7 +44,20 @@ public class PluginService {
     }
 
     public List<PluginProfile> getProfiles() {
-        return null;
+        List<PluginProfile> profiles = pluginDao.getProfiles();
+        return profiles;
+    }
+
+    public List<PluginProfile> getProfiles(String pluginId) {
+        List<PluginProfile> profiles = pluginDao.getProfiles(pluginId);
+        return profiles;
+    }
+
+    public PluginInfo getPlugin(String pluginId) {
+        // TODO get all scheduled processes hierarchically
+        List<PluginProfile> profiles = pluginDao.getProfiles(pluginId);
+        PluginInfo plugin = pluginDao.getPlugin(pluginId, profiles);
+        return plugin;
     }
 
     public void createProfile(PluginProfile profile) {

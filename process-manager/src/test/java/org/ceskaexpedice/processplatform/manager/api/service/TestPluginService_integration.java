@@ -14,12 +14,14 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,6 +30,7 @@ import java.util.Properties;
  * @author ppodsednik
  */
 public class TestPluginService_integration {
+    private static String PLUGIN1_ID = "testPlugin1";
     private static String PROFILE1_ID = "testPlugin1-big";
 
     private static Properties testsProperties;
@@ -47,18 +50,6 @@ public class TestPluginService_integration {
     }
 
     @Test
-    public void testGetPlugin() {
-    }
-
-    @Test
-    public void testGetPlugins() {
-    }
-
-    @Test
-    public void testValidatePayload() {
-    }
-
-    @Test
     public void testGetProfile() {
         PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
         Assertions.assertNotNull(profile);
@@ -68,7 +59,33 @@ public class TestPluginService_integration {
 
     @Test
     public void testGetProfiles() {
+        List<PluginProfile> profiles = pluginService.getProfiles();
+        Assertions.assertEquals(1, profiles.size());
     }
+
+    @Test
+    public void testGetProfiles_plugin() {
+        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(1, profiles.size());
+    }
+
+    @Test
+    public void testGetPlugin() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID);
+        Assertions.assertNotNull(pluginInfo);
+        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists");
+        Assertions.assertNull(pluginInfo);
+    }
+
+    @Test
+    public void testGetPlugins() {
+        // TODO plugins with profiles?
+    }
+
+    @Test
+    public void testValidatePayload() {
+    }
+
 
     @Test
     public void testCreateProfile() {

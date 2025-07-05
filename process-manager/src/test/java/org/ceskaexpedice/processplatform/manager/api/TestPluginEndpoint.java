@@ -15,6 +15,8 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import java.util.Properties;
 
 import static org.mockito.Mockito.mock;
 
@@ -47,9 +51,18 @@ public class TestPluginEndpoint extends JerseyTest {
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        PluginService pluginServiceMock = mock(PluginService.class);
+
+        //PluginService pluginServiceMock = mock(PluginService.class);
+        ManagerConfiguration managerConfiguration = new ManagerConfiguration(new Properties());
+        managerConfiguration.set(ManagerConfiguration.JDBC_URL_KEY, "jdbc:postgresql://localhost:15432/kramerius");
+        managerConfiguration.set(ManagerConfiguration.JDBC_USER_NAME_KEY, "fedoraAdmin");
+        managerConfiguration.set(ManagerConfiguration.JDBC_USER_PASSWORD_KEY, "fedoraAdmin");
+        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
+        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
+
+
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new PluginEndpoint(pluginServiceMock));
+        resourceConfig.register(new PluginEndpoint(pluginService));
         return resourceConfig;
     }
 
@@ -60,8 +73,8 @@ public class TestPluginEndpoint extends JerseyTest {
   }*/
 
     @Test
-    public void testGetProfiles() {
-        Response response = target("admin/profiles").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+    public void testGetPlugin() {
+        Response response = target("plugin/testPlugin1").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
         String entity = response.readEntity(String.class);
         System.out.println(entity);
