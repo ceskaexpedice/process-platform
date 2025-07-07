@@ -30,90 +30,6 @@ public final class APIRestUtilities {
     private APIRestUtilities() {
     }
 
-    public static Response exceptionToErrorResponse(Exception e) {
-        UUID id = UUID.randomUUID();
-        if (e instanceof NullPointerException) {
-            error(e, id);
-            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(jsonError(String.format("Null pointer exception - id %s",id))).build();
-        }
-        String msg = prepareMsg(e, id);
-        if (e instanceof IllegalArgumentException) {
-            warn(e, id);
-            return Response.status(Status.BAD_REQUEST).entity(jsonError(msg)).build();
-        }
-        if (e instanceof DataAccessException) {
-            error(e, id);
-            return Response.serverError().entity(jsonError(msg)).build();
-        }
-
-        // Generic, some other not expected error
-        // We need to hide any specific information
-        // global Message with id only generated
-        String globalMsg = String.format("Unexpected error, contact support - id %s", id);
-        error(e, id);
-        return Response.serverError().entity(jsonError(globalMsg)).build();
-    }
-
-    public static String exceptionToErrorMsg(Exception e) {
-        UUID id = UUID.randomUUID();
-        if (e instanceof NullPointerException) {
-            error(e, id);
-            return String.format("Null pointer exception - id %s",id);
-        }
-        String msg = prepareMsg(e, id);
-        if (e instanceof IllegalArgumentException) {
-            warn(e, id);
-            return msg;
-        }
-        /*
-        if (e instanceof AspireException) {
-            error(logger, e, id);
-            return msg;
-        }*/
-
-        // Generic, some other not expected error
-        // We need to hide any specific information
-        // global Message with id only generated
-        String globalMsg = String.format("Unexpected error, contact support - id %s", id);
-        error(e, id);
-        return globalMsg;
-    }
-
-    private static void error(Exception e, UUID id) {
-        //log(logger, Severity.ERROR, e, id);
-    }
-
-    private static void warn(Exception e, UUID id) {
-        //log(logger, Severity.WARN, e, id);
-    }
-
-    /*
-    private static void log(ALogger logger, Severity sev, Exception e, UUID id) {
-        if (logger != null)
-            logger.log(sev, e, "Exception in REST handler: id: %s, message: %s", id, e.getMessage());
-    }*/
-
-    /**
-     * Create a json style error message from the message on an exception
-     *
-     * @param e the exception
-     * @return the json
-     */
-    private static String jsonError(Exception e) {
-        return String.format("{\"error\":{\"message\": \"%s\"}}", e.toString());
-    }
-
-    /**
-     * Create a json style error message
-     *
-     * @return the json
-     */
-    private static String jsonError(String fmt, Object... args) {
-        String msg = args == null || args.length == 0 ? fmt : String.format(fmt, args);
-        return String.format("{\"error\":{\"message\": \"%s\"}}", msg);
-    }
-
-
     /**
      * Create a JAX response for an OK (200) message
      *
@@ -124,12 +40,6 @@ public final class APIRestUtilities {
     public static Response ok(String fmt, Object... args) {
         return Response.ok().entity(jsonMessage(fmt, args)).build();
     }
-
-    private static String jsonMessage(String fmt, Object... args) {
-        String msg = (args == null || args.length == 0) ? fmt : String.format(fmt, args);
-        return String.format("{\"message\": \"%s\"}", msg);
-    }
-
     /**
      * Create a JAX response for an Not Found (404) message
      *
@@ -170,7 +80,8 @@ public final class APIRestUtilities {
      */
     public static Response notAcceptable(Exception e) {
         UUID id = UUID.randomUUID();
-        error(e,id);
+        LOGGER.severe(String.format("Database error [%s]: %s", id, e.getMessage()));
+        //error(e,id);
         return Response.status(Status.NOT_ACCEPTABLE).entity(jsonMessage(prepareMsg(e,id))).build();
     }
 
@@ -194,6 +105,34 @@ public final class APIRestUtilities {
     public static Response jsonPayload(String jsonPayload) {
         return Response.ok(jsonPayload, MediaType.APPLICATION_JSON).build();
     }
+
+    /**
+     * Create a json style error message from the message on an exception
+     *
+     * @param e the exception
+     * @return the json
+     */
+    private static String jsonError(Exception e) {
+        return String.format("{\"error\":{\"message\": \"%s\"}}", e.toString());
+    }
+
+    /**
+     * Create a json style error message
+     *
+     * @return the json
+     */
+    private static String jsonError(String fmt, Object... args) {
+        String msg = args == null || args.length == 0 ? fmt : String.format(fmt, args);
+        return String.format("{\"error\":{\"message\": \"%s\"}}", msg);
+    }
+
+
+
+    private static String jsonMessage(String fmt, Object... args) {
+        String msg = (args == null || args.length == 0) ? fmt : String.format(fmt, args);
+        return String.format("{\"message\": \"%s\"}", msg);
+    }
+
 
 
     /**

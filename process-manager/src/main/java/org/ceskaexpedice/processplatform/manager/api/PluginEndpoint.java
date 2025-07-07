@@ -38,104 +38,74 @@ public class PluginEndpoint {
         this.pluginService = pluginService;
     }
 
+    // ------------- plugins ---------------------------
+
+    @GET
+    @Path("/{pluginId}")
+    public Response getPlugin(@PathParam("pluginId") String pluginId) {
+        PluginInfo pluginInfo = pluginService.getPlugin(pluginId);
+        if (pluginInfo == null) {
+            return APIRestUtilities.notFound("Plugin not found: %s", pluginId);
+        }
+        return Response.ok(pluginInfo).build();
+    }
+
+    @GET
+    public Response getPlugins(@QueryParam("withProfiles") boolean withProfiles) {
+        List<PluginInfo> plugins = pluginService.getPlugins(withProfiles);
+        return Response.ok(plugins).build();
+    }
+
+    @POST
+    @Path("validate_payload/{pluginId}")
+    public Response validatePayload(@PathParam("pluginId") String pluginId, Map<String, String> payload) {
+        pluginService.validatePayload(pluginId, payload);
+        return Response.ok().build();
+    }
+
+    // ------------- profiles ---------------------------
+
     @GET
     @Path("profile/{profileId}")
     public Response getProfile(@PathParam("profileId") String profileId) {
-        try {
-            PluginProfile profile = pluginService.getProfile(profileId);
-            return Response.ok(profile).build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        PluginProfile profile = pluginService.getProfile(profileId);
+        return Response.ok(profile).build();
     }
 
     @GET
     @Path("/profiles")
     public Response getProfiles() {
-        try {
-            List<PluginProfile> allProfiles = pluginService.getProfiles();
-            return Response.ok(allProfiles).build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
-    }
-
-    /*
-    @GET
-    @Path("/profiles")
-    public Response getProfiles(@QueryParam("pluginId") String pluginId) {
-        try {
-            List<PluginProfile> allProfiles = pluginService.getProfiles(pluginId);
-            return Response.ok(allProfiles).build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
-    }
-
-     */
-
-    @GET
-    @Path("/{pluginId}")
-    public Response getPlugin(@PathParam("pluginId") String pluginId) {
-        try {
-            PluginInfo pluginInfo = pluginService.getPlugin(pluginId);
-            return Response.ok(pluginInfo).build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        List<PluginProfile> allProfiles = pluginService.getProfiles();
+        return Response.ok(allProfiles).build();
     }
 
     @GET
-    public Response getPlugins() {
-        try {
-            List<PluginInfo> plugins = null;
-            return Response.ok(plugins).build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
-    }
-
-    @POST
-    @Path("validatePayload/{pluginId}")
-    public Response validatePayload(@PathParam("pluginId") String pluginId, Map<String, String> payload) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+    @Path("/plugin_profiles")
+    public Response getPluginProfiles(@QueryParam("pluginId") String pluginId) {
+        List<PluginProfile> allProfiles = pluginService.getProfiles(pluginId);
+        return Response.ok(allProfiles).build();
     }
 
     @POST
     @Path("/profile")
     public Response createProfile(PluginProfile profile) {
-        try {
-            pluginService.createProfile(profile);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        pluginService.createProfile(profile);
+        return Response.ok().build();
     }
 
     @PUT
     @Path("profile/{profileId}")
     public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
-        try {
-            pluginService.updateProfile(profileId, profile);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        pluginService.updateProfile(profileId, profile);
+        return Response.ok().build();
     }
 
     @DELETE
     @Path("profile/{profileId}")
     public Response deleteProfile(@PathParam("profileId") String profileId) {
-        try {
-            pluginService.deleteProfile(profileId);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        pluginService.deleteProfile(profileId);
+        return Response.ok().build();
     }
+
 
 }

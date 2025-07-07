@@ -49,76 +49,52 @@ public class ManagerAgentEndpoint {
     @GET
     @Path("/next-process")
     public Response getNextProcess(@QueryParam("workerId") String workerId, @QueryParam("workerTags") List<String> tags) {
-        try {
-            ScheduledProcess scheduledProcess = new ScheduledProcess();
-            // batchId
-            if (scheduledProcess != null) {
-                return Response.ok(scheduledProcess).build();
-            } else {
-                return Response.status(Response.Status.NO_CONTENT).build();
-            }
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
+        ScheduledProcess scheduledProcess = new ScheduledProcess();
+        // batchId
+        if (scheduledProcess != null) {
+            return Response.ok(scheduledProcess).build();
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).build();
         }
     }
 
     @POST
     @Path("/register-plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
-        try {
-            System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+        return Response.ok().build();
     }
 
     @POST
     @Path("/schedule-sub-process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        try {
-            System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
-                    + ",batchId-" + scheduleSubProcess.getBatchId());
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
+                + ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
     }
 
     @PUT
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
-        try {
-            // Store OS process ID of the spawned JVM
-            System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
+        return Response.ok().build();
     }
 
     @PUT
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
-        try {
-            // Store OS process ID of the spawned JVM
-            System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
+        return Response.ok().build();
     }
 
     @PUT
     @Path("/name/{processId}")
     public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
-        try {
-            // Store OS process ID of the spawned JVM
-            System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+        return Response.ok().build();
     }
 
 }

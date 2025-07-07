@@ -49,6 +49,28 @@ public class TestPluginService_integration {
         IntegrationTestsUtils.checkIntegrationTestsIgnored(testsProperties);
     }
 
+    // ------ plugins ----------
+
+    @Test
+    public void testGetPlugin() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(1, pluginInfo.getProfiles().size());
+        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists");
+        Assertions.assertNull(pluginInfo);
+    }
+
+    @Test
+    public void testGetPlugins() {
+        // TODO plugins with profiles?
+    }
+
+    @Test
+    public void testValidatePayload() {
+    }
+
+    // ------ profiles ----------
+
     @Test
     public void testGetProfile() {
         PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
@@ -64,28 +86,10 @@ public class TestPluginService_integration {
     }
 
     @Test
-    public void testGetProfiles_plugin() {
+    public void testGetPluginProfiles() {
         List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
         Assertions.assertEquals(1, profiles.size());
     }
-
-    @Test
-    public void testGetPlugin() {
-        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID);
-        Assertions.assertNotNull(pluginInfo);
-        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists");
-        Assertions.assertNull(pluginInfo);
-    }
-
-    @Test
-    public void testGetPlugins() {
-        // TODO plugins with profiles?
-    }
-
-    @Test
-    public void testValidatePayload() {
-    }
-
 
     @Test
     public void testCreateProfile() {

@@ -42,11 +42,7 @@ public class WorkerAgentEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     // TODO this just an example here
@@ -70,11 +66,7 @@ public class WorkerAgentEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsErr(@PathParam("processId") String processId,
                                       @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @GET
@@ -83,11 +75,7 @@ public class WorkerAgentEndpoint {
     public Response getProcessLogsOutLines(@PathParam("processId") String processId,
                                            @QueryParam("offset") String offsetStr,
                                            @QueryParam("limit") String limitStr) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @GET
@@ -96,20 +84,12 @@ public class WorkerAgentEndpoint {
     public Response getProcessLogsErrLines(@PathParam("processId") String processId,
                                            @QueryParam("offset") String offsetStr,
                                            @QueryParam("limit") String limitStr) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @POST
     @Path("/kill")
     public Response killJVM() {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 }

@@ -16,19 +16,20 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionMapper.class);
+    private static final Logger LOGGER = Logger.getLogger(GlobalExceptionMapper.class.getName());
 
     @Override
     public Response toResponse(Throwable e) {
@@ -37,24 +38,21 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         String msg = prepareMsg(e, id);
 
         // Customize status + message for known types
-        if (e instanceof IllegalArgumentException) {
-            log.warn("Illegal argument error [{}]: {}", id, e.getMessage());
+        if (e instanceof BusinessLogicException) {
+            LOGGER.warning(String.format("Business logic error [%s]: %s", id, e.getMessage()));
             return buildResponse(Response.Status.BAD_REQUEST, msg);
         }
-
-        if (e instanceof NullPointerException) {
-            log.error("Null pointer [{}]", id, e);
-            return buildResponse(Response.Status.INTERNAL_SERVER_ERROR,
-                    "Null pointer exception - id " + id);
-        }
-
         if (e instanceof DataAccessException) {
-            log.error("Database error [{}]", id, e);
+            LOGGER.severe(String.format("Database error [%s]: %s", id, e.getMessage()));
+            return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
+        }
+        if (e instanceof ApplicationException) {
+            LOGGER.severe(String.format("Application error [%s]: %s", id, e.getMessage()));
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
 
         // Default fallback — unexpected error
-        log.error("Unexpected error [{}]", id, e);
+        LOGGER.severe(String.format("Unexpected error [%s]: %s", id, e.getMessage()));
         return buildResponse(Response.Status.INTERNAL_SERVER_ERROR,
                 "Unexpected error, contact support – id " + id);
     }
@@ -66,7 +64,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     }
 
     private Response buildResponse(Response.Status status, String message) {
-        String json = jsonError(message);  // reuse your method
+        String json = jsonError(message);
         return Response.status(status).entity(json).type("application/json").build();
     }
 

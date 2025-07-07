@@ -14,12 +14,17 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.core.Application;
@@ -27,32 +32,29 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 /**
- * TestProfileEndpoint
+ * TestPluginEndpoint
  *
  * @author ppodsednik
  */
 public class TestPluginEndpoint extends JerseyTest {
 
-    //public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
-    //private HttpServer server;
-
-  /*
-  @BeforeEach
-  public void setUp() throws Exception {
-    final ResourceConfig rc = new ResourceConfig(ProcessResource.class);
-    server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-    server.start();
-  }*/
+    @Mock
+    private PluginService pluginServiceMock;
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
 
-        //PluginService pluginServiceMock = mock(PluginService.class);
+        /*
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(new Properties());
         managerConfiguration.set(ManagerConfiguration.JDBC_URL_KEY, "jdbc:postgresql://localhost:15432/kramerius");
         managerConfiguration.set(ManagerConfiguration.JDBC_USER_NAME_KEY, "fedoraAdmin");
@@ -60,23 +62,43 @@ public class TestPluginEndpoint extends JerseyTest {
         DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
         PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
 
+         */
+
 
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new PluginEndpoint(pluginService));
+        resourceConfig.register(new PluginEndpoint(pluginServiceMock));
+        resourceConfig.register(GlobalExceptionMapper.class);
+        resourceConfig.register(new LoggingFeature(
+                Logger.getLogger("HTTPLogger"),
+                LoggingFeature.Verbosity.PAYLOAD_ANY
+        ));
         return resourceConfig;
     }
 
-  /*
-  @AfterEach
-  public void tearDown() throws Exception {
-    //server.shutdownNow();
-  }*/
-
     @Test
     public void testGetPlugin() {
-        Response response = target("plugin/testPlugin1").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
+        PluginInfo pluginInfo = new PluginInfo("testPlugin1", null, null, null, null, null);
+        //when(pluginServiceMock.getPlugin(eq("testPlugin1"))).thenReturn(pluginInfo);
+        when(pluginServiceMock.getPlugin(anyString())).thenAnswer(invocation -> {
+            String pluginId = invocation.getArgument(0);
+            if ("testPluginError".equals(pluginId)) {
+                throw new BusinessLogicException("Plugin 'testPluginError' caused an error");
+            } else if ("testPlugin1".equals(pluginId)) {
+                return pluginInfo;
+            }
+            return null; // Or throw for unknown IDs
+        });
+
+        Response response = target("plugin/testPluginError").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+
+        Assertions.assertEquals(400, response.getStatus());
+        /*
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginServiceMock.getPlugin("testPluginError");
+        });*/
+
         String entity = response.readEntity(String.class);
+        verify(pluginServiceMock, times(1)).getPlugin(eq("testPluginError"));
         System.out.println(entity);
     }
 /*

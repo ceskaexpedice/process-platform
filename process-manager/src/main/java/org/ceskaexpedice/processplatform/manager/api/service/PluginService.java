@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.api.dao.PluginDao;
@@ -23,6 +24,7 @@ import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * PluginService
@@ -37,6 +39,33 @@ public class PluginService {
         this.managerConfiguration = managerConfiguration;
         this.pluginDao = new PluginDao(dbConnectionProvider, managerConfiguration);
     }
+
+    // ------ plugins ----------
+
+    public PluginInfo getPlugin(String pluginId) {
+        // TODO get all scheduled processes hierarchically
+        List<PluginProfile> profiles = pluginDao.getProfiles(pluginId);
+        PluginInfo plugin = pluginDao.getPlugin(pluginId, profiles);
+        return plugin;
+    }
+
+    public List<PluginInfo> getPlugins(boolean withProfiles) {
+        // TODO
+        return null;
+    }
+
+    public void validatePayload(String pluginId, Map<String, String> payload) {
+        // TODO
+        throw new BusinessLogicException("");
+    }
+
+    public void registerPluginInfo(PluginInfo pluginInfoDTO) {
+        for (PluginProfile profile : pluginInfoDTO.getProfiles()) {
+            upsertProfile(profile); // insert or update logic
+        }
+    }
+
+    // ------ profiles ----------
 
     public PluginProfile getProfile(String profileId) {
         PluginProfile profile = pluginDao.getProfile(profileId);
@@ -53,31 +82,19 @@ public class PluginService {
         return profiles;
     }
 
-    public PluginInfo getPlugin(String pluginId) {
-        // TODO get all scheduled processes hierarchically
-        List<PluginProfile> profiles = pluginDao.getProfiles(pluginId);
-        PluginInfo plugin = pluginDao.getPlugin(pluginId, profiles);
-        return plugin;
-    }
-
     public void createProfile(PluginProfile profile) {
     }
 
     public void updateProfile(String profileId, PluginProfile profile) {
     }
 
-    public void deleteProfile(String profileId) {
-    }
-
-    public void registerPluginInfo(PluginInfo pluginInfoDTO) {
-        for (PluginProfile profile : pluginInfoDTO.getProfiles()) {
-            upsertProfile(profile); // insert or update logic
-        }
-    }
-
     public void upsertProfile(PluginProfile profileDTO) {
         // checks: does this profile already exist?
         // yes → update; no → insert.
     }
+
+    public void deleteProfile(String profileId) {
+    }
+
 
 }

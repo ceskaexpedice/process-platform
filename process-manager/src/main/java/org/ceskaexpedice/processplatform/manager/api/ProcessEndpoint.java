@@ -48,39 +48,27 @@ public class ProcessEndpoint {
 
     @POST
     public Response scheduleProcess(ScheduleMainProcess scheduleProcess) {
-        try {
-            String ownerId = scheduleProcess.getOwnerId(); // ownerId must be sent from Kramerius ProcessResource
-            // batch id is created here because this is main process
-            String batchId = UUID.randomUUID().toString();
-            // ownerId + batchId will be persisted to pcp-processes
+        String ownerId = scheduleProcess.getOwnerId(); // ownerId must be sent from Kramerius ProcessResource
+        // batch id is created here because this is main process
+        String batchId = UUID.randomUUID().toString();
+        // ownerId + batchId will be persisted to pcp-processes
 
-            return Response.ok().entity("{}").build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().entity("{}").build();
     }
 
     @GET
     @Path("{processId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProcess(@PathParam("processId") String processId) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @GET
     @Path("{processId}/logs/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsOut(@PathParam("processId") String processId,
-                                                   @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+                                      @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
+        return Response.ok().build();
     }
 
     // TODO this just an example here
@@ -119,38 +107,26 @@ public class ProcessEndpoint {
     @Path("{processId}/logs/err")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsErr(@PathParam("processId") String processId,
-                                                   @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
+        return Response.ok().build();
     }
 
     @GET
     @Path("{processId}/logs/out/lines")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProcessLogsOutLines(@PathParam("processId") String processId,
-                                                        @QueryParam("offset") String offsetStr,
-                                                        @QueryParam("limit") String limitStr) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+                                           @QueryParam("offset") String offsetStr,
+                                           @QueryParam("limit") String limitStr) {
+        return Response.ok().build();
     }
 
     @GET
     @Path("{processId}/logs/err/lines")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProcessLogsErrLines(@PathParam("processId") String processId,
-                                                        @QueryParam("offset") String offsetStr,
-                                                        @QueryParam("limit") String limitStr) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+                                           @QueryParam("offset") String offsetStr,
+                                           @QueryParam("limit") String limitStr) {
+        return Response.ok().build();
     }
 
     @GET
@@ -164,44 +140,28 @@ public class ProcessEndpoint {
             @QueryParam("until") String filterUntil,
             @QueryParam("state") String filterState
     ) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @DELETE
     @Path("batches/by_first_process_id/{processId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteBatch(@PathParam("processId") String processId) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @DELETE
     @Path("batches/by_first_process_id/{processId}/execution")
     @Produces(MediaType.APPLICATION_JSON)
     public Response killBatch(@PathParam("processId") String processId) {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
     @GET
     @Path("owners")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
-        try {
-            return Response.ok().build();
-        } catch (Exception e) {
-            return APIRestUtilities.exceptionToErrorResponse(e);
-        }
+        return Response.ok().build();
     }
 
 }
