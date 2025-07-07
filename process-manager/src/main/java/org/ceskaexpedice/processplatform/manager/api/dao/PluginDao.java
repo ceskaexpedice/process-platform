@@ -41,6 +41,38 @@ public class PluginDao {
         this.managerConfiguration = managerConfiguration;
     }
 
+    public PluginInfo getPlugin(String pluginId, List<PluginProfile> pluginProfiles) {
+        try (Connection connection = getConnection()) {
+            List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
+                    PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, pluginProfiles);
+                    returnsList.add(pluginProfile);
+                    return true;
+                }
+            }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?", pluginId);
+            return processes.size() == 1 ? processes.get(0) : null;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public List<PluginInfo> getPlugins() {
+        try (Connection connection = getConnection()) {
+            List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
+                    PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, null);
+                    returnsList.add(pluginProfile);
+                    return true;
+                }
+            }.executeQuery("select " + "*" + " from PCP_PLUGIN p");
+            return processes;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
     public PluginProfile getProfile(String profileId) {
         try (Connection connection = getConnection()) {
             List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
@@ -88,23 +120,6 @@ public class PluginDao {
             throw new DataAccessException(e.toString(), e);
         }
     }
-
-    public PluginInfo getPlugin(String pluginId, List<PluginProfile> pluginProfiles) {
-        try (Connection connection = getConnection()) {
-            List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
-                @Override
-                public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
-                    PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, pluginProfiles);
-                    returnsList.add(pluginProfile);
-                    return true;
-                }
-            }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?", pluginId);
-            return processes.size() == 1 ? processes.get(0) : null;
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        }
-    }
-
 
     private Connection getConnection() {
         Connection connection = dbConnectionProvider.get();

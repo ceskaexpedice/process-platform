@@ -14,6 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -21,8 +22,12 @@ import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * TestPluginService_integration
@@ -62,11 +67,22 @@ public class TestPluginService_integration {
 
     @Test
     public void testGetPlugins() {
-        // TODO plugins with profiles?
+        List<PluginInfo> plugins = pluginService.getPlugins();
+        Assertions.assertEquals(1, plugins.size());
     }
 
     @Test
     public void testValidatePayload() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        pluginService.validatePayload(PLUGIN1_ID, payload);
+
+        payload.remove("surname");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN1_ID, payload);
+        });
+
     }
 
     // ------ profiles ----------

@@ -17,20 +17,24 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.manager.api.dao.PluginDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * PluginService
  * @author ppodsednik
  */
 public class PluginService {
+    private static final Logger LOGGER = Logger.getLogger(PluginService.class.getName());
 
     private final ManagerConfiguration managerConfiguration;
     private final PluginDao pluginDao;
@@ -49,14 +53,21 @@ public class PluginService {
         return plugin;
     }
 
-    public List<PluginInfo> getPlugins(boolean withProfiles) {
-        // TODO
-        return null;
+    public List<PluginInfo> getPlugins() {
+        return pluginDao.getPlugins();
     }
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
-        // TODO
-        throw new BusinessLogicException("");
+        // TODO validate input
+        PluginInfo plugin = getPlugin(pluginId);
+        for(String name: plugin.getPayloadFieldSpecMap().keySet()){
+            PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);
+            if(payloadFieldSpec.isRequired()){
+                if(!payload.containsKey(name)){
+                    throw new BusinessLogicException("Payload field " + name + " is missing");
+                }
+            }
+        }
     }
 
     public void registerPluginInfo(PluginInfo pluginInfoDTO) {

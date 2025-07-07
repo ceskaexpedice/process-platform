@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Provider
@@ -39,20 +40,20 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
         // Customize status + message for known types
         if (e instanceof BusinessLogicException) {
-            LOGGER.warning(String.format("Business logic error [%s]: %s", id, e.getMessage()));
+            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.BAD_REQUEST, msg);
         }
         if (e instanceof DataAccessException) {
-            LOGGER.severe(String.format("Database error [%s]: %s", id, e.getMessage()));
+            LOGGER.log(Level.SEVERE, String.format("Database error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
         if (e instanceof ApplicationException) {
-            LOGGER.severe(String.format("Application error [%s]: %s", id, e.getMessage()));
+            LOGGER.log(Level.SEVERE, String.format("Application error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
 
         // Default fallback — unexpected error
-        LOGGER.severe(String.format("Unexpected error [%s]: %s", id, e.getMessage()));
+        LOGGER.log(Level.SEVERE, String.format("Unexpected error [%s]: %s", id, e.getMessage()), e);
         return buildResponse(Response.Status.INTERNAL_SERVER_ERROR,
                 "Unexpected error, contact support – id " + id);
     }

@@ -51,8 +51,8 @@ public class PluginEndpoint {
     }
 
     @GET
-    public Response getPlugins(@QueryParam("withProfiles") boolean withProfiles) {
-        List<PluginInfo> plugins = pluginService.getPlugins(withProfiles);
+    public Response getPlugins() {
+        List<PluginInfo> plugins = pluginService.getPlugins();
         return Response.ok(plugins).build();
     }
 
