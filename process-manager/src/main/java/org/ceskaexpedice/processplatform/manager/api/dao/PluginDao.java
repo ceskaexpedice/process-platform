@@ -16,6 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
@@ -35,6 +38,7 @@ public class PluginDao {
     private static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());
     private final DbConnectionProvider dbConnectionProvider;
     private final ManagerConfiguration managerConfiguration;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public PluginDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         this.dbConnectionProvider = dbConnectionProvider;
@@ -73,49 +77,24 @@ public class PluginDao {
         }
     }
 
-    public PluginProfile getProfile(String profileId) {
+    public void createPlugin(PluginInfo plugin) {
         try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
-                @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
-                    returnsList.add(pluginProfile);
-                    return false;
-                }
-            }.executeQuery("select " + "*" + " from PCP_PROFILE p  where PROFILE_ID = ?", profileId);
-            return profiles.size() == 1 ? profiles.get(0) : null;
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        }
-    }
+            String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map) VALUES (?, ?, ?, ?::jsonb)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, plugin.getPluginId());
+                stmt.setString(2, plugin.getDescription());
+                stmt.setString(3, plugin.getMainClass());
 
-    public List<PluginProfile> getProfiles() {
-        try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
-                @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
-                    returnsList.add(pluginProfile);
-                    return false;
-                }
-            }.executeQuery("select " + "*" + " from PCP_PROFILE p");
-            return profiles;
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        }
-    }
+                String json = mapper.writeValueAsString(plugin.getPayloadFieldSpecMap());
+                stmt.setString(4, json);
 
-    public List<PluginProfile> getProfiles(String pluginId) {
-        try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
-                @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
-                    returnsList.add(pluginProfile);
-                    return false;
-                }
-            }.executeQuery("select " + "*" + " from PCP_PROFILE p  where PLUGIN_ID = ?", pluginId);
-            return profiles;
+                Array scheduledProfilesArray = connection.createArrayOf("text", plugin.getScheduledProfiles().toArray());
+                stmt.setArray(5, scheduledProfilesArray);
+
+                stmt.executeUpdate();
+            } catch (JsonProcessingException e) {
+                throw new ApplicationException(e.toString(), e);
+            }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }

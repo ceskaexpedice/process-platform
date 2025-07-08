@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.manager.api;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
+import org.ceskaexpedice.processplatform.common.RemoteAgentException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -40,11 +41,15 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
         // Customize status + message for known types
         if (e instanceof BusinessLogicException) {
-            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s", id, e.getMessage()), e);
+            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s", id, e.getMessage()));
             return buildResponse(Response.Status.BAD_REQUEST, msg);
         }
         if (e instanceof DataAccessException) {
             LOGGER.log(Level.SEVERE, String.format("Database error [%s]: %s", id, e.getMessage()), e);
+            return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
+        }
+        if (e instanceof RemoteAgentException) {
+            LOGGER.log(Level.SEVERE, String.format("Remote agent call error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
         if (e instanceof ApplicationException) {

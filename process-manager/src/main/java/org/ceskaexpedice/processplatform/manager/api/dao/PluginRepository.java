@@ -46,6 +46,7 @@ public class PluginRepository {
         }
     }
 
+    /*
     public void insertPluginProfile(Connection conn, PluginProfile profile) throws SQLException {
         String sql = "INSERT INTO pcp_profile (profile_id, plugin_id, jvm_args) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -58,4 +59,6 @@ public class PluginRepository {
             stmt.executeUpdate();
         }
     }
+
+     */
 }

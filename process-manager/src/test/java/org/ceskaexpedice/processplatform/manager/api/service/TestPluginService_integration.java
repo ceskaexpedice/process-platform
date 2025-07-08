@@ -14,18 +14,29 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -36,22 +47,27 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class TestPluginService_integration {
     private static String PLUGIN1_ID = "testPlugin1";
+    private static String PLUGIN2_ID = "testPlugin2";
     private static String PROFILE1_ID = "testPlugin1-big";
+    private static String NEW_PROFILE_ID = "newProfileId";
 
     private static Properties testsProperties;
     private static PluginService pluginService;
+    private static DbConnectionProvider dbConnectionProvider;
 
     @BeforeAll
     static void beforeAll() {
         testsProperties = IntegrationTestsUtils.loadProperties();
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
-        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
+        dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
         pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
     }
 
     @BeforeEach
     void beforeEach() {
         IntegrationTestsUtils.checkIntegrationTestsIgnored(testsProperties);
+        createTables();
+        loadData();
     }
 
     // ------ plugins ----------
@@ -60,7 +76,16 @@ public class TestPluginService_integration {
     public void testGetPlugin() {
         PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID);
         Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(2, pluginInfo.getProfiles().size());
+        Assertions.assertEquals(2, pluginInfo.getPayloadFieldSpecMap().size());
+        // TODO Assertions.assertEquals(2, pluginInfo.getScheduledProfiles().size());
+
+        pluginInfo = pluginService.getPlugin(PLUGIN2_ID);
+        Assertions.assertNotNull(pluginInfo);
         Assertions.assertEquals(1, pluginInfo.getProfiles().size());
+        Assertions.assertNull(pluginInfo.getPayloadFieldSpecMap());
+        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
+
         pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists");
         Assertions.assertNull(pluginInfo);
     }
@@ -68,7 +93,7 @@ public class TestPluginService_integration {
     @Test
     public void testGetPlugins() {
         List<PluginInfo> plugins = pluginService.getPlugins();
-        Assertions.assertEquals(1, plugins.size());
+        Assertions.assertEquals(2, plugins.size());
     }
 
     @Test
@@ -82,7 +107,12 @@ public class TestPluginService_integration {
         assertThrows(BusinessLogicException.class, () -> {
             pluginService.validatePayload(PLUGIN1_ID, payload);
         });
+        // TODO test more
 
+    }
+
+    @Test
+    public void testRegisterPlugin() {
     }
 
     // ------ profiles ----------
@@ -98,25 +128,87 @@ public class TestPluginService_integration {
     @Test
     public void testGetProfiles() {
         List<PluginProfile> profiles = pluginService.getProfiles();
-        Assertions.assertEquals(1, profiles.size());
+        Assertions.assertEquals(3, profiles.size());
     }
 
     @Test
     public void testGetPluginProfiles() {
         List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(1, profiles.size());
+        Assertions.assertEquals(2, profiles.size());
     }
 
     @Test
     public void testCreateProfile() {
+        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(2, profiles.size());
+        PluginProfile profile = new PluginProfile(NEW_PROFILE_ID, PLUGIN1_ID, List.of("-Xmx32g"));
+        pluginService.createProfile(profile);
+        profiles = pluginService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(3, profiles.size());
     }
 
     @Test
     public void testUpdateProfile() {
+        PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
+        Assertions.assertEquals(2, profile.getJvmArgs().size());
+        List<String> args = List.of("-Xmx32g", "a", "b", "c");
+        profile.setJvmArgs(args);
+        pluginService.updateProfile(profile);
+        profile = pluginService.getProfile(PROFILE1_ID);
+        Assertions.assertEquals(4, profile.getJvmArgs().size());
     }
 
     @Test
     public void testDeleteProfile() {
+        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(2, profiles.size());
+        pluginService.deleteProfile(PROFILE1_ID);
+        profiles = pluginService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(1, profiles.size());
     }
 
+    private static void createTables() {
+        Connection connection = dbConnectionProvider.get();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_profile");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_plugin");
+            preparedStatement.executeUpdate();
+
+            InputStream is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_plugin.sql");
+            String sql = IOUtils.toString(is, StandardCharsets.UTF_8);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_profile.sql");
+            sql = IOUtils.toString(is, StandardCharsets.UTF_8);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            DbUtils.tryClose(connection);
+        }
+    }
+
+    private static void loadData() {
+        Connection connection = dbConnectionProvider.get();
+        try (InputStream is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("test_data.sql")) {
+            String sql = IOUtils.toString(is, StandardCharsets.UTF_8);
+            // Split by semicolon if multiple statements (not perfect but works for simple scripts)
+            String[] statements = sql.split(";");
+            for (String raw : statements) {
+                String trimmed = raw.trim();
+                if (!trimmed.isEmpty()) {
+                    try (Statement stmt = connection.createStatement()) {
+                        stmt.execute(trimmed);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            DbUtils.tryClose(connection);
+        }
+    }
 }

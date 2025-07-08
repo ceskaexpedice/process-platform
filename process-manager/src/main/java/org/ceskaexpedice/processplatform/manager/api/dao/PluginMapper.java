@@ -28,11 +28,11 @@ import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import java.sql.*;
 import java.util.*;
 
-public class PluginMapper {
+class PluginMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static PluginInfo mapPluginInfo(ResultSet rsPlugin, List<PluginProfile> profiles) {
+    static PluginInfo mapPluginInfo(ResultSet rsPlugin, List<PluginProfile> profiles) {
         try {
             PluginInfo plugin = new PluginInfo();
             plugin.setPluginId(rsPlugin.getString("plugin_id"));
@@ -40,8 +40,10 @@ public class PluginMapper {
             plugin.setMainClass(rsPlugin.getString("main_class"));
 
             String json = rsPlugin.getString("payload_field_spec_map");
-            Map<String, PayloadFieldSpec> specMap = mapper.readValue(json, new TypeReference<>() {});
-            plugin.setPayloadFieldSpecMap(specMap);
+            if(json != null){
+                Map<String, PayloadFieldSpec> specMap = mapper.readValue(json, new TypeReference<>() {});
+                plugin.setPayloadFieldSpecMap(specMap);
+            }
 
             Array array = rsPlugin.getArray("scheduled_profiles");
             Set<String> scheduledProfiles = new HashSet<>();
@@ -60,7 +62,7 @@ public class PluginMapper {
         }
     }
 
-    public static PluginProfile mapPluginProfile(ResultSet rsProfile) throws SQLException {
+    static PluginProfile mapPluginProfile(ResultSet rsProfile) throws SQLException {
         PluginProfile profile = new PluginProfile();
         profile.setProfileId(rsProfile.getString("profile_id"));
         profile.setPluginId(rsProfile.getString("plugin_id"));

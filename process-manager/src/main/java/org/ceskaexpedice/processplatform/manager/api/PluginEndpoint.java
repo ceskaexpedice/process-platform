@@ -96,7 +96,7 @@ public class PluginEndpoint {
     @PUT
     @Path("profile/{profileId}")
     public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
-        pluginService.updateProfile(profileId, profile);
+        pluginService.updateProfile(profile);
         return Response.ok().build();
     }
 
