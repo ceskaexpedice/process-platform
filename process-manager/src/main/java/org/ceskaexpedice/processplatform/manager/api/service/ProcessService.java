@@ -16,8 +16,16 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.manager.api.dao.ProcessDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * ProcessService
@@ -25,11 +33,23 @@ import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
  */
 public class ProcessService {
     private final ManagerConfiguration managerConfiguration;
-    private final DbConnectionProvider dbConnectionProvider;
+    private final ProcessDao processDao;
 
     public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider) {
         this.managerConfiguration = managerConfiguration;
-        this.dbConnectionProvider = dbConnectionProvider;
+        this.processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
+    }
+
+    public void scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
+
+    }
+
+    public void scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
+
+    }
+
+    public ScheduledProcess getNextScheduledProcess(String workerId, List<String> tags) {
+        return null;
     }
 
 }

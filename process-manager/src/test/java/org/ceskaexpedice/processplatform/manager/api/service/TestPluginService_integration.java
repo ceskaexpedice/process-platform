@@ -14,28 +14,18 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
-import java.util.logging.Level;
 
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -44,13 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author ppodsednik
  */
 public class TestPluginService_integration {
-    private static String PLUGIN1_ID = "testPlugin1";
-    private static String PLUGIN2_ID = "testPlugin2";
-    private static String PLUGIN_NEW_ID = "testPluginNew";
-
-    private static String PROFILE1_ID = "testPlugin1-big";
-    private static String NEW_PROFILE_ID = "newProfileId";
-
     private static Properties testsProperties;
     private static PluginService pluginService;
     private static DbConnectionProvider dbConnectionProvider;
@@ -66,8 +49,8 @@ public class TestPluginService_integration {
     @BeforeEach
     void beforeEach() {
         IntegrationTestsUtils.checkIntegrationTestsIgnored(testsProperties);
-        createTables();
-        loadData();
+        createTables(dbConnectionProvider);
+        loadTestData(dbConnectionProvider);
     }
 
     // ------ plugins ----------
@@ -188,48 +171,4 @@ public class TestPluginService_integration {
         Assertions.assertEquals(1, profiles.size());
     }
 
-    private static void createTables() {
-        Connection connection = dbConnectionProvider.get();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_profile");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_plugin");
-            preparedStatement.executeUpdate();
-
-            InputStream is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_plugin.sql");
-            String sql = IOUtils.toString(is, StandardCharsets.UTF_8);
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.executeUpdate();
-
-            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_profile.sql");
-            sql = IOUtils.toString(is, StandardCharsets.UTF_8);
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            DbUtils.tryClose(connection);
-        }
-    }
-
-    private static void loadData() {
-        Connection connection = dbConnectionProvider.get();
-        try (InputStream is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("test_data.sql")) {
-            String sql = IOUtils.toString(is, StandardCharsets.UTF_8);
-            // Split by semicolon if multiple statements (not perfect but works for simple scripts)
-            String[] statements = sql.split(";");
-            for (String raw : statements) {
-                String trimmed = raw.trim();
-                if (!trimmed.isEmpty()) {
-                    try (Statement stmt = connection.createStatement()) {
-                        stmt.execute(trimmed);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            DbUtils.tryClose(connection);
-        }
-    }
 }
