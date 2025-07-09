@@ -1,6 +1,7 @@
 [
   {
     "profileId": "testPlugin1-big",
+    "description": "Big profile",
     "jvmArgs": [
       "-Xms1g",
       "-Xmx64g"
@@ -8,6 +9,7 @@
   },
   {
     "profileId": "testPlugin1-smallest",
+    "description": "Smallest profile",
     "jvmArgs": [
       "-Xms1g",
       "-Xmx2g"

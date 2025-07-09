@@ -63,10 +63,10 @@ public class PluginService {
     public void validatePayload(String pluginId, Map<String, String> payload) {
         // TODO validate input
         PluginInfo plugin = getPlugin(pluginId);
-        for(String name: plugin.getPayloadFieldSpecMap().keySet()){
+        for (String name : plugin.getPayloadFieldSpecMap().keySet()) {
             PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);
-            if(payloadFieldSpec.isRequired()){
-                if(!payload.containsKey(name)){
+            if (payloadFieldSpec.isRequired()) {
+                if (!payload.containsKey(name)) {
                     throw new BusinessLogicException("Payload field " + name + " is missing");
                 }
             }
@@ -74,8 +74,22 @@ public class PluginService {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        for (PluginProfile profile : pluginInfo.getProfiles()) {
-            upsertProfile(profile); // insert or update logic
+        // TODO log messages
+        PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
+        if (pluginExisting != null) {
+            // already registered
+            for (PluginProfile profile : pluginInfo.getProfiles()) {
+                PluginProfile profileExisting = profileDao.getProfile(profile.getProfileId());
+                if (profileExisting == null) {
+                    // let's register new profile to the existing plugin
+                    profileDao.createProfile(profile);
+                }
+            }
+        } else {
+            pluginDao.createPlugin(pluginInfo);
+            for (PluginProfile profile : pluginInfo.getProfiles()) {
+                profileDao.createProfile(profile);
+            }
         }
     }
 
@@ -102,11 +116,6 @@ public class PluginService {
 
     public void updateProfile(PluginProfile profile) {
         profileDao.updateProfile(profile);
-    }
-
-    public void upsertProfile(PluginProfile profile) {
-        // checks: does this profile already exist?
-        // yes → update; no → insert.
     }
 
     public void deleteProfile(String profileId) {

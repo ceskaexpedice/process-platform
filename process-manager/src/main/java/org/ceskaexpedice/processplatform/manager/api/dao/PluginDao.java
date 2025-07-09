@@ -79,7 +79,7 @@ public class PluginDao {
 
     public void createPlugin(PluginInfo plugin) {
         try (Connection connection = getConnection()) {
-            String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map) VALUES (?, ?, ?, ?::jsonb)";
+            String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map, scheduled_profiles) VALUES (?, ?, ?, ?::jsonb, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, plugin.getPluginId());
                 stmt.setString(2, plugin.getDescription());

@@ -29,20 +29,26 @@ INSERT INTO pcp_plugin (plugin_id,
         ARRAY['testPlugin3']);
 
 INSERT INTO pcp_profile (profile_id,
+                         description,
                          plugin_id,
                          jvm_args)
   VALUES ('testPlugin1-big',
+          'Big profile',
         'testPlugin1',
         ARRAY ['-Xmx32g', '-Xms1g']);
 INSERT INTO pcp_profile (profile_id,
+                         description,
                          plugin_id,
                          jvm_args)
   VALUES ('testPlugin1-small',
+          'Small profile',
         'testPlugin1',
         ARRAY ['-Xmx1g', '-Xms1g']);
 INSERT INTO pcp_profile (profile_id,
+                         description,
                          plugin_id,
                          jvm_args)
   VALUES ('testPlugin2-default',
+          'Default profile',
         'testPlugin2',
         ARRAY ['-Xms1g']);

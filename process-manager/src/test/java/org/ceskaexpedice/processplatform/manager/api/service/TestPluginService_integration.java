@@ -16,6 +16,7 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -32,10 +33,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,6 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestPluginService_integration {
     private static String PLUGIN1_ID = "testPlugin1";
     private static String PLUGIN2_ID = "testPlugin2";
+    private static String PLUGIN_NEW_ID = "testPluginNew";
+
     private static String PROFILE1_ID = "testPlugin1-big";
     private static String NEW_PROFILE_ID = "newProfileId";
 
@@ -113,6 +113,27 @@ public class TestPluginService_integration {
 
     @Test
     public void testRegisterPlugin() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID);
+        Assertions.assertNull(pluginInfo);
+
+        // TODO more tests
+        Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
+        payloadFieldSpecMap.put("name", new PayloadFieldSpec("string", true));
+        Set<String> scheduledProfiles = new HashSet<>();
+        scheduledProfiles.add(NEW_PROFILE_ID);
+
+        List<PluginProfile> profiles  = new ArrayList<>();
+        PluginProfile pluginProfile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN_NEW_ID, new ArrayList<>());
+        profiles.add(pluginProfile);
+
+        PluginInfo pluginInfoNew = new PluginInfo(PLUGIN_NEW_ID, "Test plugin New", "com.mainClass",
+                payloadFieldSpecMap, scheduledProfiles, profiles);
+
+        pluginService.registerPlugin(pluginInfoNew);
+
+        pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(1, pluginInfo.getProfiles().size());
     }
 
     // ------ profiles ----------
@@ -141,7 +162,7 @@ public class TestPluginService_integration {
     public void testCreateProfile() {
         List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
         Assertions.assertEquals(2, profiles.size());
-        PluginProfile profile = new PluginProfile(NEW_PROFILE_ID, PLUGIN1_ID, List.of("-Xmx32g"));
+        PluginProfile profile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN1_ID, List.of("-Xmx32g"));
         pluginService.createProfile(profile);
         profiles = pluginService.getProfiles(PLUGIN1_ID);
         Assertions.assertEquals(3, profiles.size());

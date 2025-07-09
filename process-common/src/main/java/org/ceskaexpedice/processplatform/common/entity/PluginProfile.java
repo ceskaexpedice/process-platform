@@ -24,14 +24,16 @@ import java.util.List;
  */
 public class PluginProfile {
     private String profileId;
+    private String description;
     private String pluginId;
     private List<String> jvmArgs;
 
     public PluginProfile() {
     }
 
-    public PluginProfile(String profileId, String pluginId, List<String> jvmArgs) {
+    public PluginProfile(String profileId, String description, String pluginId, List<String> jvmArgs) {
         this.profileId = profileId;
+        this.description = description;
         this.pluginId = pluginId;
         this.jvmArgs = jvmArgs;
     }
@@ -58,5 +60,13 @@ public class PluginProfile {
 
     public void setJvmArgs(List<String> jvmArgs) {
         this.jvmArgs = jvmArgs;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

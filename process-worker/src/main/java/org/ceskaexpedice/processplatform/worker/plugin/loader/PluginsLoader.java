@@ -103,7 +103,7 @@ public final class PluginsLoader {
 
         List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
         if(profiles.isEmpty()){
-            PluginProfile defaultProfile = new PluginProfile(pluginId, pluginId, new ArrayList<>());
+            PluginProfile defaultProfile = new PluginProfile(pluginId, pluginId, pluginId, new ArrayList<>());
             profiles.add(defaultProfile);
         }
 

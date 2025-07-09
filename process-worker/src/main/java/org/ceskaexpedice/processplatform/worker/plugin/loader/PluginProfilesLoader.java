@@ -46,9 +46,11 @@ final class PluginProfilesLoader {
         // Merge: external overrides internal by 'profileId'
         Map<String, PluginProfile> merged = new LinkedHashMap<>();
         for (PluginProfile p : internalProfiles) {
+            p.setPluginId(pluginId);
             merged.put(p.getProfileId(), p);
         }
         for (PluginProfile p : externalProfiles) {
+            p.setPluginId(pluginId);
             merged.put(p.getProfileId(), p);
         }
 
