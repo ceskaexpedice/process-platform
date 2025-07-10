@@ -75,6 +75,7 @@ public class TestPluginJvmLauncher {
 
         ScheduledProcess scheduledProcess = new ScheduledProcess(
                 PLUGIN1_PROCESS_ID,
+                PLUGIN1_PROFILE_BIG,
                 PLUGIN1_ID,
                 PLUGIN1_MAIN_CLASS,
                 payload,

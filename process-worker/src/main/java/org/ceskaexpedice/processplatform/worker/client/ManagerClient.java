@@ -263,6 +263,22 @@ public class ManagerClient {
         }
     }
 
+    public void updateWorkerId(String processId) {
+        String url = String.format("%sagent/worker/%s?worker=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId,
+                workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
+        HttpPut httpPut = new HttpPut(url);
+
+        int statusCode = -1;
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
+            statusCode = response.getCode();
+            if (statusCode != 200) {
+                throw new RemoteAgentException("Failed to update PID", "manager", statusCode, null);
+            }
+        } catch (IOException e) {
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
+        }
+    }
+
     public void updateProcessName(String processId, String name) {
         String url = String.format("%sagent/name/%s?name=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, name);
         HttpPut httpPut = new HttpPut(url);

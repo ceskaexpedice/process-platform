@@ -25,6 +25,7 @@ import java.util.Map;
  */
 public class ScheduledProcess {
     private String processId;
+    private String profileId;
     private String pluginId;
     private String mainClass;
     private Map<String, String> payload;
@@ -35,9 +36,10 @@ public class ScheduledProcess {
     public ScheduledProcess() {
     }
 
-    public ScheduledProcess(String processId, String pluginId, String mainClass,
+    public ScheduledProcess(String processId, String profileId, String pluginId, String mainClass,
                             Map<String, String> payload, List<String> jvmArgs, String batchId, String ownerId) {
         this.processId = processId;
+        this.profileId = profileId;
         this.pluginId = pluginId;
         this.mainClass = mainClass;
         this.payload = payload;
@@ -72,5 +74,41 @@ public class ScheduledProcess {
 
     public String getOwnerId() {
         return ownerId;
+    }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
+
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
+    }
+
+    public void setMainClass(String mainClass) {
+        this.mainClass = mainClass;
+    }
+
+    public void setPayload(Map<String, String> payload) {
+        this.payload = payload;
+    }
+
+    public void setJvmArgs(List<String> jvmArgs) {
+        this.jvmArgs = jvmArgs;
+    }
+
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
     }
 }

@@ -48,7 +48,7 @@ public class ManagerAgentEndpoint {
 
     @GET
     @Path("/next-process")
-    public Response getNextProcess(@QueryParam("workerId") String workerId, @QueryParam("workerTags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("workerTags") List<String> tags) {
         ScheduledProcess scheduledProcess = new ScheduledProcess();
         // batchId
         if (scheduledProcess != null) {
@@ -70,6 +70,14 @@ public class ManagerAgentEndpoint {
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
                 + ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/worker/{processId}")
+    public Response updateWorker(@PathParam("processId") String processId, @QueryParam("worker") String worker) {
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateWorker:processId-" + processId + ";worker-" + worker);
         return Response.ok().build();
     }
 

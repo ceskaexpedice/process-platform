@@ -155,6 +155,7 @@ public class PluginStarter implements PluginContext {
 
     private static void updatePID(ProcessConfiguration processConfiguration, ManagerClient managerClient) {
         String pid = getPid();
+        managerClient.updateWorkerId(processConfiguration.get(PROCESS_ID_KEY));
         managerClient.updateProcessPid(processConfiguration.get(PROCESS_ID_KEY), pid);
     }
 

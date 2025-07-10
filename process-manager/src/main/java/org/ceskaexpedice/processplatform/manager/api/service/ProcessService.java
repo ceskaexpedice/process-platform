@@ -41,15 +41,26 @@ public class ProcessService {
     }
 
     public void scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
-
+        processDao.createProcess(scheduleMainProcess);
     }
 
     public void scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
 
     }
 
-    public ScheduledProcess getNextScheduledProcess(String workerId, List<String> tags) {
-        return null;
+    public ScheduledProcess getNextScheduledProcess(List<String> tags) {
+        List<ScheduledProcess> scheduledProcesses = processDao.getScheduledProcesses();
+        ScheduledProcess selectedProcess = null;
+        for (ScheduledProcess scheduledProcess : scheduledProcesses) {
+            if(tags.contains(scheduledProcess.getProfileId())){
+                selectedProcess = scheduledProcess;
+                break;
+            }
+        }
+        // TODO populate pluginId, mainClass, jvmArgs from plugin
+        // set process state to NOT_RUNNING
+
+        return selectedProcess;
     }
 
 }

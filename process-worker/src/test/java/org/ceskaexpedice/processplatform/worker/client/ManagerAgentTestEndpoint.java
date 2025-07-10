@@ -41,7 +41,7 @@ public class ManagerAgentTestEndpoint {
 
     @GET
     @Path("/next-process")
-    public Response getNextProcess(@QueryParam("workerId") String workerId, @QueryParam("workerTags") List<String> tags) {
+    public Response getNextProcess(@QueryParam("workerTags") List<String> tags) {
         System.out.print("ManagerAgentEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
@@ -56,6 +56,7 @@ public class ManagerAgentTestEndpoint {
 
             ScheduledProcess scheduledProcess = new ScheduledProcess(
                     Constants.PLUGIN1_PROCESS_ID,
+                    Constants.PLUGIN1_PROFILE_SMALL,
                     Constants.PLUGIN1_ID,
                     Constants.PLUGIN1_MAIN_CLASS,
                     payload,
@@ -67,6 +68,7 @@ public class ManagerAgentTestEndpoint {
         } else if (counter == 2) {
             ScheduledProcess scheduledProcess = new ScheduledProcess(
                     Constants.PLUGIN2_PROCESS_ID,
+                    Constants.PLUGIN2_ID,
                     Constants.PLUGIN2_ID,
                     Constants.PLUGIN2_MAIN_CLASS,
                     new HashMap<>(),
@@ -93,6 +95,14 @@ public class ManagerAgentTestEndpoint {
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
                 ",batchId-" + scheduleSubProcess.getBatchId());
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/worker/{processId}")
+    public Response updateWorker(@PathParam("processId") String processId, @QueryParam("worker") String worker) {
+        // Store OS process ID of the spawned JVM
+        System.out.println("ManagerAgentEndpoint: updateWorker:processId-" + processId + ";worker-" + worker);
         return Response.ok().build();
     }
 

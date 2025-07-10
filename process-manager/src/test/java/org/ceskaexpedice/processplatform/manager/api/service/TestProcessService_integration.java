@@ -15,6 +15,8 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
@@ -54,21 +56,27 @@ public class TestProcessService_integration {
     }
 
     @Test
-    public void testGetPlugin() {
-        PluginInfo pluginInfo = processService.getPlugin(PLUGIN1_ID);
-        Assertions.assertNotNull(pluginInfo);
-        Assertions.assertEquals(2, pluginInfo.getProfiles().size());
-        Assertions.assertEquals(2, pluginInfo.getPayloadFieldSpecMap().size());
-        // TODO Assertions.assertEquals(2, pluginInfo.getScheduledProfiles().size());
+    public void testScheduleProcess() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleProcess(scheduleMainProcess);
+        // TODO
+    }
 
-        pluginInfo = processService.getPlugin(PLUGIN2_ID);
-        Assertions.assertNotNull(pluginInfo);
-        Assertions.assertEquals(1, pluginInfo.getProfiles().size());
-        Assertions.assertNull(pluginInfo.getPayloadFieldSpecMap());
-        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
-
-        pluginInfo = processService.getPlugin(PLUGIN1_ID + "notExists");
-        Assertions.assertNull(pluginInfo);
+    @Test
+    public void testNextProcess() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleProcess(scheduleMainProcess);
+        List<String> tags = new ArrayList<>();
+        tags.add(PROFILE1_ID);
+        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(tags);
+        Assertions.assertNotNull(nextScheduledProcess);
+        // TODO more asserts
     }
 
 }

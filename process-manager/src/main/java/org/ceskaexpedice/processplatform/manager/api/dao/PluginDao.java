@@ -47,7 +47,7 @@ public class PluginDao {
 
     public PluginInfo getPlugin(String pluginId, List<PluginProfile> pluginProfiles) {
         try (Connection connection = getConnection()) {
-            List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
+            List<PluginInfo> pluginInfos = new JDBCQueryTemplate<PluginInfo>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
                     PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, pluginProfiles);
@@ -55,7 +55,7 @@ public class PluginDao {
                     return true;
                 }
             }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?", pluginId);
-            return processes.size() == 1 ? processes.get(0) : null;
+            return pluginInfos.size() == 1 ? pluginInfos.get(0) : null;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
@@ -63,7 +63,7 @@ public class PluginDao {
 
     public List<PluginInfo> getPlugins() {
         try (Connection connection = getConnection()) {
-            List<PluginInfo> processes = new JDBCQueryTemplate<PluginInfo>(connection) {
+            List<PluginInfo> pluginInfos = new JDBCQueryTemplate<PluginInfo>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
                     PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, null);
@@ -71,7 +71,7 @@ public class PluginDao {
                     return true;
                 }
             }.executeQuery("select " + "*" + " from PCP_PLUGIN p");
-            return processes;
+            return pluginInfos;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
