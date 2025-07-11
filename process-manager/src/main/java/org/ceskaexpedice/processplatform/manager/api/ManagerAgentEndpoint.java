@@ -17,15 +17,13 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.*;
-import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.service.PluginService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

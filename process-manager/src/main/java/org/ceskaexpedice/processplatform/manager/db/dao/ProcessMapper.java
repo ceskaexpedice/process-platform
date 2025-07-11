@@ -14,19 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -35,20 +31,20 @@ class ProcessMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static ScheduledProcess mapScheduledProcess(ResultSet rsProcess) {
+    static ProcessEntity mapProcess(ResultSet rsProcess) {
         try {
-            ScheduledProcess scheduledProcess = new ScheduledProcess();
-            scheduledProcess.setProcessId(rsProcess.getString("process_id"));
-            scheduledProcess.setProfileId(rsProcess.getString("profile_id"));
-            scheduledProcess.setBatchId(rsProcess.getString("batch_id"));
-            scheduledProcess.setOwnerId(rsProcess.getString("owner"));
+            ProcessEntity processEntity = new ProcessEntity();
+            processEntity.setProcessId(rsProcess.getString("process_id"));
+            processEntity.setProfileId(rsProcess.getString("profile_id"));
+            processEntity.setBatchId(rsProcess.getString("batch_id"));
+            processEntity.setOwnerId(rsProcess.getString("owner"));
 
             String json = rsProcess.getString("payload");
             if(json != null){
                 Map<String, String> payloadMap = mapper.readValue(json, new TypeReference<>() {});
-                scheduledProcess.setPayload(payloadMap);
+                processEntity.setPayload(payloadMap);
             }
-            return scheduledProcess;
+            return processEntity;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         } catch (JsonProcessingException e) {

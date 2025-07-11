@@ -20,8 +20,8 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.io.IOException;

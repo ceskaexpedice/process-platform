@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
 import java.util.List;
@@ -39,12 +38,12 @@ public class ProfileDao {
         this.managerConfiguration = managerConfiguration;
     }
 
-    public PluginProfile getProfile(String profileId) {
+    public PluginProfileEntity getProfile(String profileId) {
         try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
+            List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
+                public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
+                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return false;
                 }
@@ -55,12 +54,12 @@ public class ProfileDao {
         }
     }
 
-    public List<PluginProfile> getProfiles() {
+    public List<PluginProfileEntity> getProfiles() {
         try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
+            List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
+                public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
+                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }
@@ -71,12 +70,12 @@ public class ProfileDao {
         }
     }
 
-    public List<PluginProfile> getProfiles(String pluginId) {
+    public List<PluginProfileEntity> getProfiles(String pluginId) {
         try (Connection connection = getConnection()) {
-            List<PluginProfile> profiles = new JDBCQueryTemplate<PluginProfile>(connection) {
+            List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfile> returnsList) throws SQLException {
-                    PluginProfile pluginProfile = PluginMapper.mapPluginProfile(rs);
+                public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
+                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }
@@ -87,7 +86,7 @@ public class ProfileDao {
         }
     }
 
-    public void createProfile(PluginProfile profile) {
+    public void createProfile(PluginProfileEntity profile) {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_profile (profile_id, plugin_id, jvm_args) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -107,7 +106,7 @@ public class ProfileDao {
 
     }
 
-    public void updateProfile(PluginProfile profile) {
+    public void updateProfile(PluginProfileEntity profile) {
         try (Connection connection = getConnection()) {
             String sql = "UPDATE pcp_profile SET jvm_args = ? WHERE profile_id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {

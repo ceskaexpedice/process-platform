@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +24,8 @@ import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
 import java.util.*;
@@ -32,9 +34,9 @@ class PluginMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static PluginInfo mapPluginInfo(ResultSet rsPlugin, List<PluginProfile> profiles) {
+    static PluginEntity mapPlugin(ResultSet rsPlugin) {
         try {
-            PluginInfo plugin = new PluginInfo();
+            PluginEntity plugin = new PluginEntity();
             plugin.setPluginId(rsPlugin.getString("plugin_id"));
             plugin.setDescription(rsPlugin.getString("description"));
             plugin.setMainClass(rsPlugin.getString("main_class"));
@@ -53,7 +55,6 @@ class PluginMapper {
             }
             plugin.setScheduledProfiles(scheduledProfiles);
 
-            plugin.setProfiles(profiles);
             return plugin;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
@@ -62,8 +63,8 @@ class PluginMapper {
         }
     }
 
-    static PluginProfile mapPluginProfile(ResultSet rsProfile) throws SQLException {
-        PluginProfile profile = new PluginProfile();
+    static PluginProfileEntity mapPluginProfile(ResultSet rsProfile) throws SQLException {
+        PluginProfileEntity profile = new PluginProfileEntity();
         profile.setProfileId(rsProfile.getString("profile_id"));
         profile.setPluginId(rsProfile.getString("plugin_id"));
 

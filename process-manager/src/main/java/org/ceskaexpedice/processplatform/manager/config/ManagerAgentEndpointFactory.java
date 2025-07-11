@@ -19,8 +19,6 @@ package org.ceskaexpedice.processplatform.manager.config;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;

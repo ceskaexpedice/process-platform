@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.service;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.manager.api.dao.ProcessDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.ProcessDao;
+import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * ProcessService
@@ -41,26 +41,43 @@ public class ProcessService {
     }
 
     public void scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
-        processDao.createProcess(scheduleMainProcess);
+        String newProcessId = UUID.randomUUID().toString();
+        String newBatchId = UUID.randomUUID().toString();
+
+        ProcessEntity processEntity = ProcessServiceMapper.mapProcess(scheduleMainProcess);
+        processEntity.setProcessId(newProcessId);
+        processEntity.setBatchId(newBatchId);
+
+        processDao.createPlannedProcess(processEntity);
     }
 
     public void scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
+        String newProcessId = UUID.randomUUID().toString();
+        String ownerId = null; // TODO fetch it from owner process
 
+        ProcessEntity processEntity = ProcessServiceMapper.mapProcess(scheduleSubProcess);
+        processEntity.setProcessId(newProcessId);
+        processEntity.setOwnerId(ownerId);
+
+        processDao.createPlannedProcess(processEntity);
     }
 
     public ScheduledProcess getNextScheduledProcess(List<String> tags) {
-        List<ScheduledProcess> scheduledProcesses = processDao.getScheduledProcesses();
-        ScheduledProcess selectedProcess = null;
-        for (ScheduledProcess scheduledProcess : scheduledProcesses) {
-            if(tags.contains(scheduledProcess.getProfileId())){
-                selectedProcess = scheduledProcess;
+        List<ProcessEntity> processes = processDao.getPlannedProcesses();
+        ScheduledProcess scheduledProcess = null;
+        for (ProcessEntity processEntity : processes) {
+            if(tags.contains(processEntity.getProfileId())){
+                scheduledProcess = ProcessServiceMapper.mapProcess(processEntity);
+                // TODO populate pluginId, mainClass, jvmArgs from plugin
+                scheduledProcess.setJvmArgs(null); // TODO
+                scheduledProcess.setPluginId(null); // TODO
+                scheduledProcess.setMainClass(null); // TODO
                 break;
             }
         }
-        // TODO populate pluginId, mainClass, jvmArgs from plugin
         // set process state to NOT_RUNNING
 
-        return selectedProcess;
+        return scheduledProcess;
     }
 
 }

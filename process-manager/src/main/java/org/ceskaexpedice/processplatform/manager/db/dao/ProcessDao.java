@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,12 +23,11 @@ import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.entity.*;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public class ProcessDao {
@@ -43,23 +42,23 @@ public class ProcessDao {
         this.managerConfiguration = managerConfiguration;
     }
 
-    public List<ScheduledProcess> getScheduledProcesses() {
+    public List<ProcessEntity> getPlannedProcesses() {
         try (Connection connection = getConnection()) {
-            List<ScheduledProcess> processes = new JDBCQueryTemplate<ScheduledProcess>(connection) {
+            List<ProcessEntity> processEntities = new JDBCQueryTemplate<ProcessEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<ScheduledProcess> returnsList) throws SQLException {
-                    ScheduledProcess scheduledProcess = ProcessMapper.mapScheduledProcess(rs);
-                    returnsList.add(scheduledProcess);
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
+                    ProcessEntity processEntity = ProcessMapper.mapProcess(rs);
+                    returnsList.add(processEntity);
                     return true;
                 }
             }.executeQuery("select " + "*" + " from PCP_PROCESS p  where STATUS = ?", ProcessState.PLANNED.getVal());
-            return processes;
+            return processEntities;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
     }
 
-    public void createProcess(ScheduleMainProcess scheduleMainProcess) {
+    public void createPlannedProcess(ProcessEntity processEntity) {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_process(" +
                     "process_id," +
@@ -81,14 +80,14 @@ public class ProcessDao {
                     "    ?" +
                     "  )";
             try (PreparedStatement insertStatement = connection.prepareStatement(sql)) {
-                insertStatement.setString(1, UUID.randomUUID().toString());
-                insertStatement.setString(2, scheduleMainProcess.getProfileId());
+                insertStatement.setString(1, processEntity.getProcessId());
+                insertStatement.setString(2, processEntity.getProfileId());
                 insertStatement.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
                 insertStatement.setInt(4, ProcessState.PLANNED.getVal());
-                insertStatement.setString(5, UUID.randomUUID().toString());
-                String json = mapper.writeValueAsString(scheduleMainProcess.getPayload());
+                insertStatement.setString(5, processEntity.getBatchId());
+                String json = mapper.writeValueAsString(processEntity.getPayload());
                 insertStatement.setString(6, json);
-                insertStatement.setString(7, scheduleMainProcess.getOwnerId());
+                insertStatement.setString(7, processEntity.getOwnerId());
                 insertStatement.executeUpdate();
             } catch (JsonProcessingException e) {
                 throw new ApplicationException(e.toString(), e);

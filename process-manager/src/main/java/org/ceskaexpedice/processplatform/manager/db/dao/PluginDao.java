@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.*;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PluginDao {
@@ -45,39 +42,39 @@ public class PluginDao {
         this.managerConfiguration = managerConfiguration;
     }
 
-    public PluginInfo getPlugin(String pluginId, List<PluginProfile> pluginProfiles) {
+    public PluginEntity getPlugin(String pluginId) {
         try (Connection connection = getConnection()) {
-            List<PluginInfo> pluginInfos = new JDBCQueryTemplate<PluginInfo>(connection) {
+            List<PluginEntity> plugins = new JDBCQueryTemplate<PluginEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
-                    PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, pluginProfiles);
-                    returnsList.add(pluginProfile);
+                public boolean handleRow(ResultSet rs, List<PluginEntity> returnsList) {
+                    PluginEntity pluginEntity = PluginMapper.mapPlugin(rs);
+                    returnsList.add(pluginEntity);
                     return true;
                 }
             }.executeQuery("select " + "*" + " from PCP_PLUGIN p  where PLUGIN_ID = ?", pluginId);
-            return pluginInfos.size() == 1 ? pluginInfos.get(0) : null;
+            return plugins.size() == 1 ? plugins.get(0) : null;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
     }
 
-    public List<PluginInfo> getPlugins() {
+    public List<PluginEntity> getPlugins() {
         try (Connection connection = getConnection()) {
-            List<PluginInfo> pluginInfos = new JDBCQueryTemplate<PluginInfo>(connection) {
+            List<PluginEntity> plugins = new JDBCQueryTemplate<PluginEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginInfo> returnsList) throws SQLException {
-                    PluginInfo pluginProfile = PluginMapper.mapPluginInfo(rs, null);
-                    returnsList.add(pluginProfile);
+                public boolean handleRow(ResultSet rs, List<PluginEntity> returnsList) {
+                    PluginEntity pluginEntity = PluginMapper.mapPlugin(rs);
+                    returnsList.add(pluginEntity);
                     return true;
                 }
             }.executeQuery("select " + "*" + " from PCP_PLUGIN p");
-            return pluginInfos;
+            return plugins;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
     }
 
-    public void createPlugin(PluginInfo plugin) {
+    public void createPlugin(PluginEntity plugin) {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map, scheduled_profiles) VALUES (?, ?, ?, ?::jsonb, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {

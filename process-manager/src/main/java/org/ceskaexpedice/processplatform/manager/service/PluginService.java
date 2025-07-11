@@ -14,18 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.manager.api.GlobalExceptionMapper;
-import org.ceskaexpedice.processplatform.manager.api.dao.PluginDao;
-import org.ceskaexpedice.processplatform.manager.api.dao.ProfileDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -51,13 +53,18 @@ public class PluginService {
 
     public PluginInfo getPlugin(String pluginId) {
         // TODO get all scheduled processes hierarchically
-        List<PluginProfile> profiles = profileDao.getProfiles(pluginId);
-        PluginInfo plugin = pluginDao.getPlugin(pluginId, profiles);
-        return plugin;
+        PluginEntity pluginEntity = pluginDao.getPlugin(pluginId);
+        PluginInfo pluginInfo = PluginServiceMapper.mapPlugin(pluginEntity);
+        if(pluginInfo == null) return null;
+
+        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
+        pluginInfo.setProfiles(profiles);
+        return pluginInfo;
     }
 
     public List<PluginInfo> getPlugins() {
-        return pluginDao.getPlugins();
+        List<PluginInfo> plugins = PluginServiceMapper.mapPlugins(pluginDao.getPlugins());
+        return plugins;
     }
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
@@ -79,16 +86,17 @@ public class PluginService {
         if (pluginExisting != null) {
             // already registered
             for (PluginProfile profile : pluginInfo.getProfiles()) {
-                PluginProfile profileExisting = profileDao.getProfile(profile.getProfileId());
+                PluginProfileEntity profileExisting = profileDao.getProfile(profile.getProfileId());
                 if (profileExisting == null) {
                     // let's register new profile to the existing plugin
-                    profileDao.createProfile(profile);
+                    PluginProfileEntity newProfile = PluginServiceMapper.mapProfile(profile);
+                    profileDao.createProfile(newProfile);
                 }
             }
         } else {
-            pluginDao.createPlugin(pluginInfo);
+            pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
             for (PluginProfile profile : pluginInfo.getProfiles()) {
-                profileDao.createProfile(profile);
+                profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
             }
         }
     }
@@ -96,26 +104,26 @@ public class PluginService {
     // ------ profiles ----------
 
     public PluginProfile getProfile(String profileId) {
-        PluginProfile profile = profileDao.getProfile(profileId);
+        PluginProfile profile = PluginServiceMapper.mapProfile(profileDao.getProfile(profileId));
         return profile;
     }
 
     public List<PluginProfile> getProfiles() {
-        List<PluginProfile> profiles = profileDao.getProfiles();
+        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles());
         return profiles;
     }
 
     public List<PluginProfile> getProfiles(String pluginId) {
-        List<PluginProfile> profiles = profileDao.getProfiles(pluginId);
+        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
         return profiles;
     }
 
     public void createProfile(PluginProfile profile) {
-        profileDao.createProfile(profile);
+        profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
     }
 
     public void updateProfile(PluginProfile profile) {
-        profileDao.updateProfile(profile);
+        profileDao.updateProfile(PluginServiceMapper.mapProfile(profile));
     }
 
     public void deleteProfile(String profileId) {

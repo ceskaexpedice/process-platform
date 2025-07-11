@@ -17,11 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.json.JSONObject;
+import org.ceskaexpedice.processplatform.manager.service.ProcessService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
@@ -31,7 +27,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 /**
