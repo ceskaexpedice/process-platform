@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.manager.api;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
-import org.ceskaexpedice.processplatform.manager.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

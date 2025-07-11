@@ -24,7 +24,7 @@ import java.util.Map;
  * ScheduleProcess
  * @author ppodsednik
  */
-public class ScheduleProcess {
+public abstract class ScheduleProcess {
     private String profileId;
     private Map<String, String> payload;
 

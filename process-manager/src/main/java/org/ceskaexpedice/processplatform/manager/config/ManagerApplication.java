@@ -20,8 +20,8 @@ import jakarta.servlet.ServletContext;
 import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
-import org.ceskaexpedice.processplatform.manager.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;

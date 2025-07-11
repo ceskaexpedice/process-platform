@@ -17,7 +17,7 @@
 package org.ceskaexpedice.testutils;
 
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.manager.service.TestPluginService_integration;
+import org.ceskaexpedice.processplatform.manager.api.service.TestPluginService_integration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 

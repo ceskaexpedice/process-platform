@@ -16,7 +16,7 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.manager.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;

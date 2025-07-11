@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.service;
+package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
@@ -27,7 +27,6 @@ import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -88,7 +87,7 @@ public class PluginService {
             for (PluginProfile profile : pluginInfo.getProfiles()) {
                 PluginProfileEntity profileExisting = profileDao.getProfile(profile.getProfileId());
                 if (profileExisting == null) {
-                    // let's register new profile to the existing plugin
+                    // let's register new profile for the existing plugin
                     PluginProfileEntity newProfile = PluginServiceMapper.mapProfile(profile);
                     profileDao.createProfile(newProfile);
                 }
