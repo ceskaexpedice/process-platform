@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    api 'org.ceskaexpedice:process-common:1.0-SNAPSHOT'
+	api project(':process-common')
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
