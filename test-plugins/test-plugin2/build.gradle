@@ -1,29 +1,21 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
+	id 'org.ceskaexpedice.processplatform.process' version '1.0.0'
+
 }
 
-/*
-publishing {
-
-    publications {
-        myLibrary(MavenPublication) {
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/ceskaexpedice/akubra"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
+/** create process */ 
+processPlugin {
+    pluginName = "test-plugin2"
+    profiles = [
+        [
+            profileId: "default-test-plugin2",
+            description: "Deafult",
+            jvmArgs: ["-Xmx8g"]
+        ]
+    ]
 }
-*/
+
 
 repositories {
     mavenLocal()
