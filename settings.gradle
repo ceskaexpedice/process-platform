@@ -1,3 +1,16 @@
+pluginManagement {
+    repositories {
+		maven {
+            url = uri("https://raw.githubusercontent.com/ceskaexpedice/process-platform/main/process-plugin-gradle/docs")
+        }
+        maven {
+            url = uri("https://raw.githubusercontent.com/ceskaexpedice/process-platform/main/process-worker-plugin-gradle/docs")
+        }
+        gradlePluginPortal()
+    }
+}
+
+
 rootProject.name = 'process-platform'
 
 include	'process-common'
@@ -5,6 +18,26 @@ include	'process-api'
 include	'process-manager'
 include	'process-worker'
 
-include	'test-plugins:test-plugin1'
-include	'test-plugins:test-plugin2'
 
+include 'process-plugin-gradle'
+include 'process-worker-plugin-gradle'
+
+//gradlew -Pplugin=test-plugin1 :test-plugins:test-plugin1:build
+// Načti pouze pokud -Pplugin=true
+if (gradle.startParameter.projectProperties.get("plugin") == "true") {
+
+    println "→ Enabling all test-plugins and test-worker"
+
+    // Načti všechny pluginy z test-plugins/*
+    file("test-plugins").listFiles()?.each { pluginDir ->
+        if (pluginDir.isDirectory() && new File(pluginDir, "build.gradle").exists()) {
+            def pluginName = pluginDir.name
+            println "  - including plugin :test-plugins:${pluginName}"
+            include ":test-plugins:${pluginName}"
+            project(":test-plugins:${pluginName}").projectDir = pluginDir
+        }
+    }
+
+    // A načti worker
+    include 'test-worker'
+}
