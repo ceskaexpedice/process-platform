@@ -35,6 +35,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteAgentException;
 import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
@@ -42,12 +43,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * ManagerClient
  * @author ppodsednik
  */
 public class ManagerClient {
+
+    public static final Logger LOGGER = Logger.getLogger(ManagerClient.class.getName());
+
     private final WorkerConfiguration workerConfiguration;
     private final CloseableHttpClient closeableHttpClient;
     ObjectMapper mapper = new ObjectMapper();
@@ -78,9 +83,11 @@ public class ManagerClient {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/register-plugin";
-        HttpPost post = new HttpPost(url);
+        String managerUrl = new EffectiveWorkerConfiguration((workerConfiguration)).getManagerBaseUrl();
+        String url = managerUrl + "agent/register-plugin";
+        LOGGER.info("Registering plugin at " + url);
 
+        HttpPost post = new HttpPost(url);
         String json;
         try {
             json = mapper.writeValueAsString(pluginInfo);
@@ -102,7 +109,8 @@ public class ManagerClient {
     }
 
     public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        String url = workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/schedule-sub-process";
+        String url = getManageBaseUrl() + "agent/schedule-sub-process";
+        LOGGER.info(String.format("Scheduling sub-process at %s", url));
         HttpPost post = new HttpPost(url);
 
         String json;
@@ -125,11 +133,15 @@ public class ManagerClient {
         }
     }
 
+    private String getManageBaseUrl() {
+        return new EffectiveWorkerConfiguration(workerConfiguration).getManagerBaseUrl();
+    }
+
     public ScheduledProcess getNextProcess() {
         URIBuilder uriBuilder;
         HttpGet get;
         try {
-            uriBuilder = new URIBuilder(workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY) + "agent/next-process");
+            uriBuilder = new URIBuilder(getManageBaseUrl() + "agent/next-process");
             uriBuilder.addParameter(WorkerConfiguration.WORKER_ID_KEY, workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
             List<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_TAGS_KEY).split(","))
                     .map(String::trim)

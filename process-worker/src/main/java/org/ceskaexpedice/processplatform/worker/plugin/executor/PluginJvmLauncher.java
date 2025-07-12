@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +49,8 @@ public final class PluginJvmLauncher {
 
     public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
-            List<String> command = createCommand(scheduledProcess, workerConfiguration);
+            //List<String> command = createCommand(scheduledProcess, workerConfiguration);
+            List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));
             Process processR = pb.start();
@@ -64,6 +67,7 @@ public final class PluginJvmLauncher {
             return -1;
         }
     }
+
 
     private static List<String> createCommand(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
         List<String> command = new ArrayList<>();
@@ -97,6 +101,57 @@ public final class PluginJvmLauncher {
         command.add(PluginStarter.class.getName());
         return command;
     }
+
+
+    private static List<String> createCommandJVMArgs(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
+        Path argFile = generateJvmArgsFile(scheduledProcess, workerConfiguration);
+        return List.of("java", "@" + argFile.toAbsolutePath());
+    }
+
+    private static Path generateJvmArgsFile(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
+        List<String> args = new ArrayList<>();
+
+        args.add("-Duser.home=" + System.getProperty("user.home"));
+        args.add("-Dfile.encoding=UTF-8");
+
+        // JVM args ze ScheduledProcess
+        List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
+        if (javaProcessParameters != null) {
+            args.addAll(javaProcessParameters);
+        }
+
+        // Base64 configy
+        ObjectMapper mapper = new ObjectMapper();
+
+        String workerConfigJson = mapper.writeValueAsString(workerConfiguration.getAll());
+        String encodedWorkerConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
+        args.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedWorkerConfig);
+
+        ProcessConfiguration processConfiguration = new ProcessConfiguration();
+        convert(scheduledProcess, processConfiguration);
+        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcess.getProcessId() + "");
+        File standardStreamFile = standardOutFile(processWorkingDir);
+        File errStreamFile = errorOutFile(processWorkingDir);
+        processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
+        processConfiguration.set(SERR_FILE_KEY, errStreamFile.getAbsolutePath());
+
+        String processConfigJson = mapper.writeValueAsString(processConfiguration.getAll());
+        String encodedProcessConfig = Base64.getEncoder().encodeToString(processConfigJson.getBytes(StandardCharsets.UTF_8));
+        args.add("-D" + PROCESS_CONFIG_BASE64_KEY + "=" + encodedProcessConfig);
+
+        // Classpath
+        args.add("-cp");
+        args.add(workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY));
+
+        // Main class
+        args.add(PluginStarter.class.getName());
+
+        // Zápis do souboru
+        Path argsFile = Files.createTempFile("jvm", ".args");
+        Files.write(argsFile, args, StandardCharsets.UTF_8);
+        return argsFile;
+    }
+
 
     private static void convert(ScheduledProcess scheduledProcess, ProcessConfiguration processConfiguration) throws JsonProcessingException {
         processConfiguration.set(MAIN_CLASS_KEY, scheduledProcess.getMainClass());

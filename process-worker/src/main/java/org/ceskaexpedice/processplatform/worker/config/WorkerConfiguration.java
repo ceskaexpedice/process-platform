@@ -35,6 +35,7 @@ public class WorkerConfiguration {
     public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
 
     public static final String WORKER_LOOP_SLEEP_SEC_KEY = "workerLoopSleepSec";
+
     public static final String PLUGIN_PATH_KEY = "pluginPath";
     public static final String STARTER_CLASSPATH_KEY = "starterClasspath";
     public static final String MANAGER_BASE_URL_KEY = "managerBaseUrl";

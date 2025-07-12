@@ -16,8 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.WorkerAgentEndpoint;
 import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;

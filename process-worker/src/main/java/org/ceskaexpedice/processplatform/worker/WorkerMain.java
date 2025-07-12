@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.worker;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
+import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
@@ -52,7 +53,8 @@ public class WorkerMain {
     }
 
     private List<PluginInfo> scanPlugins() {
-        File pluginsDir = new File(workerConfiguration.get(WorkerConfiguration.PLUGIN_PATH_KEY));
+        File pluginsDir = new EffectiveWorkerConfiguration(workerConfiguration).getPluginDirectory();
+        LOGGER.info(String.format("Plugin folder is %s", pluginsDir));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }

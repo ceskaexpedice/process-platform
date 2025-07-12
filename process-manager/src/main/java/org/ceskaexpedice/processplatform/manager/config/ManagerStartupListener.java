@@ -16,19 +16,29 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.DbUtils;
+import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ManagerStartupListener implements ServletContextListener {
+
+    public static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -48,6 +58,29 @@ public class ManagerStartupListener implements ServletContextListener {
         ServletContext ctx = sce.getServletContext();
         ctx.setAttribute("pluginService", pluginService);
         ctx.setAttribute("processService", processService);
+
+        makeSureTableExists(dbProvider, "pcp_profile");
+        makeSureTableExists(dbProvider, "pcp_process");
+        makeSureTableExists(dbProvider, "pcp_plugin");
+    }
+
+    private void makeSureTableExists(DbConnectionProvider dbProvider, String tableName) {
+        try {
+            Connection connection = dbProvider.get();
+            boolean pcpProfile = DbUtils.tableExists(connection, tableName);
+            if (!pcpProfile) {
+                JDBCUpdateTemplate updateTemplate = new JDBCUpdateTemplate(connection, true);
+                InputStream is = getClass().getClassLoader().getResourceAsStream(String.format("%s.sql", tableName));
+                String sql = IOUtils.toString(is, "UTF-8");
+                updateTemplate.executeUpdate(sql);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(), e);
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
