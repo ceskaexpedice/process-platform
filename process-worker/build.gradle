@@ -17,9 +17,11 @@ dependencies {
 
     implementation 'org.glassfish.jersey.containers:jersey-container-servlet:2.39'
     implementation 'org.glassfish.jersey.inject:jersey-hk2:2.39'
-    implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0' // Provided by Tomcat
 
-    providedCompile 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    //implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0' // Provided by Tomcat
+    //providedCompile 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1' // Provided by Tomcat
+    providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
 
     implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
     implementation "javax.inject:javax.inject:1"
