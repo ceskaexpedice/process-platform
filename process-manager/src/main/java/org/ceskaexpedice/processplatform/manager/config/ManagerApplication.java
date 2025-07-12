@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import jakarta.servlet.ServletContext;
+import javax.servlet.ServletContext;
 import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
