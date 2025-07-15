@@ -17,15 +17,14 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
 import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -48,15 +47,14 @@ public class PluginService {
         this.profileDao = new ProfileDao(dbConnectionProvider, managerConfiguration);
     }
 
-    // ------ plugins ----------
-
     public PluginInfo getPlugin(String pluginId) {
         // TODO get all scheduled processes hierarchically
         PluginEntity pluginEntity = pluginDao.getPlugin(pluginId);
         PluginInfo pluginInfo = PluginServiceMapper.mapPlugin(pluginEntity);
-        if(pluginInfo == null) return null;
-
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
+        if (pluginInfo == null) {
+            return null;
+        }
+        List<PluginProfile> profiles = ProfileServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
         pluginInfo.setProfiles(profiles);
         return pluginInfo;
     }
@@ -80,54 +78,15 @@ public class PluginService {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        // TODO log messages
         PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
         if (pluginExisting != null) {
-            // already registered
-            for (PluginProfile profile : pluginInfo.getProfiles()) {
-                PluginProfileEntity profileExisting = profileDao.getProfile(profile.getProfileId());
-                if (profileExisting == null) {
-                    // let's register new profile for the existing plugin
-                    PluginProfileEntity newProfile = PluginServiceMapper.mapProfile(profile);
-                    profileDao.createProfile(newProfile);
-                }
-            }
-        } else {
-            pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
-            for (PluginProfile profile : pluginInfo.getProfiles()) {
-                profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
-            }
+            LOGGER.info("Plugin with id " + pluginInfo.getPluginId() + " already registered");
+            return;
+        }
+        pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
+        for (PluginProfile profile : pluginInfo.getProfiles()) {
+            profileDao.createProfile(ProfileServiceMapper.mapProfile(profile));
         }
     }
-
-    // ------ profiles ----------
-
-    public PluginProfile getProfile(String profileId) {
-        PluginProfile profile = PluginServiceMapper.mapProfile(profileDao.getProfile(profileId));
-        return profile;
-    }
-
-    public List<PluginProfile> getProfiles() {
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles());
-        return profiles;
-    }
-
-    public List<PluginProfile> getProfiles(String pluginId) {
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
-        return profiles;
-    }
-
-    public void createProfile(PluginProfile profile) {
-        profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
-    }
-
-    public void updateProfile(PluginProfile profile) {
-        profileDao.updateProfile(PluginServiceMapper.mapProfile(profile));
-    }
-
-    public void deleteProfile(String profileId) {
-        profileDao.deleteProfile(profileId);
-    }
-
 
 }

@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
@@ -49,7 +49,7 @@ public final class PluginJvmLauncher {
 
     public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
-            //List<String> command = createCommand(scheduledProcess, workerConfiguration);
+            // TODO List<String> command = createCommand(scheduledProcess, workerConfiguration);
             List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));
@@ -69,39 +69,40 @@ public final class PluginJvmLauncher {
     }
 
 
-    private static List<String> createCommand(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
-        List<String> command = new ArrayList<>();
-        command.add("java");
-        command.add("-Duser.home=" + System.getProperty("user.home"));
-        command.add("-Dfile.encoding=UTF-8");
-        List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
-        for (String jpParam : javaProcessParameters) {
-            command.add(jpParam);
-        }
-
-        String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
-        String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
-        command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
-
-        ProcessConfiguration processConfiguration = new ProcessConfiguration();
-        convert(scheduledProcess, processConfiguration);
-        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcess.getProcessId() + "");
-        File standardStreamFile = standardOutFile(processWorkingDir);
-        File errStreamFile = errorOutFile(processWorkingDir);
-        processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
-        processConfiguration.set(SERR_FILE_KEY, errStreamFile.getAbsolutePath());
-        String processConfigJson = new ObjectMapper().writeValueAsString(processConfiguration.getAll());
-        String encodedProcessConfig = Base64.getEncoder().encodeToString(processConfigJson.getBytes(StandardCharsets.UTF_8));
-        command.add("-D" + PROCESS_CONFIG_BASE64_KEY + "=" + encodedProcessConfig);
-
-        command.add("-cp");
-        String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
-        command.add(starterClasspath);
-
-        command.add(PluginStarter.class.getName());
-        return command;
-    }
-
+//    private static List<String> createCommand(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
+//        List<String> command = new ArrayList<>();
+//        command.add("java");
+//        command.add("-Duser.home=" + System.getProperty("user.home"));
+//        command.add("-Dfile.encoding=UTF-8");
+//        List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
+//        for (String jpParam : javaProcessParameters) {
+//            command.add(jpParam);
+//        }
+//
+//        String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
+//        String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
+//        command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
+//
+//        ProcessConfiguration processConfiguration = new ProcessConfiguration();
+//        convert(scheduledProcess, processConfiguration);
+//        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY),
+//                scheduledProcess.getProcessId() + "");
+//        File standardStreamFile = standardOutFile(processWorkingDir);
+//        File errStreamFile = errorOutFile(processWorkingDir);
+//        processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
+//        processConfiguration.set(SERR_FILE_KEY, errStreamFile.getAbsolutePath());
+//        String processConfigJson = new ObjectMapper().writeValueAsString(processConfiguration.getAll());
+//        String encodedProcessConfig = Base64.getEncoder().encodeToString(processConfigJson.getBytes(StandardCharsets.UTF_8));
+//        command.add("-D" + PROCESS_CONFIG_BASE64_KEY + "=" + encodedProcessConfig);
+//
+//        command.add("-cp");
+//        String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
+//        command.add(starterClasspath);
+//
+//        command.add(PluginStarter.class.getName());
+//        return command;
+//    }
+//
 
     private static List<String> createCommandJVMArgs(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
         Path argFile = generateJvmArgsFile(scheduledProcess, workerConfiguration);
@@ -129,7 +130,8 @@ public final class PluginJvmLauncher {
 
         ProcessConfiguration processConfiguration = new ProcessConfiguration();
         convert(scheduledProcess, processConfiguration);
-        File processWorkingDir = prepareProcessWorkingDirectory(scheduledProcess.getProcessId() + "");
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY),
+                scheduledProcess.getProcessId() + "");
         File standardStreamFile = standardOutFile(processWorkingDir);
         File errStreamFile = errorOutFile(processWorkingDir);
         processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());

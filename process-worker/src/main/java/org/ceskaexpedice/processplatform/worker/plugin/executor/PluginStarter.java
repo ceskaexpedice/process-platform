@@ -20,9 +20,8 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
@@ -155,7 +154,6 @@ public class PluginStarter implements PluginContext {
 
     private static void updatePID(ProcessConfiguration processConfiguration, ManagerClient managerClient) {
         String pid = getPid();
-        managerClient.updateWorkerId(processConfiguration.get(PROCESS_ID_KEY));
         managerClient.updateProcessPid(processConfiguration.get(PROCESS_ID_KEY), pid);
     }
 

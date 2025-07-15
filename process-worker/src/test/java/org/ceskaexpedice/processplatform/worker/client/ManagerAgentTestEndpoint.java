@@ -15,7 +15,7 @@
 package org.ceskaexpedice.processplatform.worker.client;
 
 
-import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.Constants;
 
 import javax.ws.rs.*;
@@ -34,14 +34,23 @@ public class ManagerAgentTestEndpoint {
     //private final AgentService agentService;
     private static int counter;
 
-  /*
-  public ManagerAgentEndpoint(AgentService agentService) {
-    //this.agentService = agentService;
-  }*/
+    @POST
+    @Path("/register-node")
+    public Response registerNode(Node node) {
+        System.out.println("ManagerAgentEndpoint: registerNode: " + node.getNodeId());
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/register-plugin")
+    public Response registerPlugin(PluginInfo pluginInfo) {
+        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+        return Response.ok().build();
+    }
 
     @GET
-    @Path("/next-process")
-    public Response getNextProcess(@QueryParam("workerTags") List<String> tags) {
+    @Path("/next-process/{workerId}")
+    public Response getNextProcess(@PathParam("workerId") String workerId) {
         System.out.print("ManagerAgentEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
@@ -81,13 +90,6 @@ public class ManagerAgentTestEndpoint {
             System.out.println("null");
             return null;
         }
-    }
-
-    @POST
-    @Path("/register-plugin")
-    public Response registerPlugin(PluginInfo pluginInfo) {
-        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
-        return Response.ok().build();
     }
 
     @POST

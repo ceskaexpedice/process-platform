@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.manager.db.entity;
 import java.util.Map;
 
 /**
- * Process
+ * ProcessEntity
  * @author ppodsednik
  */
 public class ProcessEntity {

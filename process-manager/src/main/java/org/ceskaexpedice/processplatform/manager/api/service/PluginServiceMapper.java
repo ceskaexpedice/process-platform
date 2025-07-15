@@ -16,10 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,35 +55,4 @@ class PluginServiceMapper {
         }
         return plugins;
     }
-
-    static PluginProfile mapProfile(PluginProfileEntity profileEntity) {
-        if(profileEntity == null) return null;
-        PluginProfile pluginProfile = new PluginProfile();
-        pluginProfile.setPluginId(profileEntity.getPluginId());
-        pluginProfile.setJvmArgs(profileEntity.getJvmArgs());
-        pluginProfile.setProfileId(profileEntity.getProfileId());
-        pluginProfile.setDescription(profileEntity.getDescription());
-        return pluginProfile;
-    }
-
-    static List<PluginProfile> mapProfiles(List<PluginProfileEntity> profileEntities) {
-        if(profileEntities == null) return null;
-        List<PluginProfile> profiles = new ArrayList<>();
-        for (PluginProfileEntity profileEntity : profileEntities) {
-            PluginProfile pluginProfile = PluginServiceMapper.mapProfile(profileEntity);
-            profiles.add(pluginProfile);
-        }
-        return profiles;
-    }
-
-    static PluginProfileEntity mapProfile(PluginProfile profile) {
-        if(profile == null) return null;
-        PluginProfileEntity pluginProfileEntity = new PluginProfileEntity();
-        pluginProfileEntity.setPluginId(profile.getPluginId());
-        pluginProfileEntity.setJvmArgs(profile.getJvmArgs());
-        pluginProfileEntity.setProfileId(profile.getProfileId());
-        pluginProfileEntity.setDescription(profile.getDescription());
-        return pluginProfileEntity;
-    }
-
 }

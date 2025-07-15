@@ -29,8 +29,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
 
 /**
  * TestWorkerMain
@@ -51,8 +50,9 @@ public class TestWorkerMain {
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
         String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
-        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
+        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, TAGS);
         workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
+        workerConfiguration.set(WORKER_ID_KEY, "testWorker");
 
         final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);

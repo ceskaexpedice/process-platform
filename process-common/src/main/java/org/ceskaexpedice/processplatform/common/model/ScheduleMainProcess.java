@@ -14,25 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.entity;
+package org.ceskaexpedice.processplatform.common.model;
 
-public class PayloadFieldSpec {
-    private String type;    // e.g., "string", "boolean", "number"
-    private boolean required;
+import java.util.Map;
 
-    public PayloadFieldSpec() {
+/**
+ * ScheduleProcess
+ * @author ppodsednik
+ */
+public class ScheduleMainProcess extends ScheduleProcess{
+    private String ownerId;
+
+    public ScheduleMainProcess() {
     }
 
-    public PayloadFieldSpec(String type, boolean required) {
-        this.type = type;
-        this.required = required;
+    public ScheduleMainProcess(String profileId, Map<String, String> payload, String ownerId) {
+        super(profileId, payload);
+        this.ownerId = ownerId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public boolean isRequired() {
-        return required;
+    public String getOwnerId() {
+        return ownerId;
     }
 }

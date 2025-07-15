@@ -14,8 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
@@ -30,13 +29,13 @@ import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * TestProcessService_integration
+ * TestPluginService_integration
  *
  * @author ppodsednik
  */
-public class TestProcessService_integration {
+public class TestProfileService_integration {
     private static Properties testsProperties;
-    private static ProcessService processService;
+    private static ProfileService profileService;
     private static DbConnectionProvider dbConnectionProvider;
 
     @BeforeAll
@@ -44,7 +43,7 @@ public class TestProcessService_integration {
         testsProperties = IntegrationTestsUtils.loadProperties();
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
         dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
-        processService = new ProcessService(managerConfiguration, dbConnectionProvider);
+        profileService = new ProfileService(managerConfiguration, dbConnectionProvider);
     }
 
     @BeforeEach
@@ -55,27 +54,34 @@ public class TestProcessService_integration {
     }
 
     @Test
-    public void testScheduleProcess() {
-        Map<String, String> payload = new HashMap<>();
-        payload.put("name", "Pe");
-        payload.put("surname", "Po");
-        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        processService.scheduleProcess(scheduleMainProcess);
-        // TODO
+    public void testGetProfile() {
+        PluginProfile profile = profileService.getProfile(PROFILE1_ID);
+        Assertions.assertNotNull(profile);
+        profile = profileService.getProfile(PROFILE1_ID + "notExists");
+        Assertions.assertNull(profile);
     }
 
     @Test
-    public void testGetNextScheduledProcess() {
-        Map<String, String> payload = new HashMap<>();
-        payload.put("name", "Pe");
-        payload.put("surname", "Po");
-        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        processService.scheduleProcess(scheduleMainProcess);
-        List<String> tags = new ArrayList<>();
-        tags.add(PROFILE1_ID);
-        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess("workerId"); // TODO
-        Assertions.assertNotNull(nextScheduledProcess);
-        // TODO more asserts
+    public void testGetProfiles() {
+        List<PluginProfile> profiles = profileService.getProfiles();
+        Assertions.assertEquals(3, profiles.size());
+    }
+
+    @Test
+    public void testGetPluginProfiles() {
+        List<PluginProfile> profiles = profileService.getProfiles(PLUGIN1_ID);
+        Assertions.assertEquals(2, profiles.size());
+    }
+
+    @Test
+    public void testUpdateProfile() {
+        PluginProfile profile = profileService.getProfile(PROFILE1_ID);
+        Assertions.assertEquals(2, profile.getJvmArgs().size());
+        List<String> args = List.of("-Xmx32g", "a", "b", "c");
+        profile.setJvmArgs(args);
+        profileService.updateProfile(profile);
+        profile = profileService.getProfile(PROFILE1_ID);
+        Assertions.assertEquals(4, profile.getJvmArgs().size());
     }
 
 }

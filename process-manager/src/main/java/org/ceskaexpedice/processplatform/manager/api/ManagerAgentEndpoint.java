@@ -16,14 +16,14 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -38,22 +38,19 @@ public class ManagerAgentEndpoint {
 
     private final PluginService pluginService;
     private final ProcessService processService;
+    private final NodeService nodeService;
 
-    public ManagerAgentEndpoint(PluginService pluginService, ProcessService processService) {
+    public ManagerAgentEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
         this.pluginService = pluginService;
         this.processService = processService;
+        this.nodeService = nodeService;
     }
 
-    @GET
-    @Path("/next-process")
-    public Response getNextProcess(@QueryParam("workerTags") List<String> tags) {
-        ScheduledProcess scheduledProcess = new ScheduledProcess();
-        // batchId
-        if (scheduledProcess != null) {
-            return Response.ok(scheduledProcess).build();
-        } else {
-            return Response.status(Response.Status.NO_CONTENT).build();
-        }
+    @POST
+    @Path("/register-node")
+    public Response registerNode(Node node) {
+        System.out.println("ManagerAgentEndpoint: registerNode: " + node.getNodeId());
+        return Response.ok().build();
     }
 
     @POST
@@ -63,19 +60,23 @@ public class ManagerAgentEndpoint {
         return Response.ok().build();
     }
 
+    @GET
+    @Path("/next-process/{workerId}")
+    public Response getNextProcess(@PathParam("workerId") String workerId) {
+        ScheduledProcess scheduledProcess = processService.getNextScheduledProcess(workerId);
+        // batchId
+        if (scheduledProcess != null) {
+            return Response.ok(scheduledProcess).build();
+        } else {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+    }
+
     @POST
     @Path("/schedule-sub-process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
                 + ",batchId-" + scheduleSubProcess.getBatchId());
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("/worker/{processId}")
-    public Response updateWorker(@PathParam("processId") String processId, @QueryParam("worker") String worker) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateWorker:processId-" + processId + ";worker-" + worker);
         return Response.ok().build();
     }
 

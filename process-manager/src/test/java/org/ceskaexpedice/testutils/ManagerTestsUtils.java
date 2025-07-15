@@ -46,6 +46,8 @@ public final class ManagerTestsUtils {
             preparedStatement.executeUpdate();
             preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_plugin");
             preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("DROP TABLE IF EXISTS pcp_node");
+            preparedStatement.executeUpdate();
 
             InputStream is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_plugin.sql");
             String sql = IOUtils.toString(is, StandardCharsets.UTF_8);
@@ -58,6 +60,11 @@ public final class ManagerTestsUtils {
             preparedStatement.executeUpdate();
 
             is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_process.sql");
+            sql = IOUtils.toString(is, StandardCharsets.UTF_8);
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_node.sql");
             sql = IOUtils.toString(is, StandardCharsets.UTF_8);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();

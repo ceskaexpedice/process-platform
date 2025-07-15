@@ -17,7 +17,6 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
@@ -43,7 +42,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return false;
                 }
@@ -59,7 +58,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }
@@ -75,7 +74,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }

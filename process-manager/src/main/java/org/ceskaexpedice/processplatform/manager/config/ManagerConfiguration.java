@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
  * @author ppodsednik
  */
 public class ManagerConfiguration {
-    private static final String WORKER_URL_KEY_PREFIX = "worker.";
-    private static final String WORKER_URL_KEY_SUFFIX = ".url";
     public static final String JDBC_URL_KEY = "jdbcUrl";
     public static final String JDBC_USER_NAME_KEY = "jdbcUsername";
     public static final String JDBC_USER_PASSWORD_KEY = "jdbcPassword";
@@ -88,35 +86,6 @@ public class ManagerConfiguration {
      */
     public String getOrDefault(String key, String defaultValue) {
         return props.getProperty(key, defaultValue);
-    }
-
-    public String getWorkerUrl(String workerId) {
-        return getWorkerUrlMap().get(workerId);
-    }
-
-    /**
-     * Returns a mapping of workerId to base URL
-     */
-    private Map<String, String> getWorkerUrlMap() {
-        return props.entrySet().stream()
-                .filter(entry -> {
-                    String key = entry.getKey().toString();
-                    return key.startsWith(WORKER_URL_KEY_PREFIX) && key.endsWith(WORKER_URL_KEY_SUFFIX);
-                })
-                .collect(Collectors.toMap(
-                        entry -> extractWorkerId(entry.getKey().toString()),
-                        entry -> entry.getValue().toString()
-                ));
-    }
-
-    /**
-     * Extracts workerId from key like "worker.worker-1.url"
-     * Example:
-     * worker.worker-1.url = http://localhost:8081
-     * worker.worker-2.url = http://10.0.0.5:8081
-     */
-    private String extractWorkerId(String key) {
-        return key.substring(WORKER_URL_KEY_PREFIX.length(), key.length() - WORKER_URL_KEY_SUFFIX.length());
     }
 
 }

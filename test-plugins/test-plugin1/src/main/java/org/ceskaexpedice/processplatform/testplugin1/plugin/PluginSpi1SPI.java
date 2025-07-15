@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.testplugin1.plugin;
 
 import org.ceskaexpedice.processplatform.api.PluginSpi;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 
 import java.util.HashMap;
 import java.util.Map;

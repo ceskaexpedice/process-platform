@@ -16,13 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.entity.*;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class ProcessServiceMapper {
 

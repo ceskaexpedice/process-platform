@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.manager.db.entity;
 import java.util.List;
 
 /**
- * PluginProfileTO
+ * PluginProfileEntity
  * @author ppodsednik
  */
 public class PluginProfileEntity {

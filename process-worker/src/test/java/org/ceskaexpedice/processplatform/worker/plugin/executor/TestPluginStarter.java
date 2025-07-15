@@ -17,9 +17,8 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
-import org.ceskaexpedice.processplatform.common.entity.ProcessState;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
@@ -39,8 +38,7 @@ import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.Constants.*;
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.PROCESS_CONFIG_BASE64_KEY;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -56,10 +54,11 @@ public class TestPluginStarter {
     private WorkerConfiguration workerConfiguration;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         URL resource = getClass().getClassLoader().getResource("plugins");
         workerConfiguration = new WorkerConfiguration(new Properties());
         workerConfiguration.set(PLUGIN_PATH_KEY, resource.getFile());
+        workerConfiguration.set(WORKER_ID_KEY, "testWorker");
     }
 
     @Test
@@ -74,7 +73,7 @@ public class TestPluginStarter {
             pluginContextFactoryMockedStatic.when(() -> PluginContextFactory.createPluginContext(any(), any())).thenReturn(pluginContextMock);
 
             // prepare plugin working dirs
-            File processWorkingDir = prepareProcessWorkingDirectory(PLUGIN1_PROCESS_ID);
+            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WORKER_ID_KEY), PLUGIN1_PROCESS_ID);
             File standardStreamFile = standardOutFile(processWorkingDir);
             File errStreamFile = errorOutFile(processWorkingDir);
 

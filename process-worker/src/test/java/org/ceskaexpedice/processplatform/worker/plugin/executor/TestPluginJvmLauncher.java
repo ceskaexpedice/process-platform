@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerAgentTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -31,6 +31,7 @@ import java.util.*;
 
 import static org.ceskaexpedice.processplatform.worker.Constants.*;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_ID_KEY;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -51,6 +52,7 @@ public class TestPluginJvmLauncher {
         String starterClasspath = System.getProperty("java.class.path");
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
+        workerConfiguration.set(WORKER_ID_KEY, "testWorker");
 
         final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);

@@ -17,7 +17,7 @@ package org.ceskaexpedice.processplatform.worker.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.Constants;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
@@ -63,8 +63,8 @@ public class TestManagerClient {
     public void testGetNextProcess() {
         WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
-        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
-        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
+        String PROFILES = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, PROFILES);
         workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         ScheduledProcess nextProcess = managerClient.getNextProcess();
@@ -89,7 +89,7 @@ public class TestManagerClient {
             }
         }
 
-        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, "testPlugin1-big,testPlugin1-small");
+        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, "testPlugin1-big,testPlugin1-small");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.registerPlugin(testPlugin1);
         System.out.println("entity");

@@ -16,15 +16,13 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.entity;
 
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * PluginInfo
+ * PluginEntity
  * @author ppodsednik
  */
 public class PluginEntity {

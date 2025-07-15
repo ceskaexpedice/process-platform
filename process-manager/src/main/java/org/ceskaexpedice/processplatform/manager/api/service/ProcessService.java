@@ -16,15 +16,17 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
 import org.ceskaexpedice.processplatform.manager.db.dao.ProcessDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -34,10 +36,12 @@ import java.util.UUID;
 public class ProcessService {
     private final ManagerConfiguration managerConfiguration;
     private final ProcessDao processDao;
+    private final NodeDao nodeDao;
 
     public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider) {
         this.managerConfiguration = managerConfiguration;
         this.processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
+        this.nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
     }
 
     public void scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
@@ -62,10 +66,11 @@ public class ProcessService {
         processDao.createPlannedProcess(processEntity);
     }
 
-    public ScheduledProcess getNextScheduledProcess(List<String> tags) {
+    public ScheduledProcess getNextScheduledProcess(String workerId) {
         List<ProcessEntity> processes = processDao.getPlannedProcesses();
         ScheduledProcess scheduledProcess = null;
         for (ProcessEntity processEntity : processes) {
+            Set<String> tags = nodeDao.getNode(workerId).getTags();
             if(tags.contains(processEntity.getProfileId())){
                 scheduledProcess = ProcessServiceMapper.mapProcess(processEntity);
                 // TODO populate pluginId, mainClass, jvmArgs from plugin
@@ -75,7 +80,8 @@ public class ProcessService {
                 break;
             }
         }
-        // set process state to NOT_RUNNING
+        // TODO set process state to NOT_RUNNING
+        // TODO set workerId on the process
 
         return scheduledProcess;
     }

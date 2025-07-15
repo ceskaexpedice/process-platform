@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.api.context;
 
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 
 /**
  * PluginContext

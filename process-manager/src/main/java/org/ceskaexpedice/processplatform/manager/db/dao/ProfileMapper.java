@@ -17,48 +17,31 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
-import java.sql.*;
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
-class PluginMapper {
+class ProfileMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static PluginEntity mapPlugin(ResultSet rsPlugin) {
-        try {
-            PluginEntity plugin = new PluginEntity();
-            plugin.setPluginId(rsPlugin.getString("plugin_id"));
-            plugin.setDescription(rsPlugin.getString("description"));
-            plugin.setMainClass(rsPlugin.getString("main_class"));
+    static PluginProfileEntity mapPluginProfile(ResultSet rsProfile) throws SQLException {
+        PluginProfileEntity profile = new PluginProfileEntity();
+        profile.setProfileId(rsProfile.getString("profile_id"));
+        profile.setPluginId(rsProfile.getString("plugin_id"));
 
-            String json = rsPlugin.getString("payload_field_spec_map");
-            if(json != null){
-                Map<String, PayloadFieldSpec> specMap = mapper.readValue(json, new TypeReference<>() {});
-                plugin.setPayloadFieldSpecMap(specMap);
-            }
+        Array array = rsProfile.getArray("jvm_args");
+        profile.setJvmArgs(array != null ? Arrays.asList((String[]) array.getArray()) : new ArrayList<>());
 
-            Array array = rsPlugin.getArray("scheduled_profiles");
-            Set<String> scheduledProfiles = new HashSet<>();
-            if (array != null) {
-                String[] arr = (String[]) array.getArray();
-                scheduledProfiles = new HashSet<>(Arrays.asList(arr));
-            }
-            plugin.setScheduledProfiles(scheduledProfiles);
-
-            return plugin;
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException(e.toString(), e);
-        }
+        return profile;
     }
-
 }

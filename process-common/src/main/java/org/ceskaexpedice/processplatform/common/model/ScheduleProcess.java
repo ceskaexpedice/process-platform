@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.entity;
-
-import com.fasterxml.jackson.databind.JsonNode;
+package org.ceskaexpedice.processplatform.common.model;
 
 import java.util.Map;
 
@@ -24,18 +22,24 @@ import java.util.Map;
  * ScheduleProcess
  * @author ppodsednik
  */
-public class ScheduleMainProcess extends ScheduleProcess{
-    private String ownerId;
+public abstract class ScheduleProcess {
+    private String profileId;
+    private Map<String, String> payload;
 
-    public ScheduleMainProcess() {
+    public ScheduleProcess() {
     }
 
-    public ScheduleMainProcess(String profileId, Map<String, String> payload, String ownerId) {
-        super(profileId, payload);
-        this.ownerId = ownerId;
+    public ScheduleProcess(String profileId, Map<String, String> payload) {
+        this.profileId = profileId;
+        this.payload = payload;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getProfileId() {
+        return profileId;
     }
+
+    public Map<String, String> getPayload() {
+        return payload;
+    }
+
 }

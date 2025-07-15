@@ -14,34 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common.entity;
+package org.ceskaexpedice.processplatform.common.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+public class PayloadFieldSpec {
+    private String type;    // e.g., "string", "boolean", "number"
+    private boolean required;
 
-import java.util.Map;
-
-/**
- * ScheduleProcess
- * @author ppodsednik
- */
-public abstract class ScheduleProcess {
-    private String profileId;
-    private Map<String, String> payload;
-
-    public ScheduleProcess() {
+    public PayloadFieldSpec() {
     }
 
-    public ScheduleProcess(String profileId, Map<String, String> payload) {
-        this.profileId = profileId;
-        this.payload = payload;
+    public PayloadFieldSpec(String type, boolean required) {
+        this.type = type;
+        this.required = required;
     }
 
-    public String getProfileId() {
-        return profileId;
+    public String getType() {
+        return type;
     }
 
-    public Map<String, String> getPayload() {
-        return payload;
+    public boolean isRequired() {
+        return required;
     }
-
 }

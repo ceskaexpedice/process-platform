@@ -16,8 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 
@@ -37,8 +36,6 @@ public class PluginEndpoint {
     public PluginEndpoint(PluginService pluginService) {
         this.pluginService = pluginService;
     }
-
-    // ------------- plugins ---------------------------
 
     @GET
     @Path("/{pluginId}")
@@ -62,50 +59,5 @@ public class PluginEndpoint {
         pluginService.validatePayload(pluginId, payload);
         return Response.ok().build();
     }
-
-    // ------------- profiles ---------------------------
-
-    @GET
-    @Path("profile/{profileId}")
-    public Response getProfile(@PathParam("profileId") String profileId) {
-        PluginProfile profile = pluginService.getProfile(profileId);
-        return Response.ok(profile).build();
-    }
-
-    @GET
-    @Path("/profiles")
-    public Response getProfiles() {
-        List<PluginProfile> allProfiles = pluginService.getProfiles();
-        return Response.ok(allProfiles).build();
-    }
-
-    @GET
-    @Path("/plugin_profiles")
-    public Response getPluginProfiles(@QueryParam("pluginId") String pluginId) {
-        List<PluginProfile> allProfiles = pluginService.getProfiles(pluginId);
-        return Response.ok(allProfiles).build();
-    }
-
-    @POST
-    @Path("/profile")
-    public Response createProfile(PluginProfile profile) {
-        pluginService.createProfile(profile);
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("profile/{profileId}")
-    public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
-        pluginService.updateProfile(profile);
-        return Response.ok().build();
-    }
-
-    @DELETE
-    @Path("profile/{profileId}")
-    public Response deleteProfile(@PathParam("profileId") String profileId) {
-        pluginService.deleteProfile(profileId);
-        return Response.ok().build();
-    }
-
 
 }

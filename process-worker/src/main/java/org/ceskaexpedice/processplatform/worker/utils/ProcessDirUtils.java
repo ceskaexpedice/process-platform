@@ -24,13 +24,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKING_DIR;
+
 public final class ProcessDirUtils {
 
     private ProcessDirUtils() {}
 
-    public static File prepareProcessWorkingDirectory(String processId) {
-        String value = WorkerConfiguration.DEFAULT_WORKER_WORKDIR + File.separator + processId;
-        File processWorkingDir = new File(value);
+    public static File prepareProcessWorkingDirectory(String workerId, String processId) {
+        String workdir = WORKING_DIR + File.separator + workerId + File.separator + processId;
+        File processWorkingDir = new File(workdir);
         if (!processWorkingDir.exists()) {
             boolean mkdirs = processWorkingDir.mkdirs();
             if (!mkdirs){

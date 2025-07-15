@@ -34,15 +34,13 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteAgentException;
-import org.ceskaexpedice.processplatform.common.entity.*;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -80,6 +78,32 @@ public class ManagerClient {
 
 
         this.workerConfiguration = workerConfiguration;
+    }
+
+    public void registerNode(Node node) {
+        String managerUrl = new EffectiveWorkerConfiguration((workerConfiguration)).getManagerBaseUrl();
+        String url = managerUrl + "agent/register-node";
+        LOGGER.info("Registering node at " + url);
+
+        HttpPost post = new HttpPost(url);
+        String json;
+        try {
+            json = mapper.writeValueAsString(node);
+        } catch (JsonProcessingException e) {
+            throw new ApplicationException(e.toString(), e);
+        }
+        StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+        post.setEntity(entity);
+
+        int statusCode = -1;
+        try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
+            statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 204) {
+                throw new RemoteAgentException("Failed to register node", "manager", statusCode, null);
+            }
+        } catch (IOException e) {
+            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
+        }
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
@@ -141,15 +165,7 @@ public class ManagerClient {
         URIBuilder uriBuilder;
         HttpGet get;
         try {
-            uriBuilder = new URIBuilder(getManageBaseUrl() + "agent/next-process");
-            uriBuilder.addParameter(WorkerConfiguration.WORKER_ID_KEY, workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
-            List<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_TAGS_KEY).split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .toList();
-            for (String tag : tags) {
-                uriBuilder.addParameter(WorkerConfiguration.WORKER_TAGS_KEY, tag);
-            }
+            uriBuilder = new URIBuilder(getManageBaseUrl() + "agent/next-process/" + workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
@@ -262,22 +278,6 @@ public class ManagerClient {
 
     public void updateProcessPid(String processId, String pid) {
         String url = String.format("%sagent/pid/%s?pid=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId, pid);
-        HttpPut httpPut = new HttpPut(url);
-
-        int statusCode = -1;
-        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
-            statusCode = response.getCode();
-            if (statusCode != 200) {
-                throw new RemoteAgentException("Failed to update PID", "manager", statusCode, null);
-            }
-        } catch (IOException e) {
-            throw new RemoteAgentException(e.getMessage(), "manager", statusCode, e);
-        }
-    }
-
-    public void updateWorkerId(String processId) {
-        String url = String.format("%sagent/worker/%s?worker=%s", workerConfiguration.get(WorkerConfiguration.MANAGER_BASE_URL_KEY), processId,
-                workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;

@@ -14,8 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.worker.Constants;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,7 @@ public class TestPluginsLoader {
         assertNotNull(testPlugin2);
 
         // check profiles were merged:
-        // testPlugin1.json from jar:
+        // profile.json from jar:
         /*
         [
           {
@@ -66,30 +66,17 @@ public class TestPluginsLoader {
           }
         ]
          */
-        // testPlugin1.json from test/resources/plugins/testPlugin1:
-        /*
-        [
-          {
-            "profileId": "testPlugin1-big",
-            "jvmArgs": ["-Xms1g", "-Xmx64g"]
-          },
-          {
-            "profileId": "testPlugin1-smallest",
-            "jvmArgs": ["-Xms1g","-Xmx2g"]
-          }
-        ]
-         */
-        assertEquals(3, testPlugin1.getProfiles().size());
-        PluginProfile profileBiggest = null;
+        assertEquals(2, testPlugin1.getProfiles().size());
+        PluginProfile profileBig = null;
         for (PluginProfile profile : testPlugin1.getProfiles()) {
             if(profile.getProfileId().equals(Constants.PLUGIN1_PROFILE_BIG)){
-                profileBiggest = profile;
+                profileBig = profile;
             }
         }
-        assertNotNull(profileBiggest);
+        assertNotNull(profileBig);
         boolean biggestXmx = false;
-        for (String jvmArg : profileBiggest.getJvmArgs()) {
-            if(jvmArg.equals("-Xmx64g")){
+        for (String jvmArg : profileBig.getJvmArgs()) {
+            if(jvmArg.equals("-Xmx32g")){
                 biggestXmx = true;
             }
         }

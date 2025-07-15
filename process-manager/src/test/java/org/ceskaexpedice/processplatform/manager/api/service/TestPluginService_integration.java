@@ -15,12 +15,11 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
@@ -53,8 +52,6 @@ public class TestPluginService_integration {
         createTables(dbConnectionProvider);
         loadTestData(dbConnectionProvider);
     }
-
-    // ------ plugins ----------
 
     @Test
     public void testGetPlugin() {
@@ -118,58 +115,6 @@ public class TestPluginService_integration {
         pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID);
         Assertions.assertNotNull(pluginInfo);
         Assertions.assertEquals(1, pluginInfo.getProfiles().size());
-    }
-
-    // ------ profiles ----------
-
-    @Test
-    public void testGetProfile() {
-        PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertNotNull(profile);
-        profile = pluginService.getProfile(PROFILE1_ID + "notExists");
-        Assertions.assertNull(profile);
-    }
-
-    @Test
-    public void testGetProfiles() {
-        List<PluginProfile> profiles = pluginService.getProfiles();
-        Assertions.assertEquals(3, profiles.size());
-    }
-
-    @Test
-    public void testGetPluginProfiles() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-    }
-
-    @Test
-    public void testCreateProfile() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-        PluginProfile profile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN1_ID, List.of("-Xmx32g"));
-        pluginService.createProfile(profile);
-        profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(3, profiles.size());
-    }
-
-    @Test
-    public void testUpdateProfile() {
-        PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertEquals(2, profile.getJvmArgs().size());
-        List<String> args = List.of("-Xmx32g", "a", "b", "c");
-        profile.setJvmArgs(args);
-        pluginService.updateProfile(profile);
-        profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertEquals(4, profile.getJvmArgs().size());
-    }
-
-    @Test
-    public void testDeleteProfile() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-        pluginService.deleteProfile(PROFILE1_ID);
-        profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(1, profiles.size());
     }
 
 }

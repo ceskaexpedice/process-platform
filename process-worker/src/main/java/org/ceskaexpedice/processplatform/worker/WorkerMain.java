@@ -17,7 +17,9 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.Node;
+import org.ceskaexpedice.processplatform.common.model.NodeType;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -25,8 +27,11 @@ import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * WorkerMain
@@ -46,6 +51,7 @@ public class WorkerMain {
         LOGGER.info("Initializing...");
         this.workerConfiguration = workerConfiguration;
         managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
+        registerNode();
         registerPlugins();
         this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
         workerLoop.start();
@@ -59,9 +65,24 @@ public class WorkerMain {
         return pluginsList;
     }
 
+    private void registerNode() {
+        // TODO
+        Node node = new Node();
+        node.setNodeId(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
+        node.setDescription("????");
+        node.setType(NodeType.worker);
+        node.setUrl(workerConfiguration.get(WorkerConfiguration.WORKER_BASE_URL_KEY));
+        Set<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_PROFILES_KEY).split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+        node.setTags(tags);
+        managerClient.registerNode(node);
+    }
+
     private void registerPlugins() {
         List<PluginInfo> pluginsList = scanPlugins();
-        if(pluginsList.isEmpty()){
+        if (pluginsList.isEmpty()) {
             throw new ApplicationException("No plugins found");
         }
         for (PluginInfo pluginInfo : pluginsList) {

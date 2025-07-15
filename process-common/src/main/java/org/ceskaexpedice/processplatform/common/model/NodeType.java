@@ -14,26 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.api;
+package org.ceskaexpedice.processplatform.common.model;
 
-import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
-
-import java.util.Map;
-import java.util.Set;
-
-/**
- * ProcessPlugin
- * @author ppodsednik
- */
-public interface PluginSpi {
-
-    String getPluginId();        // e.g., "import"
-
-    String getDescription();     // e.g., "Imports FOXML into system"
-
-    String getMainClass();       // e.g., "cz.kramerius.plugin.importer.Main"
-
-    Map<String, PayloadFieldSpec> getPayloadSpec();
-
-    Set<String> getScheduledProfiles();
+public enum NodeType {
+    manager, worker
 }

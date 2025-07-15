@@ -17,10 +17,10 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.PluginSpi;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 
 import java.io.File;
 import java.net.*;
@@ -101,7 +101,7 @@ public final class PluginsLoader {
         Set<String> scheduledProfiles = plugin.getScheduledProfiles();
         Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
 
-        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
+        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar);
         if(profiles.isEmpty()){
             PluginProfile defaultProfile = new PluginProfile(pluginId, pluginId, pluginId, new ArrayList<>());
             profiles.add(defaultProfile);

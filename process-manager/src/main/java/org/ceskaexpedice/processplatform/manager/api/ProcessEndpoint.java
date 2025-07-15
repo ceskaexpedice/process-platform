@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
 import javax.ws.rs.*;
