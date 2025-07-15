@@ -30,7 +30,7 @@ import java.util.*;
 @Path("/agent")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ManagerAgentTestEndpoint {
+public class WorkerTestEndpoint {
     //private final AgentService agentService;
     private static int counter;
 

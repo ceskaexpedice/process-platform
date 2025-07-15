@@ -30,17 +30,17 @@ import java.util.logging.Logger;
  * ManagerAgentEndpoint
  * @author ppodsednik
  */
-@Path("/agent")
+@Path("/worker")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ManagerAgentEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(ManagerAgentEndpoint.class.getName());
+public class WorkerEndpoint {
+    private static final Logger LOGGER = Logger.getLogger(WorkerEndpoint.class.getName());
 
     private final PluginService pluginService;
     private final ProcessService processService;
     private final NodeService nodeService;
 
-    public ManagerAgentEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
+    public WorkerEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
         this.pluginService = pluginService;
         this.processService = processService;
         this.nodeService = nodeService;

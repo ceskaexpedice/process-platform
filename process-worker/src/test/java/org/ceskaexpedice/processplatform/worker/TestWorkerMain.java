@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.worker.client.ManagerAgentTestEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.WorkerTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -54,7 +54,7 @@ public class TestWorkerMain {
         workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
         workerConfiguration.set(WORKER_ID_KEY, "testWorker");
 
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(WorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }

@@ -31,14 +31,14 @@ import static org.mockito.Mockito.mock;
  * TestAgentEndpoint
  * @author ppodsednik
  */
-public class TestWorkerAgentEndpoint extends JerseyTest {
+public class TestManagerEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         WorkerAgentService agentServiceMock = mock(WorkerAgentService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new WorkerAgentEndpoint(agentServiceMock));
+        resourceConfig.register(new ManagerEndpoint(agentServiceMock));
         return resourceConfig;
     }
 

@@ -15,6 +15,7 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -34,15 +35,16 @@ import static org.mockito.Mockito.mock;
  *
  * @author ppodsednik
  */
-public class TestManagerAgentEndpoint extends JerseyTest {
+public class TestWorkerEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         PluginService pluginService = mock(PluginService.class);
         ProcessService processService = mock(ProcessService.class);
+        NodeService nodeService = mock(NodeService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ManagerAgentEndpoint(pluginService, processService));
+        resourceConfig.register(new WorkerEndpoint(pluginService, processService, nodeService));
         return resourceConfig;
     }
 

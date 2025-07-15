@@ -17,9 +17,10 @@
 package org.ceskaexpedice.processplatform.manager.config;
 
 import javax.servlet.ServletContext;
-import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.WorkerEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -37,10 +38,11 @@ public class ManagerApplication extends ResourceConfig {
     public ManagerApplication(@Context ServletContext context) {
         PluginService pluginService = (PluginService) context.getAttribute("pluginService");
         ProcessService processService = (ProcessService) context.getAttribute("processService");
+        NodeService nodeService = (NodeService) context.getAttribute("nodeService");
 
         register(new PluginEndpoint(pluginService));
         register(new ProcessEndpoint(processService));
-        register(new ManagerAgentEndpoint(pluginService, processService));
+        register(new WorkerEndpoint(pluginService, processService, nodeService));
         // TODO register(GlobalExceptionMapper.class);
     }
 

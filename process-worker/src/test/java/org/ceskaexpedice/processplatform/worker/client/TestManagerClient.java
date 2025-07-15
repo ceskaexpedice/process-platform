@@ -49,7 +49,7 @@ public class TestManagerClient {
 
     @BeforeEach
     public void setUp() throws Exception {
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(WorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
         server.start();
     }

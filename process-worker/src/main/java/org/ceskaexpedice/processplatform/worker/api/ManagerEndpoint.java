@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;
 
 import javax.ws.rs.*;
@@ -32,9 +31,9 @@ import java.io.InputStream;
 @Path("/agent")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class WorkerAgentEndpoint {
+public class ManagerEndpoint {
 
-    public WorkerAgentEndpoint(WorkerAgentService agentService) {
+    public ManagerEndpoint(WorkerAgentService agentService) {
     }
 
     @GET
