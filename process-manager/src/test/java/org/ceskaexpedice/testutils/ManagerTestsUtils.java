@@ -28,12 +28,15 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 public final class ManagerTestsUtils {
+    public static String NODE_WORKER_ID = "worker1";
+
     public static String PLUGIN1_ID = "testPlugin1";
     public static String PLUGIN2_ID = "testPlugin2";
-    public static String PLUGIN_NEW_ID = "testPluginNew";
+    public static String PLUGIN_NEW_ID = "newPluginId";
 
     public static String PROFILE1_ID = "testPlugin1-big";
-    public static String NEW_PROFILE_ID = "newProfileId";
+    public static String PROFILE2_ID = "testPlugin1-small";
+    public static String PROFILE_NEW_ID = "newProfileId";
 
     private ManagerTestsUtils() {}
 

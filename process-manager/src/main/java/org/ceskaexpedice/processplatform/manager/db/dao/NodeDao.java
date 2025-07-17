@@ -20,8 +20,8 @@ import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.NodeMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
 import java.util.List;
@@ -38,22 +38,34 @@ public class NodeDao {
         this.managerConfiguration = managerConfiguration;
     }
 
+    public void createNode(NodeEntity nodeEntity) {
+        try (Connection connection = getConnection()) {
+            String sql = "INSERT INTO pcp_node (node_id, description, type, url, tags) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, nodeEntity.getNodeId());
+                stmt.setString(2, nodeEntity.getDescription());
+                stmt.setString(3, nodeEntity.getType());
+                stmt.setString(4, nodeEntity.getUrl());
+                Array tagsArray = connection.createArrayOf("text", nodeEntity.getTags().toArray());
+                stmt.setArray(5, tagsArray);
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
     public NodeEntity getNode(String nodeId) {
         try (Connection connection = getConnection()) {
-            // TODO
-           /*
-            List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
+            List<NodeEntity> nodes = new JDBCQueryTemplate<NodeEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
-                    returnsList.add(pluginProfile);
+                public boolean handleRow(ResultSet rs, List<NodeEntity> returnsList) throws SQLException {
+                    NodeEntity nodeEntity = NodeMapper.mapNode(rs);
+                    returnsList.add(nodeEntity);
                     return false;
                 }
-            }.executeQuery("select " + "*" + " from PCP_PROFILE p  where PROFILE_ID = ?", profileId);
-            return profiles.size() == 1 ? profiles.get(0) : null;
-
-            */
-            return null;
+            }.executeQuery("select " + "*" + " from PCP_NODE n  where NODE_ID = ?", nodeId);
+            return nodes.size() == 1 ? nodes.get(0) : null;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }

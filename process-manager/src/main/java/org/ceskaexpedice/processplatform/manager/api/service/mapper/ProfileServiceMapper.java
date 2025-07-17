@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
@@ -22,9 +22,9 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-class ProfileServiceMapper {
+public class ProfileServiceMapper {
 
-    static PluginProfile mapProfile(PluginProfileEntity profileEntity) {
+    public static PluginProfile mapProfile(PluginProfileEntity profileEntity) {
         if(profileEntity == null) return null;
         PluginProfile pluginProfile = new PluginProfile();
         pluginProfile.setPluginId(profileEntity.getPluginId());
@@ -34,7 +34,7 @@ class ProfileServiceMapper {
         return pluginProfile;
     }
 
-    static List<PluginProfile> mapProfiles(List<PluginProfileEntity> profileEntities) {
+    public static List<PluginProfile> mapProfiles(List<PluginProfileEntity> profileEntities) {
         if(profileEntities == null) return null;
         List<PluginProfile> profiles = new ArrayList<>();
         for (PluginProfileEntity profileEntity : profileEntities) {
@@ -44,7 +44,7 @@ class ProfileServiceMapper {
         return profiles;
     }
 
-    static PluginProfileEntity mapProfile(PluginProfile profile) {
+    public static PluginProfileEntity mapProfile(PluginProfile profile) {
         if(profile == null) return null;
         PluginProfileEntity pluginProfileEntity = new PluginProfileEntity();
         pluginProfileEntity.setPluginId(profile.getPluginId());

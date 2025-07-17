@@ -20,6 +20,7 @@ import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProfileMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;

@@ -20,8 +20,8 @@ import java.io.File;
 
 public class EffectiveWorkerConfiguration {
 
-    public static final String TOMCAT_HOME = System.getProperty("catalina.home");
-    public static final String MANAGER_BASE_URL = System.getenv("MANAGER_BASE_URL");
+    private static final String TOMCAT_HOME = System.getProperty("catalina.home");
+    private static final String MANAGER_BASE_URL = System.getenv("MANAGER_BASE_URL");
 
     private final WorkerConfiguration base;
 
@@ -29,7 +29,7 @@ public class EffectiveWorkerConfiguration {
         this.base = base;
     }
 
-    public String getPluginPath() {
+    private String getPluginPath() {
         String defaultVal = TOMCAT_HOME != null
                 ? TOMCAT_HOME + File.separator + "lib" + File.separator + "plugins"
                 : "lib" + File.separator + "plugins";

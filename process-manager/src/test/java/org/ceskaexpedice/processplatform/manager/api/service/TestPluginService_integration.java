@@ -101,10 +101,10 @@ public class TestPluginService_integration {
         Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
         payloadFieldSpecMap.put("name", new PayloadFieldSpec("string", true));
         Set<String> scheduledProfiles = new HashSet<>();
-        scheduledProfiles.add(NEW_PROFILE_ID);
+        scheduledProfiles.add(PROFILE_NEW_ID);
 
         List<PluginProfile> profiles  = new ArrayList<>();
-        PluginProfile pluginProfile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN_NEW_ID, new ArrayList<>());
+        PluginProfile pluginProfile = new PluginProfile(PROFILE_NEW_ID, "Test", PLUGIN_NEW_ID, new ArrayList<>());
         profiles.add(pluginProfile);
 
         PluginInfo pluginInfoNew = new PluginInfo(PLUGIN_NEW_ID, "Test plugin New", "com.mainClass",

@@ -24,6 +24,7 @@ import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;

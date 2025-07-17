@@ -99,7 +99,7 @@ public class WorkerConfiguration {
         return props.getProperty(key, defaultValue);
     }
 
-    public static WorkerConfiguration getWorkerConfig() {
+    public static WorkerConfiguration decodeWorkerConfig() {
         String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
         Map<String, String> workerProps = parseSimpleJson(workerConfigJson);

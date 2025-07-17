@@ -22,6 +22,7 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.*;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.PluginMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.sql.*;

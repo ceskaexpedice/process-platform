@@ -20,6 +20,8 @@ import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.PluginServiceMapper;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
 import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
 import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;

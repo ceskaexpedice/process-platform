@@ -61,7 +61,7 @@ public class PluginStarter implements PluginContext {
 
     public static void main(String[] args) {
         ProcessConfiguration processConfig = getProcessConfig();
-        WorkerConfiguration workerConfig = getWorkerConfig();
+        WorkerConfiguration workerConfig = decodeWorkerConfig();
         ManagerClient managerClient = null;
 
         PrintStream outStream = null;

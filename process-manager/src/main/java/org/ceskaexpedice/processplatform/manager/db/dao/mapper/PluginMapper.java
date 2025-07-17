@@ -14,37 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.db.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
-class ProcessMapper {
+public class PluginMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static ProcessEntity mapProcess(ResultSet rsProcess) {
+    public static PluginEntity mapPlugin(ResultSet rsPlugin) {
         try {
-            ProcessEntity processEntity = new ProcessEntity();
-            processEntity.setProcessId(rsProcess.getString("process_id"));
-            processEntity.setProfileId(rsProcess.getString("profile_id"));
-            processEntity.setBatchId(rsProcess.getString("batch_id"));
-            processEntity.setOwnerId(rsProcess.getString("owner"));
+            PluginEntity plugin = new PluginEntity();
+            plugin.setPluginId(rsPlugin.getString("plugin_id"));
+            plugin.setDescription(rsPlugin.getString("description"));
+            plugin.setMainClass(rsPlugin.getString("main_class"));
 
-            String json = rsProcess.getString("payload");
+            String json = rsPlugin.getString("payload_field_spec_map");
             if(json != null){
-                Map<String, String> payloadMap = mapper.readValue(json, new TypeReference<>() {});
-                processEntity.setPayload(payloadMap);
+                Map<String, PayloadFieldSpec> specMap = mapper.readValue(json, new TypeReference<>() {});
+                plugin.setPayloadFieldSpecMap(specMap);
             }
-            return processEntity;
+
+            Array array = rsPlugin.getArray("scheduled_profiles");
+            Set<String> scheduledProfiles = new HashSet<>();
+            if (array != null) {
+                String[] arr = (String[]) array.getArray();
+                scheduledProfiles = new HashSet<>(Arrays.asList(arr));
+            }
+            plugin.setScheduledProfiles(scheduledProfiles);
+
+            return plugin;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         } catch (JsonProcessingException e) {

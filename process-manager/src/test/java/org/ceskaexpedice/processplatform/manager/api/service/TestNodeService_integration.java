@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
@@ -23,8 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 
@@ -54,13 +53,26 @@ public class TestNodeService_integration {
     }
 
     @Test
-    public void testGetNode() {
-        /*
-        PluginProfile profile = profileService.getProfile(PROFILE1_ID);
-        Assertions.assertNotNull(profile);
-        profile = profileService.getProfile(PROFILE1_ID + "notExists");
-        Assertions.assertNull(profile);
+    public void testRegisterNode() {
+        Node node = nodeService.getNode(NODE_WORKER_ID);
+        Assertions.assertNull(node);
 
-         */
+        Node newNode = new Node();
+        newNode.setNodeId(NODE_WORKER_ID);
+        newNode.setDescription("test node");
+        newNode.setType(NodeType.worker);
+        newNode.setUrl("http://localhost");
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        tags.add(PROFILE2_ID);
+        tags.add(PROFILE_NEW_ID);
+        newNode.setTags(tags);
+
+        nodeService.registerNode(newNode);
+
+        node = nodeService.getNode(NODE_WORKER_ID);
+        Assertions.assertNotNull(node);
+        Assertions.assertEquals(3, node.getTags().size());
     }
+
 }

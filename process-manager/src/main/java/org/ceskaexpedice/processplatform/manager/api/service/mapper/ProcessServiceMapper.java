@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-class ProcessServiceMapper {
+public class ProcessServiceMapper {
 
-    static ProcessEntity mapProcess(ScheduleMainProcess scheduleMainProcess) {
+    public static ProcessEntity mapProcess(ScheduleMainProcess scheduleMainProcess) {
         if(scheduleMainProcess == null) return null;
         ProcessEntity processEntity = new ProcessEntity();
         processEntity.setProfileId(scheduleMainProcess.getProfileId());
@@ -30,7 +30,7 @@ class ProcessServiceMapper {
         return processEntity;
     }
 
-    static ProcessEntity mapProcess(ScheduleSubProcess scheduleSubProcess) {
+    public static ProcessEntity mapProcess(ScheduleSubProcess scheduleSubProcess) {
         if(scheduleSubProcess == null) return null;
         ProcessEntity processEntity = new ProcessEntity();
         processEntity.setProfileId(scheduleSubProcess.getProfileId());
@@ -39,7 +39,7 @@ class ProcessServiceMapper {
         return processEntity;
     }
 
-    static ScheduledProcess mapProcess(ProcessEntity processEntity) {
+    public static ScheduledProcess mapProcess(ProcessEntity processEntity) {
         if(processEntity == null) return null;
         ScheduledProcess scheduledProcess = new ScheduledProcess();
         scheduledProcess = new ScheduledProcess();

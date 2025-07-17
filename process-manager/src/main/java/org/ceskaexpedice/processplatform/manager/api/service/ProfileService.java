@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;

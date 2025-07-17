@@ -16,19 +16,19 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.NodeServiceMapper;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.PluginServiceMapper;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
-import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
-import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
+import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -44,6 +44,21 @@ public class NodeService {
     public NodeService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider) {
         this.managerConfiguration = managerConfiguration;
         this.nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
+    }
+
+    public void registerNode(Node node) {
+        Node nodeExisting = getNode(node.getNodeId());
+        if (nodeExisting != null) {
+            LOGGER.info("Node with id " + node.getNodeId() + " already registered");
+            return;
+        }
+        nodeDao.createNode(NodeServiceMapper.mapNode(node));
+    }
+
+    public Node getNode(String nodeId) {
+        NodeEntity nodeEntity = nodeDao.getNode(nodeId);
+        Node node = NodeServiceMapper.mapNode(nodeEntity);
+        return node;
     }
 
 }

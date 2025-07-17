@@ -14,15 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.db.dao;
+package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.Array;
@@ -30,13 +24,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-class ProfileMapper {
+public class ProfileMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static PluginProfileEntity mapPluginProfile(ResultSet rsProfile) throws SQLException {
+    public static PluginProfileEntity mapPluginProfile(ResultSet rsProfile) throws SQLException {
         PluginProfileEntity profile = new PluginProfileEntity();
         profile.setProfileId(rsProfile.getString("profile_id"));
+        profile.setDescription(rsProfile.getString("description"));
         profile.setPluginId(rsProfile.getString("plugin_id"));
 
         Array array = rsProfile.getArray("jvm_args");

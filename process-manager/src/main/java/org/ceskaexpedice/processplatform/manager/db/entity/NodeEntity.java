@@ -29,7 +29,7 @@ public class NodeEntity {
     private String nodeId;
     private String description;
     private String type;
-    private String urls;
+    private String url;
     private Set<String> tags;
 
     public NodeEntity() {
@@ -59,12 +59,12 @@ public class NodeEntity {
         this.type = type;
     }
 
-    public String getUrls() {
-        return urls;
+    public String getUrl() {
+        return url;
     }
 
-    public void setUrls(String urls) {
-        this.urls = urls;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Set<String> getTags() {

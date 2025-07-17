@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
@@ -22,9 +22,9 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-class PluginServiceMapper {
+public class PluginServiceMapper {
 
-    static PluginInfo mapPlugin(PluginEntity pluginEntity) {
+    public static PluginInfo mapPlugin(PluginEntity pluginEntity) {
         if(pluginEntity == null) return null;
         PluginInfo pluginInfo = new PluginInfo();
         pluginInfo.setPluginId(pluginEntity.getPluginId());
@@ -35,7 +35,7 @@ class PluginServiceMapper {
         return pluginInfo;
     }
 
-    static PluginEntity mapPlugin(PluginInfo pluginInfo) {
+    public static PluginEntity mapPlugin(PluginInfo pluginInfo) {
         if(pluginInfo == null) return null;
         PluginEntity pluginEntity = new PluginEntity();
         pluginEntity.setPluginId(pluginInfo.getPluginId());
@@ -46,7 +46,7 @@ class PluginServiceMapper {
         return pluginEntity;
     }
 
-    static List<PluginInfo> mapPlugins(List<PluginEntity> pluginEntities) {
+    public static List<PluginInfo> mapPlugins(List<PluginEntity> pluginEntities) {
         if(pluginEntities == null) return null;
         List<PluginInfo> plugins = new ArrayList<>();
         for (PluginEntity pluginEntity : pluginEntities) {
