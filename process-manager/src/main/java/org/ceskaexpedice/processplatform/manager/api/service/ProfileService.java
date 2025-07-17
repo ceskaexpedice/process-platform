@@ -53,11 +53,6 @@ public class ProfileService {
         return profiles;
     }
 
-    public List<PluginProfile> getProfiles(String pluginId) {
-        List<PluginProfile> profiles = ProfileServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
-        return profiles;
-    }
-
     public void updateProfile(PluginProfile profile) {
         profileDao.updateProfile(ProfileServiceMapper.mapProfile(profile));
     }

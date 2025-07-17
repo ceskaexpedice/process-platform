@@ -27,22 +27,11 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestRest Description
+ * TestProcessEndpoint
  *
  * @author ppodsednik
  */
-public class TestProcessEntityEndpoint extends JerseyTest {
-
-    //public static final String BASE_URI = "http://localhost:9998/processplatform/processes/";
-    //private HttpServer server;
-
-  /*
-  @BeforeEach
-  public void setUp() throws Exception {
-    final ResourceConfig rc = new ResourceConfig(ProcessResource.class);
-    server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-    server.start();
-  }*/
+public class TestProcessEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
@@ -50,6 +39,7 @@ public class TestProcessEntityEndpoint extends JerseyTest {
         ProcessService processServiceMock = mock(ProcessService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new ProcessEndpoint(processServiceMock));
+        resourceConfig.register(GlobalExceptionMapper.class);
         return resourceConfig;
     }
 

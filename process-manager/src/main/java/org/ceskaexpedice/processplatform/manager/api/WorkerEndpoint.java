@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
@@ -47,21 +48,21 @@ public class WorkerEndpoint {
     }
 
     @POST
-    @Path("/register-node")
+    @Path("/register_node")
     public Response registerNode(Node node) {
-        System.out.println("ManagerAgentEndpoint: registerNode: " + node.getNodeId());
-        return Response.ok().build();
+        nodeService.registerNode(node);
+        return APIRestUtilities.ok("Node %s registered", node.getNodeId());
     }
 
     @POST
-    @Path("/register-plugin")
+    @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
-        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
-        return Response.ok().build();
+        pluginService.registerPlugin(pluginInfo);
+        return APIRestUtilities.ok("Plugin %s registered", pluginInfo.getPluginId());
     }
 
     @GET
-    @Path("/next-process/{workerId}")
+    @Path("/next_process/{workerId}")
     public Response getNextProcess(@PathParam("workerId") String workerId) {
         ScheduledProcess scheduledProcess = processService.getNextScheduledProcess(workerId);
         // batchId
@@ -73,7 +74,7 @@ public class WorkerEndpoint {
     }
 
     @POST
-    @Path("/schedule-sub-process")
+    @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
                 + ",batchId-" + scheduleSubProcess.getBatchId());

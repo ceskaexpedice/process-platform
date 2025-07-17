@@ -68,12 +68,6 @@ public class TestProfileService_integration {
     }
 
     @Test
-    public void testGetPluginProfiles() {
-        List<PluginProfile> profiles = profileService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-    }
-
-    @Test
     public void testUpdateProfile() {
         PluginProfile profile = profileService.getProfile(PROFILE1_ID);
         Assertions.assertEquals(2, profile.getJvmArgs().size());

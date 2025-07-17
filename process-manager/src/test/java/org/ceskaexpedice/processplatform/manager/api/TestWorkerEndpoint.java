@@ -14,38 +14,79 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.model.Node;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mockito.Mockito.mock;
+import java.util.ArrayList;
+
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
- * TestRest Description
+ * TestWorkerEndpoint
  *
  * @author ppodsednik
  */
 public class TestWorkerEndpoint extends JerseyTest {
+    private static final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private PluginService pluginServiceMock;
+    @Mock
+    private ProcessService processServiceMock;
+    @Mock
+    private NodeService nodeServiceMock;
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        PluginService pluginService = mock(PluginService.class);
-        ProcessService processService = mock(ProcessService.class);
-        NodeService nodeService = mock(NodeService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new WorkerEndpoint(pluginService, processService, nodeService));
+        resourceConfig.register(new WorkerEndpoint(pluginServiceMock, processServiceMock, nodeServiceMock));
+        resourceConfig.register(GlobalExceptionMapper.class);
         return resourceConfig;
+    }
+
+    @Test
+    public void testRegisterNode() throws JsonProcessingException {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER_ID);
+        String json = mapper.writeValueAsString(node);
+        Response response = target("worker/register_node").request(MediaType.APPLICATION_JSON).post((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(nodeServiceMock, times(1)).registerNode(any());
+    }
+
+    @Test
+    public void testRegisterPlugin() throws JsonProcessingException {
+        PluginInfo pluginInfo = new PluginInfo();
+        pluginInfo.setPluginId(PLUGIN1_ID);
+        String json = mapper.writeValueAsString(pluginInfo);
+        Response response = target("worker/register_plugin").request(MediaType.APPLICATION_JSON).post((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(pluginServiceMock, times(1)).registerPlugin(any());
     }
 
     @Test
@@ -55,5 +96,22 @@ public class TestWorkerEndpoint extends JerseyTest {
         ScheduledProcess entity = response.readEntity(ScheduledProcess.class);
         System.out.println(entity);
     }
+
+    @Test
+    public void testScheduleSubProcess() {
+    }
+
+    @Test
+    public void testUpdateProcessPid() throws JsonProcessingException {
+    }
+
+    @Test
+    public void testUpdateProcessState() throws JsonProcessingException {
+    }
+
+    @Test
+    public void testUpdateProcessName() throws JsonProcessingException {
+    }
+
 
 }

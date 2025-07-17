@@ -17,11 +17,10 @@ package org.ceskaexpedice.processplatform.manager.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
-import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.glassfish.jersey.logging.LoggingFeature;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -29,36 +28,33 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 /**
  * TestPluginEndpoint
  *
  * @author ppodsednik
  */
-public class TestPluginEndpoint extends JerseyTest {
+public class TestProfileEndpoint extends JerseyTest {
 
     @Mock
-    private PluginService pluginServiceMock;
+    private ProfileService profileServiceMock;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new PluginEndpoint(pluginServiceMock));
+        resourceConfig.register(new ProfileEndpoint(profileServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
         /* TODO
         resourceConfig.register(new LoggingFeature(
@@ -70,50 +66,46 @@ public class TestPluginEndpoint extends JerseyTest {
     }
 
     @Test
-    public void testGetPlugin() throws JsonProcessingException {
-        PluginInfo retVal = new PluginInfo(PLUGIN1_ID, null, null, null, null, null);
-        when(pluginServiceMock.getPlugin(eq(PLUGIN1_ID))).thenReturn(retVal);
+    public void testGetProfile() throws JsonProcessingException {
+        PluginProfile retVal = new PluginProfile(PROFILE1_ID, null, PLUGIN1_ID, null);
+        when(profileServiceMock.getProfile(eq(PROFILE1_ID))).thenReturn(retVal);
 
-        Response response = target("plugin/" + PLUGIN1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Response response = target("profile/" + PROFILE1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
-        PluginInfo pluginInfo = mapper.readValue(json,PluginInfo.class);
-        Assertions.assertEquals(PLUGIN1_ID, pluginInfo.getPluginId());
+        PluginProfile profile = mapper.readValue(json,PluginProfile.class);
+        Assertions.assertEquals(PROFILE1_ID, profile.getProfileId());
 
-        response = target("plugin/" + PLUGIN2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        response = target("profile/" + PROFILE2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(404, response.getStatus());
 
-        verify(pluginServiceMock, times(2)).getPlugin(any());
-        /* TODO
-        when(pluginServiceMock.getPlugin(anyString())).thenAnswer(invocation -> {
-            String pluginId = invocation.getArgument(0);
-            if ("testPluginError".equals(pluginId)) {
-                throw new BusinessLogicException("Plugin 'testPluginError' caused an error");
-            } else if ("testPlugin1".equals(pluginId)) {
-                return retVal;
-            }
-            return null; // Or throw for unknown IDs
-        });
-         */
-        /*
-        assertThrows(BusinessLogicException.class, () -> {
-            pluginServiceMock.getPlugin("testPluginError");
-        });*/
+        verify(profileServiceMock, times(2)).getProfile(any());
     }
 
     @Test
-    public void testGetPlugins() throws JsonProcessingException {
-        List<PluginInfo> retVal = new ArrayList<>();
-        retVal.add(new PluginInfo(PLUGIN1_ID, null, null, null, null, null));
-        retVal.add(new PluginInfo(PLUGIN2_ID, null, null, null, null, null));
-        when(pluginServiceMock.getPlugins()).thenReturn(retVal);
+    public void testGetProfiles() throws JsonProcessingException {
+        List<PluginProfile> retVal = new ArrayList<>();
+        retVal.add(new PluginProfile(PROFILE1_ID, null, PLUGIN1_ID, null));
+        retVal.add(new PluginProfile(PROFILE2_ID, null, PLUGIN1_ID, null));
+        when(profileServiceMock.getProfiles()).thenReturn(retVal);
 
-        Response response = target("plugin/").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Response response = target("profile/").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
-        List<PluginInfo> pluginInfos = mapper.readValue(json, new TypeReference<>() {
+        List<PluginProfile> profiles = mapper.readValue(json, new TypeReference<>() {
         });
-        Assertions.assertEquals(2, pluginInfos.size());
+        Assertions.assertEquals(2, profiles.size());
+    }
+
+    @Test
+    public void testUpdateProfile() throws JsonProcessingException {
+        PluginProfile pluginProfile = new PluginProfile(PROFILE1_ID, null, PLUGIN1_ID, new ArrayList<>());
+        String json = mapper.writeValueAsString(pluginProfile);
+        Response response = target("profile/" + PROFILE1_ID).request(MediaType.APPLICATION_JSON).put((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(profileServiceMock, times(1)).updateProfile(any());
     }
 
 }

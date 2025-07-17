@@ -16,7 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 
 import javax.ws.rs.*;
@@ -39,28 +41,23 @@ public class ProfileEndpoint {
     @Path("/{profileId}")
     public Response getProfile(@PathParam("profileId") String profileId) {
         PluginProfile profile = profileService.getProfile(profileId);
+        if (profile == null) {
+            return APIRestUtilities.notFound("Profile not found: %s", profileId);
+        }
         return Response.ok(profile).build();
     }
 
     @GET
-    @Path("/profiles")
     public Response getProfiles() {
         List<PluginProfile> allProfiles = profileService.getProfiles();
         return Response.ok(allProfiles).build();
     }
 
-    @GET
-    @Path("/plugin_profiles")
-    public Response getPluginProfiles(@QueryParam("pluginId") String pluginId) {
-        List<PluginProfile> allProfiles = profileService.getProfiles(pluginId);
-        return Response.ok(allProfiles).build();
-    }
-
     @PUT
-    @Path("profile/{profileId}")
+    @Path("/{profileId}")
     public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
         profileService.updateProfile(profile);
-        return Response.ok().build();
+        return APIRestUtilities.ok("Profile %s updated", profileId);
     }
 
 }

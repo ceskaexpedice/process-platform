@@ -16,41 +16,38 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.model.PluginInfo;
-import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.common.model.Node;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Map;
 
-@Path("/plugin")
+@Path("/node")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PluginEndpoint {
+public class NodeEndpoint {
 
-    private final PluginService pluginService;
+    private final NodeService nodeService;
 
-    public PluginEndpoint(PluginService pluginService) {
-        this.pluginService = pluginService;
+    public NodeEndpoint(NodeService nodeService) {
+        this.nodeService = nodeService;
     }
 
     @GET
-    @Path("/{pluginId}")
-    public Response getPlugin(@PathParam("pluginId") String pluginId) {
-        PluginInfo pluginInfo = pluginService.getPlugin(pluginId);
-        if (pluginInfo == null) {
-            return APIRestUtilities.notFound("Plugin not found: %s", pluginId);
-        }
-        return Response.ok(pluginInfo).build();
+    @Path("/{nodeId}")
+    public Response getNode(@PathParam("nodeId") String nodeId) {
+        Node node = nodeService.getNode(nodeId);
+        return Response.ok(node).build();
     }
 
     @GET
-    public Response getPlugins() {
-        List<PluginInfo> plugins = pluginService.getPlugins();
-        return Response.ok(plugins).build();
+    @Path("/profiles")
+    public Response getProfiles() {
+        // TODO
+        return Response.ok("allProfiles").build();
     }
-
 }

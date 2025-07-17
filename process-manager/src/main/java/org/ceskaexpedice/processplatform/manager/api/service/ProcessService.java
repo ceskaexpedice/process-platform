@@ -46,6 +46,7 @@ public class ProcessService {
     }
 
     public void scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
+        // TODO validate payload
         String newProcessId = UUID.randomUUID().toString();
         String newBatchId = UUID.randomUUID().toString();
 
@@ -57,6 +58,7 @@ public class ProcessService {
     }
 
     public void scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
+        // TODO validate payload
         String newProcessId = UUID.randomUUID().toString();
         String ownerId = null; // TODO fetch it from owner process
 
