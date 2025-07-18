@@ -63,46 +63,41 @@ public class WorkerEndpoint {
 
     @GET
     @Path("/next_process/{workerId}")
-    public Response getNextProcess(@PathParam("workerId") String workerId) {
+    public Response getNextScheduledProcess(@PathParam("workerId") String workerId) {
         ScheduledProcess scheduledProcess = processService.getNextScheduledProcess(workerId);
-        // batchId
         if (scheduledProcess != null) {
             return Response.ok(scheduledProcess).build();
         } else {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return APIRestUtilities.notFound("No scheduled process found for %s", workerId);
         }
     }
 
     @POST
     @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId()
-                + ",batchId-" + scheduleSubProcess.getBatchId());
-        return Response.ok().build();
+        processService.scheduleProcess(scheduleSubProcess);
+        return APIRestUtilities.ok("Subprocess for profile %s scheduled", scheduleSubProcess.getProfileId());
     }
 
     @PUT
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
-        return Response.ok().build();
+        processService.updateProcessPid(processId, pid);
+        return APIRestUtilities.ok("Process pid %s used for the process %s", pid, processId);
     }
 
     @PUT
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
-        return Response.ok().build();
+        processService.updateProcessState(processId, state);
+        return APIRestUtilities.ok("Process state %s used for the process %s", state, processId);
     }
 
     @PUT
     @Path("/name/{processId}")
     public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
-        return Response.ok().build();
+        processService.updateProcessName(processId, name);
+        return APIRestUtilities.ok("Process name %s used for the process %s", name, processId);
     }
 
 }

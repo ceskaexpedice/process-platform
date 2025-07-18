@@ -42,4 +42,11 @@ public abstract class ScheduleProcess {
         return payload;
     }
 
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
+    public void setPayload(Map<String, String> payload) {
+        this.payload = payload;
+    }
 }

@@ -28,7 +28,10 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 public final class ManagerTestsUtils {
-    public static String NODE_WORKER_ID = "worker1";
+    public static String NODE_WORKER1_ID = "worker1";
+    public static String NODE_WORKER2_ID = "worker2";
+
+    public static String PROCESS1_ID = "process1";
 
     public static String PLUGIN1_ID = "testPlugin1";
     public static String PLUGIN2_ID = "testPlugin2";

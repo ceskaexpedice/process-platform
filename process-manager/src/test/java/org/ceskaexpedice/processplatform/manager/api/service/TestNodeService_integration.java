@@ -54,11 +54,11 @@ public class TestNodeService_integration {
 
     @Test
     public void testRegisterNode() {
-        Node node = nodeService.getNode(NODE_WORKER_ID);
+        Node node = nodeService.getNode(NODE_WORKER1_ID);
         Assertions.assertNull(node);
 
         Node newNode = new Node();
-        newNode.setNodeId(NODE_WORKER_ID);
+        newNode.setNodeId(NODE_WORKER1_ID);
         newNode.setDescription("test node");
         newNode.setType(NodeType.worker);
         newNode.setUrl("http://localhost");
@@ -70,7 +70,7 @@ public class TestNodeService_integration {
 
         nodeService.registerNode(newNode);
 
-        node = nodeService.getNode(NODE_WORKER_ID);
+        node = nodeService.getNode(NODE_WORKER1_ID);
         Assertions.assertNotNull(node);
         Assertions.assertEquals(3, node.getTags().size());
     }

@@ -16,14 +16,10 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.model.Node;
-import org.ceskaexpedice.processplatform.common.model.PluginInfo;
-import org.ceskaexpedice.processplatform.common.model.PluginProfile;
-import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -68,10 +64,12 @@ public class TestWorkerEndpoint extends JerseyTest {
     @Test
     public void testRegisterNode() throws JsonProcessingException {
         Node node = new Node();
-        node.setNodeId(NODE_WORKER_ID);
+        node.setNodeId(NODE_WORKER1_ID);
         String json = mapper.writeValueAsString(node);
+
         Response response = target("worker/register_node").request(MediaType.APPLICATION_JSON).post((Entity.entity(
                 json, MediaType.APPLICATION_JSON_TYPE)));
+
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
         verify(nodeServiceMock, times(1)).registerNode(any());
@@ -82,35 +80,74 @@ public class TestWorkerEndpoint extends JerseyTest {
         PluginInfo pluginInfo = new PluginInfo();
         pluginInfo.setPluginId(PLUGIN1_ID);
         String json = mapper.writeValueAsString(pluginInfo);
+
         Response response = target("worker/register_plugin").request(MediaType.APPLICATION_JSON).post((Entity.entity(
                 json, MediaType.APPLICATION_JSON_TYPE)));
+
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
         verify(pluginServiceMock, times(1)).registerPlugin(any());
     }
 
     @Test
-    public void testNextProcess() {
-        Response response = target("agent/next-process").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+    public void testGetNextProcess() {
+        ScheduledProcess retVal = new ScheduledProcess();
+        retVal.setProcessId(PROCESS1_ID);
+        when(processServiceMock.getNextScheduledProcess(eq(NODE_WORKER1_ID))).thenReturn(retVal);
+
+        Response response = target("worker/next_process/" + NODE_WORKER1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         ScheduledProcess entity = response.readEntity(ScheduledProcess.class);
-        System.out.println(entity);
+        Assertions.assertEquals(entity.getProcessId(), retVal.getProcessId());
+
+        response = target("worker/next_process/" + NODE_WORKER2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(404, response.getStatus());
+        String entity1 = response.readEntity(String.class);
+        verify(processServiceMock, times(2)).getNextScheduledProcess(any());
     }
 
     @Test
-    public void testScheduleSubProcess() {
+    public void testScheduleSubProcess() throws JsonProcessingException {
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess();
+        scheduleSubProcess.setProfileId(PROFILE1_ID);
+        String json = mapper.writeValueAsString(scheduleSubProcess);
+
+        Response response = target("worker/schedule_sub_process").request(MediaType.APPLICATION_JSON).post((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(processServiceMock, times(1)).scheduleProcess(any(ScheduleSubProcess.class));
     }
 
     @Test
-    public void testUpdateProcessPid() throws JsonProcessingException {
+    public void testUpdateProcessPid() {
+        String json = "{}";
+        Response response = target("worker/pid/" + PROCESS1_ID).queryParam("pid","anyPid").request(MediaType.APPLICATION_JSON).put((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(processServiceMock, times(1)).updateProcessPid(eq(PROCESS1_ID), eq("anyPid"));
     }
 
     @Test
-    public void testUpdateProcessState() throws JsonProcessingException {
+    public void testUpdateProcessState() {
+        String json = "{}";
+        Response response = target("worker/state/" + PROCESS1_ID).queryParam("state",ProcessState.FINISHED).request(MediaType.APPLICATION_JSON).put((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(processServiceMock, times(1)).updateProcessState(eq(PROCESS1_ID), eq(ProcessState.FINISHED));
     }
 
     @Test
     public void testUpdateProcessName() throws JsonProcessingException {
+        String json = "{}";
+        Response response = target("worker/name/" + PROCESS1_ID).queryParam("name","new name").request(MediaType.APPLICATION_JSON).put((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(processServiceMock, times(1)).updateProcessName(eq(PROCESS1_ID), eq("new name"));
     }
 
 
