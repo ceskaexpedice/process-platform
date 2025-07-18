@@ -23,34 +23,33 @@ import javax.ws.rs.core.*;
 import java.util.*;
 
 /**
- * ManagerAgentEndpoint
+ * WorkerTestEndpoint
  *
  * @author ppodsednik
  */
-@Path("/agent")
+@Path("/worker")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class WorkerTestEndpoint {
-    //private final AgentService agentService;
     private static int counter;
 
     @POST
-    @Path("/register-node")
+    @Path("/register_node")
     public Response registerNode(Node node) {
         System.out.println("ManagerAgentEndpoint: registerNode: " + node.getNodeId());
         return Response.ok().build();
     }
 
     @POST
-    @Path("/register-plugin")
+    @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
         System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
         return Response.ok().build();
     }
 
     @GET
-    @Path("/next-process/{workerId}")
-    public Response getNextProcess(@PathParam("workerId") String workerId) {
+    @Path("/next_process/{workerId}")
+    public Response getNextScheduledProcess(@PathParam("workerId") String workerId) {
         System.out.print("ManagerAgentEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
@@ -93,18 +92,10 @@ public class WorkerTestEndpoint {
     }
 
     @POST
-    @Path("/schedule-sub-process")
+    @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
                 ",batchId-" + scheduleSubProcess.getBatchId());
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("/worker/{processId}")
-    public Response updateWorker(@PathParam("processId") String processId, @QueryParam("worker") String worker) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateWorker:processId-" + processId + ";worker-" + worker);
         return Response.ok().build();
     }
 

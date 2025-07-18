@@ -46,12 +46,18 @@ import static org.mockito.Mockito.mock;
 public class TestManagerClient {
 
     private HttpServer server;
+    private WorkerConfiguration workerConfiguration;
 
     @BeforeEach
     public void setUp() throws Exception {
         final ResourceConfig rc = new ResourceConfig(WorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
         server.start();
+        workerConfiguration = new WorkerConfiguration(new Properties());
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        String PROFILES = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, PROFILES);
+        workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
     }
 
     @AfterEach
@@ -60,14 +66,9 @@ public class TestManagerClient {
     }
 
     @Test
-    public void testGetNextProcess() {
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
-        String PROFILES = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
-        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, PROFILES);
-        workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
+    public void testGetNextScheduledProcess() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        ScheduledProcess nextProcess = managerClient.getNextProcess();
+        ScheduledProcess nextProcess = managerClient.getNextScheduledProcess();
         System.out.println("entity");
     }
 

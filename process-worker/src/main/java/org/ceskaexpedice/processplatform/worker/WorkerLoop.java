@@ -74,7 +74,7 @@ class WorkerLoop {
     }
 
     private Optional<ScheduledProcess> pollManagerForTask() {
-        ScheduledProcess processTask = managerClient.getNextProcess();
+        ScheduledProcess processTask = managerClient.getNextScheduledProcess();
         if (processTask != null) {
             return Optional.of(processTask);
         } else {

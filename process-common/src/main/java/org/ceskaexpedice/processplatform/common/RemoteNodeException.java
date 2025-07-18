@@ -16,18 +16,26 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
-public class RemoteAgentException extends RuntimeException {
-    private final String agentName;
+import org.ceskaexpedice.processplatform.common.model.NodeType;
+
+public class RemoteNodeException extends RuntimeException {
+    private final NodeType nodeType;
     private final int statusCode;
 
-    public RemoteAgentException(String message, String agentName, int statusCode, Throwable cause) {
+    public RemoteNodeException(String message, NodeType nodeType, int statusCode, Throwable cause) {
         super(message, cause);
-        this.agentName = agentName;
+        this.nodeType = nodeType;
         this.statusCode = statusCode;
     }
 
-    public String getAgentName() {
-        return agentName;
+    public RemoteNodeException(String message, NodeType nodeType, int statusCode) {
+        super(message);
+        this.nodeType = nodeType;
+        this.statusCode = statusCode;
+    }
+
+    public NodeType getNodeType() {
+        return nodeType;
     }
 
     public int getStatusCode() {
