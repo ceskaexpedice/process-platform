@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.*;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.PROCESS_CONFIG_BASE64_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;

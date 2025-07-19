@@ -77,16 +77,7 @@ public class PluginDao {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map, scheduled_profiles) VALUES (?, ?, ?, ?::jsonb, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, plugin.getPluginId());
-                stmt.setString(2, plugin.getDescription());
-                stmt.setString(3, plugin.getMainClass());
-
-                String json = mapper.writeValueAsString(plugin.getPayloadFieldSpecMap());
-                stmt.setString(4, json);
-
-                Array scheduledProfilesArray = connection.createArrayOf("text", plugin.getScheduledProfiles().toArray());
-                stmt.setArray(5, scheduledProfilesArray);
-
+                PluginMapper.mapPlugin(stmt, plugin, connection);
                 stmt.executeUpdate();
             } catch (JsonProcessingException e) {
                 throw new ApplicationException(e.toString(), e);

@@ -42,12 +42,7 @@ public class NodeDao {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_node (node_id, description, type, url, tags) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, nodeEntity.getNodeId());
-                stmt.setString(2, nodeEntity.getDescription());
-                stmt.setString(3, nodeEntity.getType());
-                stmt.setString(4, nodeEntity.getUrl());
-                Array tagsArray = connection.createArrayOf("text", nodeEntity.getTags().toArray());
-                stmt.setArray(5, tagsArray);
+                NodeMapper.mapNode(stmt, nodeEntity, connection);
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {

@@ -90,14 +90,8 @@ public class ProfileDao {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_profile (profile_id, plugin_id, jvm_args) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                ProfileMapper.mapPluginProfile(stmt, profile, connection);
                 stmt.setString(1, profile.getProfileId());
-                stmt.setString(2, profile.getPluginId());
-                if (profile.getJvmArgs() != null) {
-                    Array jvmArgsArray = connection.createArrayOf("text", profile.getJvmArgs().toArray());
-                    stmt.setArray(3, jvmArgsArray);
-                } else {
-                    stmt.setNull(3, Types.ARRAY);
-                }
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {

@@ -14,8 +14,9 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.worker.client.WorkerTestEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ForWorkerTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -28,7 +29,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
 
 /**
@@ -49,12 +50,12 @@ public class TestWorkerMain {
         String starterClasspath = System.getProperty("java.class.path");
         workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
         workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
-        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        String TAGS = WorkerTestsUtils.PLUGIN1_PROFILE_BIG + "," + WorkerTestsUtils.PLUGIN1_PROFILE_SMALL;
         workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, TAGS);
         workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
         workerConfiguration.set(WORKER_ID_KEY, "testWorker");
 
-        final ResourceConfig rc = new ResourceConfig(WorkerTestEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }

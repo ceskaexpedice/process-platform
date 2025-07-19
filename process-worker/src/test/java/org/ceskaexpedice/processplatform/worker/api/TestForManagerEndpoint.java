@@ -14,8 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.Constants;
-import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
+import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;
@@ -28,24 +28,24 @@ import javax.ws.rs.core.Response;
 import static org.mockito.Mockito.mock;
 
 /**
- * TestAgentEndpoint
+ * TestForManagerEndpoint
  * @author ppodsednik
  */
-public class TestManagerEndpoint extends JerseyTest {
+public class TestForManagerEndpoint extends JerseyTest {
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        WorkerAgentService agentServiceMock = mock(WorkerAgentService.class);
+        ForManagerService agentServiceMock = mock(ForManagerService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ManagerEndpoint(agentServiceMock));
+        resourceConfig.register(new ForManagerEndpoint(agentServiceMock));
         return resourceConfig;
     }
 
 
     @Test
     public void testGetLogs() {
-        Response response = target("agent/logs/" + Constants.PLUGIN1_PROCESS_ID)
+        Response response = target("agent/logs/" + WorkerTestsUtils.PLUGIN1_PROCESS_ID)
                 .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         //Assertions.assertEquals(200, response.getStatus());
         String entity = response.readEntity(String.class);

@@ -16,17 +16,29 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
+import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class ProfileMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static void mapPluginProfile(PreparedStatement stmt, PluginProfileEntity profile, Connection conn) throws SQLException {
+        stmt.setString(1, profile.getProfileId());
+        stmt.setString(2, profile.getPluginId());
+        if (profile.getJvmArgs() != null) {
+            Array jvmArgsArray = conn.createArrayOf("text", profile.getJvmArgs().toArray());
+            stmt.setArray(3, jvmArgsArray);
+        } else {
+            stmt.setNull(3, Types.ARRAY);
+        }
+    }
 
     public static PluginProfileEntity mapPluginProfile(ResultSet rsProfile) throws SQLException {
         PluginProfileEntity profile = new PluginProfileEntity();

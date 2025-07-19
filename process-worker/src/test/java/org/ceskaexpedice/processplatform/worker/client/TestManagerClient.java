@@ -14,26 +14,21 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.ceskaexpedice.processplatform.common.model.*;
-import org.ceskaexpedice.processplatform.worker.Constants;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.*;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -50,12 +45,12 @@ public class TestManagerClient {
 
     @BeforeEach
     public void setUp() throws Exception {
-        final ResourceConfig rc = new ResourceConfig(WorkerTestEndpoint.class);
-        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Constants.MANAGER_BASE_URI), rc);
+        final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(WorkerTestsUtils.MANAGER_BASE_URI), rc);
         server.start();
         workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
-        String PROFILES = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
+        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, WorkerTestsUtils.MANAGER_BASE_URI);
+        String PROFILES = WorkerTestsUtils.PLUGIN1_PROFILE_BIG + "," + WorkerTestsUtils.PLUGIN1_PROFILE_SMALL;
         workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, PROFILES);
         workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
     }
@@ -66,112 +61,69 @@ public class TestManagerClient {
     }
 
     @Test
-    public void testGetNextScheduledProcess() {
+    public void testRegisterNode() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        ScheduledProcess nextProcess = managerClient.getNextScheduledProcess();
-        System.out.println("entity");
+        managerClient.registerNode(node);
     }
 
     @Test
     public void testRegisterPlugin() {
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+        PluginInfo testPlugin1 = new  PluginInfo();
+        testPlugin1.setPluginId(PLUGIN1_ID);
+        PluginProfile pluginProfile = new  PluginProfile();
+        pluginProfile.setProfileId(PLUGIN1_PROFILE_SMALL);
+        pluginProfile.setPluginId(PLUGIN1_ID);
+        testPlugin1.setProfiles(Collections.singletonList(pluginProfile));
 
-        URL resource = getClass().getClassLoader().getResource("plugins");
-
-        File pluginDir = new File(resource.getFile());
-        List<PluginInfo> pluginInfos = PluginsLoader.load(pluginDir);
-        assertEquals(2, pluginInfos.size());
-        PluginInfo testPlugin1 = null;
-        for (PluginInfo pluginInfo : pluginInfos) {
-            if (pluginInfo.getPluginId().equals("testPlugin1")) {
-                testPlugin1 = pluginInfo;
-                break;
-            }
-        }
-
-        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, "testPlugin1-big,testPlugin1-small");
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.registerPlugin(testPlugin1);
-        System.out.println("entity");
     }
 
     @Test
-    public void testUpdateProcessPid() {
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
+    public void testGetNextScheduledProcess() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.updateProcessPid("uuid1", "333");
-        System.out.println("entity");
+        ScheduledProcess nextProcess = managerClient.getNextScheduledProcess();
+        Assertions.assertEquals(PLUGIN1_PROCESS_ID, nextProcess.getProcessId());
+        Assertions.assertEquals(PLUGIN1_PROFILE_SMALL, nextProcess.getProfileId());
     }
 
     @Test
-    public void testUpdateProcessState() {
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
-        ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.updateProcessState("uuid1", ProcessState.FINISHED);
-        System.out.println("entity");
-    }
-
-    @Test
-    public void testUpdateProcessName() {
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
-        ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.updateProcessName("uuid1", "newName");
-        System.out.println("entity");
-    }
-
-    @Test
-    public void testScheduleSubProcess() throws JsonProcessingException {
+    public void testScheduleSubProcess() {
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Petr");
         payload.put("surname", "Harasil");
-
-        ObjectMapper mapper = new ObjectMapper();
-        // Build arbitrary context JSON
-        ObjectNode context = mapper.createObjectNode();
-        context.put("env", "production");
-        context.put("retries", 3);
-        ObjectNode metadata = mapper.createObjectNode();
-        metadata.put("owner", "team-a");
-        metadata.putArray("features").add("fast").add("secure");
-        context.set("metadata", metadata);
-
-
         ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(
                 PLUGIN1_PROFILE_BIG,
                 payload
         );
-        scheduleSubProcess.setBatchId("batchId");
+        scheduleSubProcess.setBatchId("batchId1");
 
-        WorkerConfiguration workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, Constants.MANAGER_BASE_URI);
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.scheduleSubProcess(scheduleSubProcess);
-        System.out.println("entity");
-    }
-
-/*
-    @Test
-    public void testGetProcessByProcessId() {
-        Response response = target("processes/by_process_id/pid")
-                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
     }
 
     @Test
-    public void testScheduleProcess() {
-        Response response = target("processes").request(MediaType.APPLICATION_JSON).post((Entity.entity(
-                "{\"uf\": 99}", MediaType.APPLICATION_JSON_TYPE)));
-        Assertions.assertEquals(200, response.getStatus());
-        String responseBody = response.readEntity(String.class);
-        System.out.println(responseBody);
+    public void testUpdateProcessPid() {
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.updateProcessPid(PLUGIN1_PROCESS_ID, "333");
+        // TODO test not existing process id
     }
-    */
 
+    @Test
+    public void testUpdateProcessState() {
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.updateProcessState(PLUGIN1_PROCESS_ID, ProcessState.FINISHED);
+        // TODO test not existing process id
+    }
+
+    @Test
+    public void testUpdateProcessName() {
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        managerClient.updateProcessName(PLUGIN1_PROCESS_ID, "newName");
+        // TODO test not existing process id
+    }
 
 }

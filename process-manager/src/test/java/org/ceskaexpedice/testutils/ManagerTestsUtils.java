@@ -28,18 +28,18 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 public final class ManagerTestsUtils {
-    public static String NODE_WORKER1_ID = "worker1";
-    public static String NODE_WORKER2_ID = "worker2";
+    public static final String NODE_WORKER1_ID = "worker1";
+    public static final String NODE_WORKER2_ID = "worker2";
 
-    public static String PROCESS1_ID = "process1";
+    public static final String PROCESS1_ID = "process1";
 
-    public static String PLUGIN1_ID = "testPlugin1";
-    public static String PLUGIN2_ID = "testPlugin2";
-    public static String PLUGIN_NEW_ID = "newPluginId";
+    public static final String PLUGIN1_ID = "testPlugin1";
+    public static final String PLUGIN2_ID = "testPlugin2";
+    public static final String PLUGIN_NEW_ID = "newPluginId";
 
-    public static String PROFILE1_ID = "testPlugin1-big";
-    public static String PROFILE2_ID = "testPlugin1-small";
-    public static String PROFILE_NEW_ID = "newProfileId";
+    public static final String PROFILE1_ID = "testPlugin1-big";
+    public static final String PROFILE2_ID = "testPlugin1-small";
+    public static final String PROFILE_NEW_ID = "newProfileId";
 
     private ManagerTestsUtils() {}
 

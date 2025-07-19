@@ -28,20 +28,20 @@ import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
 /**
- * ManagerAgentEndpoint
+ * WorkerEndpoint
  * @author ppodsednik
  */
 @Path("/worker")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class WorkerEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(WorkerEndpoint.class.getName());
+public class ForWorkerEndpoint {
+    private static final Logger LOGGER = Logger.getLogger(ForWorkerEndpoint.class.getName());
 
     private final PluginService pluginService;
     private final ProcessService processService;
     private final NodeService nodeService;
 
-    public WorkerEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
+    public ForWorkerEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
         this.pluginService = pluginService;
         this.processService = processService;
         this.nodeService = nodeService;

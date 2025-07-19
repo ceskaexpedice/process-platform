@@ -21,15 +21,27 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class ProcessMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static void mapProcess(PreparedStatement stmt, ProcessEntity processEntity) throws SQLException, JsonProcessingException {
+        stmt.setString(1, processEntity.getProcessId());
+        stmt.setString(2, processEntity.getProfileId());
+        stmt.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
+        stmt.setInt(4, ProcessState.PLANNED.getVal());
+        stmt.setString(5, processEntity.getBatchId());
+        String json = mapper.writeValueAsString(processEntity.getPayload());
+        stmt.setString(6, json);
+        stmt.setString(7, processEntity.getOwnerId());
+    }
 
     public static ProcessEntity mapProcess(ResultSet rsProcess) {
         try {

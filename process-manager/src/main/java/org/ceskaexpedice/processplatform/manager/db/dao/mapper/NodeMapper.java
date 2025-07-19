@@ -18,14 +18,21 @@ package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
 import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class NodeMapper {
+
+    public static void mapNode(PreparedStatement stmt, NodeEntity nodeEntity, Connection conn) throws SQLException {
+        stmt.setString(1, nodeEntity.getNodeId());
+        stmt.setString(2, nodeEntity.getDescription());
+        stmt.setString(3, nodeEntity.getType());
+        stmt.setString(4, nodeEntity.getUrl());
+        Array tagsArray = conn.createArrayOf("text", nodeEntity.getTags().toArray());
+        stmt.setArray(5, tagsArray);
+    }
 
     public static NodeEntity mapNode(ResultSet rsNode) throws SQLException {
         NodeEntity node = new NodeEntity();

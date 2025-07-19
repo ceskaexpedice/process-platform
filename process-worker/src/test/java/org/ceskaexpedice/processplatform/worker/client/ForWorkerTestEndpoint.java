@@ -16,7 +16,7 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 
 import org.ceskaexpedice.processplatform.common.model.*;
-import org.ceskaexpedice.processplatform.worker.Constants;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -30,27 +30,27 @@ import java.util.*;
 @Path("/worker")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class WorkerTestEndpoint {
+public class ForWorkerTestEndpoint {
     private static int counter;
 
     @POST
     @Path("/register_node")
     public Response registerNode(Node node) {
-        System.out.println("ManagerAgentEndpoint: registerNode: " + node.getNodeId());
+        System.out.println("WorkerTestEndpoint: registerNode: " + node.getNodeId());
         return Response.ok().build();
     }
 
     @POST
     @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
-        System.out.println("ManagerAgentEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
+        System.out.println("WorkerTestEndpoint: registerPlugin: " + pluginInfo.getPluginId() + ",# of profiles-" + pluginInfo.getProfiles().size());
         return Response.ok().build();
     }
 
     @GET
     @Path("/next_process/{workerId}")
     public Response getNextScheduledProcess(@PathParam("workerId") String workerId) {
-        System.out.print("ManagerAgentEndpoint: getNextProcess:");
+        System.out.print("WorkerTestEndpoint: getNextProcess:");
         counter++;
         if (counter == 1) {
             List<String> jvmArgs = new ArrayList<>();
@@ -63,10 +63,10 @@ public class WorkerTestEndpoint {
             payload.put("surname", "Harasil");
 
             ScheduledProcess scheduledProcess = new ScheduledProcess(
-                    Constants.PLUGIN1_PROCESS_ID,
-                    Constants.PLUGIN1_PROFILE_SMALL,
-                    Constants.PLUGIN1_ID,
-                    Constants.PLUGIN1_MAIN_CLASS,
+                    WorkerTestsUtils.PLUGIN1_PROCESS_ID,
+                    WorkerTestsUtils.PLUGIN1_PROFILE_SMALL,
+                    WorkerTestsUtils.PLUGIN1_ID,
+                    WorkerTestsUtils.PLUGIN1_MAIN_CLASS,
                     payload,
                     jvmArgs,
                     "batchId",
@@ -75,10 +75,10 @@ public class WorkerTestEndpoint {
             return Response.ok(scheduledProcess).build();
         } else if (counter == 2) {
             ScheduledProcess scheduledProcess = new ScheduledProcess(
-                    Constants.PLUGIN2_PROCESS_ID,
-                    Constants.PLUGIN2_ID,
-                    Constants.PLUGIN2_ID,
-                    Constants.PLUGIN2_MAIN_CLASS,
+                    WorkerTestsUtils.PLUGIN2_PROCESS_ID,
+                    WorkerTestsUtils.PLUGIN2_ID,
+                    WorkerTestsUtils.PLUGIN2_ID,
+                    WorkerTestsUtils.PLUGIN2_MAIN_CLASS,
                     new HashMap<>(),
                     new ArrayList<>(),
                     "batchId",
@@ -94,7 +94,7 @@ public class WorkerTestEndpoint {
     @POST
     @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        System.out.println("ManagerAgentEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
+        System.out.println("WorkerTestEndpoint: scheduleSubProcess: " + scheduleSubProcess.getProfileId() +
                 ",batchId-" + scheduleSubProcess.getBatchId());
         return Response.ok().build();
     }
@@ -103,7 +103,7 @@ public class WorkerTestEndpoint {
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
         // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
+        System.out.println("WorkerTestEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
         return Response.ok().build();
     }
 
@@ -111,7 +111,7 @@ public class WorkerTestEndpoint {
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
         // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
+        System.out.println("WorkerTestEndpoint: updateProcessState:processId-" + processId + ";state-" + state);
         return Response.ok().build();
     }
 
@@ -119,7 +119,7 @@ public class WorkerTestEndpoint {
     @Path("/name/{processId}")
     public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
         // Store OS process ID of the spawned JVM
-        System.out.println("ManagerAgentEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+        System.out.println("WorkerTestEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
         return Response.ok().build();
     }
 

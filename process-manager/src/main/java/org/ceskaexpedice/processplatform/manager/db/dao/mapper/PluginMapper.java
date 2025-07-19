@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.sql.*;
@@ -30,6 +31,18 @@ import java.util.*;
 public class PluginMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static void mapPlugin(PreparedStatement stmt, PluginEntity plugin, Connection conn) throws SQLException, JsonProcessingException {
+        stmt.setString(1, plugin.getPluginId());
+        stmt.setString(2, plugin.getDescription());
+        stmt.setString(3, plugin.getMainClass());
+
+        String json = mapper.writeValueAsString(plugin.getPayloadFieldSpecMap());
+        stmt.setString(4, json);
+
+        Array scheduledProfilesArray = conn.createArrayOf("text", plugin.getScheduledProfiles().toArray());
+        stmt.setArray(5, scheduledProfilesArray);
+    }
 
     public static PluginEntity mapPlugin(ResultSet rsPlugin) {
         try {

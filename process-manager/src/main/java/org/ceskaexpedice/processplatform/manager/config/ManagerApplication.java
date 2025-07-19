@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.config;
 
 import javax.servlet.ServletContext;
-import org.ceskaexpedice.processplatform.manager.api.WorkerEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.ForWorkerEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
@@ -42,7 +42,7 @@ public class ManagerApplication extends ResourceConfig {
 
         register(new PluginEndpoint(pluginService));
         register(new ProcessEndpoint(processService));
-        register(new WorkerEndpoint(pluginService, processService, nodeService));
+        register(new ForWorkerEndpoint(pluginService, processService, nodeService));
         // TODO register(GlobalExceptionMapper.class);
     }
 

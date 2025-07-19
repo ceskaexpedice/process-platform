@@ -81,14 +81,7 @@ public class ProcessDao {
                     "    ?" +
                     "  )";
             try (PreparedStatement insertStatement = connection.prepareStatement(sql)) {
-                insertStatement.setString(1, processEntity.getProcessId());
-                insertStatement.setString(2, processEntity.getProfileId());
-                insertStatement.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
-                insertStatement.setInt(4, ProcessState.PLANNED.getVal());
-                insertStatement.setString(5, processEntity.getBatchId());
-                String json = mapper.writeValueAsString(processEntity.getPayload());
-                insertStatement.setString(6, json);
-                insertStatement.setString(7, processEntity.getOwnerId());
+                ProcessMapper.mapProcess(insertStatement, processEntity);
                 insertStatement.executeUpdate();
             } catch (JsonProcessingException e) {
                 throw new ApplicationException(e.toString(), e);

@@ -32,8 +32,6 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.ArrayList;
-
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.*;
  *
  * @author ppodsednik
  */
-public class TestWorkerEndpoint extends JerseyTest {
+public class TestForWorkerEndpoint extends JerseyTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private PluginService pluginServiceMock;
@@ -56,7 +54,7 @@ public class TestWorkerEndpoint extends JerseyTest {
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new WorkerEndpoint(pluginServiceMock, processServiceMock, nodeServiceMock));
+        resourceConfig.register(new ForWorkerEndpoint(pluginServiceMock, processServiceMock, nodeServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
         return resourceConfig;
     }

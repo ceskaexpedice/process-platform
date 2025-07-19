@@ -22,8 +22,8 @@ import org.ceskaexpedice.processplatform.worker.WorkerMain;
  * ManagerEndpointService
  * @author ppodsednik
  */
-public class WorkerAgentService {
+public class ForManagerService {
 
-    public WorkerAgentService(WorkerMain workerMain) {
+    public ForManagerService(WorkerMain workerMain) {
     }
 }

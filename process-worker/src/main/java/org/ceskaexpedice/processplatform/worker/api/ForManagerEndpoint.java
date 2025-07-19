@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.api.service.WorkerAgentService;
+import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,12 +28,12 @@ import java.io.InputStream;
  * AgentEndpoint
  * @author ppodsednik
  */
-@Path("/agent")
+@Path("/manager")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ManagerEndpoint {
+public class ForManagerEndpoint {
 
-    public ManagerEndpoint(WorkerAgentService agentService) {
+    public ForManagerEndpoint(ForManagerService agentService) {
     }
 
     @GET

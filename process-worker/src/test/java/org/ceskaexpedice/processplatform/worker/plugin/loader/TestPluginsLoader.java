@@ -16,7 +16,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
-import org.ceskaexpedice.processplatform.worker.Constants;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class TestPluginsLoader {
         PluginInfo testPlugin1 = null;
         PluginInfo testPlugin2 = null;
         for (PluginInfo pluginInfo : pluginInfos) {
-            if(pluginInfo.getPluginId().equals(Constants.PLUGIN1_ID)){
+            if(pluginInfo.getPluginId().equals(WorkerTestsUtils.PLUGIN1_ID)){
                 testPlugin1 = pluginInfo;
             }else{
                 testPlugin2 = pluginInfo;
@@ -69,7 +69,7 @@ public class TestPluginsLoader {
         assertEquals(2, testPlugin1.getProfiles().size());
         PluginProfile profileBig = null;
         for (PluginProfile profile : testPlugin1.getProfiles()) {
-            if(profile.getProfileId().equals(Constants.PLUGIN1_PROFILE_BIG)){
+            if(profile.getProfileId().equals(WorkerTestsUtils.PLUGIN1_PROFILE_BIG)){
                 profileBig = profile;
             }
         }

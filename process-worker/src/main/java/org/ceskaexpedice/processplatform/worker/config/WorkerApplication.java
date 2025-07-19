@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-import org.ceskaexpedice.processplatform.worker.api.ManagerEndpoint;
+import org.ceskaexpedice.processplatform.worker.api.ForManagerEndpoint;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -30,12 +30,12 @@ import javax.ws.rs.ApplicationPath;
 public class WorkerApplication extends ResourceConfig {
 
     public WorkerApplication() {
-        register(ManagerEndpoint.class);
+        register(ForManagerEndpoint.class);
 
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(WorkerAgentEndpointFactory.class).to(ManagerEndpoint.class);
+                bindFactory(WorkerAgentEndpointFactory.class).to(ForManagerEndpoint.class);
             }
         });
     }

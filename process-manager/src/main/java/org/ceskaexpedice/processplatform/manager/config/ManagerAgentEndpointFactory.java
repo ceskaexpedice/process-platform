@@ -18,7 +18,7 @@ package org.ceskaexpedice.processplatform.manager.config;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import org.ceskaexpedice.processplatform.manager.api.WorkerEndpoint;
+import org.ceskaexpedice.processplatform.manager.api.ForWorkerEndpoint;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
@@ -27,13 +27,13 @@ import javax.inject.Inject;
  * ManagerEndpointFactory
  * @author ppodsednik
  */
-public class ManagerAgentEndpointFactory implements Factory<WorkerEndpoint> {
+public class ManagerAgentEndpointFactory implements Factory<ForWorkerEndpoint> {
 
     @Inject
     private HttpServletRequest request;
 
     @Override
-    public WorkerEndpoint provide() {
+    public ForWorkerEndpoint provide() {
         ServletContext ctx = request.getServletContext();
        // WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
         //return new ManagerAgentEndpoint(new PluginService(), new ProcessService());
@@ -41,6 +41,6 @@ public class ManagerAgentEndpointFactory implements Factory<WorkerEndpoint> {
     }
 
     @Override
-    public void dispose(WorkerEndpoint t) {
+    public void dispose(ForWorkerEndpoint t) {
     }
 }
