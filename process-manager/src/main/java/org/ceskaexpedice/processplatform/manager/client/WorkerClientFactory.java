@@ -20,6 +20,10 @@ package org.ceskaexpedice.processplatform.manager.client;
 
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
+/**
+ * WorkerClientFactory
+ * @author petrp
+ */
 public final class WorkerClientFactory {
 
     private WorkerClientFactory() {

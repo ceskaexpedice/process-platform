@@ -49,4 +49,14 @@ public class NodeServiceMapper {
         return nodeEntity;
     }
 
+    public static List<Node> mapNode(List<NodeEntity> nodeEntities) {
+        if(nodeEntities == null) return null;
+        List<Node> nodes = new ArrayList<>();
+        for (NodeEntity nodeEntity : nodeEntities) {
+            Node node = mapNode(nodeEntity);
+            nodes.add(node);
+        }
+        return nodes;
+    }
+
 }

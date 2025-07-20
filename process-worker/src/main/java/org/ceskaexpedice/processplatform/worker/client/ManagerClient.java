@@ -118,14 +118,13 @@ public class ManagerClient {
         int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
-            if (code == 200 || code == 204) {
+            if (code == 200) {
                 HttpEntity entity = response.getEntity();
-                if (entity == null) {
-                    return null;
-                }
                 String json = EntityUtils.toString(entity);
                 ScheduledProcess process = mapper.readValue(json, ScheduledProcess.class);
                 return process;
+            } else if(code == 404){
+                return null;
             } else {
                 throw new RemoteNodeException("Failed to get next scheduled process", NodeType.manager, statusCode);
             }

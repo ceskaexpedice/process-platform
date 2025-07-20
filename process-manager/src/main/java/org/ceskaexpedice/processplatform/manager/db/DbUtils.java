@@ -4,6 +4,10 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * DbUtils
+ * @author petrp
+ */
 public class DbUtils {
 
     private static final Logger LOGGER = Logger.getLogger(DbUtils.class.getName());

@@ -66,6 +66,23 @@ public class NodeDao {
         }
     }
 
+    public List<NodeEntity> getNodes() {
+        try (Connection connection = getConnection()) {
+            List<NodeEntity> nodes = new JDBCQueryTemplate<NodeEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<NodeEntity> returnsList) throws SQLException {
+                    NodeEntity nodeEntity = NodeMapper.mapNode(rs);
+                    returnsList.add(nodeEntity);
+                    return true;
+                }
+            }.executeQuery("select " + "*" + " from PCP_NODE");
+            return nodes;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    // TODO
     private Connection getConnection() {
         Connection connection = dbConnectionProvider.get();
         if (connection == null) {

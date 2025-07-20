@@ -27,6 +27,10 @@ import java.sql.*;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * ProfileDao
+ * @author petrp
+ */
 public class ProfileDao {
 
     private static final Logger LOGGER = Logger.getLogger(ProfileDao.class.getName());

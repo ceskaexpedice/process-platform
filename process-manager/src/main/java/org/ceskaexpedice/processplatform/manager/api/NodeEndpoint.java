@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 
@@ -41,13 +42,16 @@ public class NodeEndpoint {
     @Path("/{nodeId}")
     public Response getNode(@PathParam("nodeId") String nodeId) {
         Node node = nodeService.getNode(nodeId);
+        if (node == null) {
+            return APIRestUtilities.notFound("Node not found: %s", nodeId);
+        }
         return Response.ok(node).build();
     }
 
     @GET
-    @Path("/profiles")
-    public Response getProfiles() {
-        // TODO
-        return Response.ok("allProfiles").build();
+    public Response getNodes() {
+        List<Node> nodes = nodeService.getNodes();
+        return Response.ok(nodes).build();
     }
+
 }

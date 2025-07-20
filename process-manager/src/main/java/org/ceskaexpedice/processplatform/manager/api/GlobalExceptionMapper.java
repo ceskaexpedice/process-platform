@@ -28,6 +28,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * GlobalExceptionMapper
+ * @author petrp
+ */
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 

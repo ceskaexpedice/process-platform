@@ -75,4 +75,38 @@ public class TestNodeService_integration {
         Assertions.assertEquals(3, node.getTags().size());
     }
 
+    @Test
+    public void testGetNode() {
+        Node newNode = new Node();
+        newNode.setNodeId(NODE_WORKER1_ID);
+        newNode.setType(NodeType.worker);
+        newNode.setTags(new HashSet<>());
+        nodeService.registerNode(newNode);
+
+        Node node = nodeService.getNode(NODE_WORKER1_ID);
+
+        Assertions.assertNotNull(node);
+        node = nodeService.getNode(NODE_WORKER1_ID + "notExists");
+        Assertions.assertNull(node);
+    }
+
+    @Test
+    public void testGetNodes() {
+        Node newNode = new Node();
+        newNode.setNodeId(NODE_WORKER1_ID);
+        newNode.setType(NodeType.worker);
+        newNode.setTags(new HashSet<>());
+        nodeService.registerNode(newNode);
+
+        newNode = new Node();
+        newNode.setNodeId(NODE_WORKER2_ID);
+        newNode.setType(NodeType.worker);
+        newNode.setTags(new HashSet<>());
+        nodeService.registerNode(newNode);
+
+        List<Node> nodes = nodeService.getNodes();
+
+        Assertions.assertEquals(2, nodes.size());
+    }
+
 }

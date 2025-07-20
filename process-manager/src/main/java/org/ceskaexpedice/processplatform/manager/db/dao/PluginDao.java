@@ -87,6 +87,7 @@ public class PluginDao {
         }
     }
 
+    // TODO
     private Connection getConnection() {
         Connection connection = dbConnectionProvider.get();
         if (connection == null) {

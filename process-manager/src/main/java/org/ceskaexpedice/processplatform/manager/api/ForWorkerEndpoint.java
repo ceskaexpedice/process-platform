@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
 /**
- * WorkerEndpoint
+ * ForWorkerEndpoint
  * @author ppodsednik
  */
 @Path("/worker")

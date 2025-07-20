@@ -59,7 +59,7 @@ public class ProcessService {
     }
 
     public void scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
-        // TODO validate payload
+        // TODO validate payload - see plugin service
         String newProcessId = UUID.randomUUID().toString();
         String ownerId = null; // TODO fetch it from owner process
 

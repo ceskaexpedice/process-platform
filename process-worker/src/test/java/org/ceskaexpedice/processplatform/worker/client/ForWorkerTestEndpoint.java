@@ -16,6 +16,7 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 
 import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 
 import javax.ws.rs.*;
@@ -86,8 +87,7 @@ public class ForWorkerTestEndpoint {
             System.out.println(scheduledProcess.getProcessId());
             return Response.ok(scheduledProcess).build();
         } else {
-            System.out.println("null");
-            return null;
+            return APIRestUtilities.notFound("No scheduled process found for %s", workerId);
         }
     }
 

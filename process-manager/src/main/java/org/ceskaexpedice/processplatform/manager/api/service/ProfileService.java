@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * PluginService
+ * ProfileService
  * @author ppodsednik
  */
 public class ProfileService {

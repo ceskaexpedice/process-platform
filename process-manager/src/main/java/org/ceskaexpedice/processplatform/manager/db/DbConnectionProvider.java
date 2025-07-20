@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Provides connection to kramerius4 database
+ * DbConnectionProvider
  *
  * @author pavels
  */

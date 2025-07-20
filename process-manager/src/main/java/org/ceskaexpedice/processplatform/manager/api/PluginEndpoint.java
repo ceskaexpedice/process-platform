@@ -26,6 +26,10 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PluginEndpoint
+ * @author petrp
+ */
 @Path("/plugin")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

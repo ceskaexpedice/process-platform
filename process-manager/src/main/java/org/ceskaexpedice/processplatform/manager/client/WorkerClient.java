@@ -24,7 +24,7 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
 /**
- * ManagerClient
+ * WorkerClient
  * @author ppodsednik
  */
 public class WorkerClient {

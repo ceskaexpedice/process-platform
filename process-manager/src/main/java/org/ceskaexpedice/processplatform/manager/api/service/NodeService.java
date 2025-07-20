@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * PluginService
+ * NodeService
  * @author ppodsednik
  */
 public class NodeService {
@@ -59,6 +59,11 @@ public class NodeService {
         NodeEntity nodeEntity = nodeDao.getNode(nodeId);
         Node node = NodeServiceMapper.mapNode(nodeEntity);
         return node;
+    }
+
+    public List<Node> getNodes() {
+        List<Node> nodes = NodeServiceMapper.mapNode(nodeDao.getNodes());
+        return nodes;
     }
 
 }
