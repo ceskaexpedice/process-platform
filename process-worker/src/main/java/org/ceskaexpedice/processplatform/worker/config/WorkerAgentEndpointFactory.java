@@ -16,14 +16,14 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.ForManagerEndpoint;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * ManagerEndpointFactory

@@ -16,14 +16,12 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ProfileMapper {
 

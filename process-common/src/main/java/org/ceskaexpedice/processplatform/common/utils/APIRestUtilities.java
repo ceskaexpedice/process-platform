@@ -16,8 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.common.utils;
 
-import org.ceskaexpedice.processplatform.common.DataAccessException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

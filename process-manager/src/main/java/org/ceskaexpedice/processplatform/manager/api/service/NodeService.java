@@ -17,16 +17,11 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.model.Node;
-import org.ceskaexpedice.processplatform.common.model.PluginInfo;
-import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.NodeServiceMapper;
-import org.ceskaexpedice.processplatform.manager.api.service.mapper.PluginServiceMapper;
-import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.util.List;
 import java.util.logging.Logger;

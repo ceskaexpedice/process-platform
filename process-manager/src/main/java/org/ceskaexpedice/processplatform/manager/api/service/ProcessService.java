@@ -16,17 +16,17 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
-import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
 import org.ceskaexpedice.processplatform.manager.db.dao.ProcessDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
-import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
-import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

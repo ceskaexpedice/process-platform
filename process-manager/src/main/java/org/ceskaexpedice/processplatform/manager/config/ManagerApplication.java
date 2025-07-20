@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import javax.servlet.ServletContext;
 import org.ceskaexpedice.processplatform.manager.api.ForWorkerEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
@@ -25,6 +24,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Context;
 

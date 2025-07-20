@@ -15,8 +15,8 @@
 package org.ceskaexpedice.processplatform.worker.client;
 
 import org.ceskaexpedice.processplatform.common.model.*;
-import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -26,12 +26,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 /**
  * TestManagerClient

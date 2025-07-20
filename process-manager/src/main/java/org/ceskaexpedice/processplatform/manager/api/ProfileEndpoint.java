@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;

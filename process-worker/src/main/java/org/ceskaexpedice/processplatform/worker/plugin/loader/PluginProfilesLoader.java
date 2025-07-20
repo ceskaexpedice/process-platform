@@ -23,7 +23,9 @@ import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 

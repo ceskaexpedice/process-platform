@@ -17,16 +17,18 @@
 package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class PluginMapper {
 

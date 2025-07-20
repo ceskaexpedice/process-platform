@@ -18,9 +18,7 @@ package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
-import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -31,15 +31,12 @@ import java.util.logging.Logger;
  * ProfileDao
  * @author petrp
  */
-public class ProfileDao {
+public class ProfileDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(ProfileDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
 
     public ProfileDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider, managerConfiguration);
     }
 
     public PluginProfileEntity getProfile(String profileId) {
@@ -142,20 +139,6 @@ public class ProfileDao {
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-    }
-
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

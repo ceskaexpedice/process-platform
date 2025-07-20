@@ -21,24 +21,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
-import org.ceskaexpedice.processplatform.manager.db.*;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.PluginMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 
-public class PluginDao {
+public class PluginDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public PluginDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider,managerConfiguration);
     }
 
     public PluginEntity getPlugin(String pluginId) {
@@ -85,21 +86,6 @@ public class PluginDao {
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-    }
-
-    // TODO
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

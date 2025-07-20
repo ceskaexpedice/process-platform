@@ -16,7 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
-import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 public class ProcessServiceMapper {

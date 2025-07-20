@@ -19,7 +19,6 @@ package org.ceskaexpedice.processplatform.manager.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 
 /**

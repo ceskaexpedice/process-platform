@@ -14,7 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.model.Node;
+import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
@@ -23,7 +24,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 

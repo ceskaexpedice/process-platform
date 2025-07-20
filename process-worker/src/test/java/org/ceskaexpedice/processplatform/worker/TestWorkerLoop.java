@@ -29,12 +29,10 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 
 /**
  * TestWorkerMain

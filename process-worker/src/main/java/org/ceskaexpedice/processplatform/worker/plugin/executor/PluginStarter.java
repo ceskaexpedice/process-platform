@@ -16,10 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
@@ -29,14 +29,16 @@ import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.decodeWorkerConfig;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.createPrintStream;
 import static org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils.annotatedMethodType;
 import static org.ceskaexpedice.processplatform.worker.utils.Utils.getPid;

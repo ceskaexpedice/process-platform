@@ -22,11 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Map;
 
 public class ProcessMapper {
 

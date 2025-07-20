@@ -18,7 +18,6 @@
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
-import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 

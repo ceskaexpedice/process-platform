@@ -17,11 +17,8 @@ package org.ceskaexpedice.processplatform.manager.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
-import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -32,16 +29,13 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.PLUGIN1_ID;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.PLUGIN2_ID;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 /**
  * TestPluginEndpoint

@@ -20,27 +20,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class ProcessDao {
+public class ProcessDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(ProcessDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public ProcessDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider,managerConfiguration);
     }
 
     public List<ProcessEntity> getPlannedProcesses() {
@@ -90,21 +90,6 @@ public class ProcessDao {
             throw new DataAccessException(e.toString(), e);
         }
 
-    }
-
-    // TODO move this to AbstractDao
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

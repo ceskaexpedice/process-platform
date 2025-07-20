@@ -20,11 +20,11 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
-import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
 import java.util.Arrays;

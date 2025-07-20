@@ -23,10 +23,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * TestPluginService_integration

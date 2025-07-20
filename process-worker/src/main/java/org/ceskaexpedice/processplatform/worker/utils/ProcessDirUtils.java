@@ -17,7 +17,6 @@
 package org.ceskaexpedice.processplatform.worker.utils;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.File;
 import java.io.FileNotFoundException;

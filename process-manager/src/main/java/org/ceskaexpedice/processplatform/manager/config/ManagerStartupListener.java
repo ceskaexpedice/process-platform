@@ -16,10 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
@@ -28,6 +24,9 @@ import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;

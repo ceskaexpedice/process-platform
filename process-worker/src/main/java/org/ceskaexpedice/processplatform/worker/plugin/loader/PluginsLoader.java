@@ -16,9 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
+import org.ceskaexpedice.processplatform.api.PluginSpi;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.api.PluginSpi;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 

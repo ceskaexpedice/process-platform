@@ -16,9 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.entity;
 
-import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
-
-import java.util.Map;
 import java.util.Set;
 
 /**

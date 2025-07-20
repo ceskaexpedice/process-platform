@@ -14,8 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
+import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Test;

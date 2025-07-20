@@ -29,10 +29,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_ID_KEY;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 
 /**
  * TestPluginJvmLauncher

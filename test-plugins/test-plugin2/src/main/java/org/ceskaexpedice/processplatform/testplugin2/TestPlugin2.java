@@ -1,8 +1,6 @@
 package org.ceskaexpedice.processplatform.testplugin2;
-import org.apache.commons.lang3.StringUtils;
+
 import org.ceskaexpedice.processplatform.api.annotations.ProcessMethod;
-import org.ceskaexpedice.processplatform.api.context.PluginContext;
-import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 
 public class TestPlugin2 {
 

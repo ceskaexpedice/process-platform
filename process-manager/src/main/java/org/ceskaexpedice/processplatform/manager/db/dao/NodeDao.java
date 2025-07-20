@@ -23,19 +23,19 @@ import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.NodeMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class NodeDao {
+public class NodeDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(NodeDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
 
     public NodeDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider, managerConfiguration);
     }
 
     public void createNode(NodeEntity nodeEntity) {
@@ -80,21 +80,6 @@ public class NodeDao {
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-    }
-
-    // TODO
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

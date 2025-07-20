@@ -16,12 +16,12 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
 import org.glassfish.hk2.api.Factory;
 
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * ManagerEndpointFactory

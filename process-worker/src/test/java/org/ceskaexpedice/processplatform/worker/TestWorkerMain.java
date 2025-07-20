@@ -29,8 +29,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 
 /**
  * TestWorkerMain
