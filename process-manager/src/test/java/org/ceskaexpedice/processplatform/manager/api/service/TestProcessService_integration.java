@@ -14,6 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * TestProcessService_integration
@@ -43,7 +46,8 @@ public class TestProcessService_integration {
         testsProperties = IntegrationTestsUtils.loadProperties();
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
         dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
-        processService = new ProcessService(managerConfiguration, dbConnectionProvider);
+        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
+        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService);
     }
 
     @BeforeEach
@@ -54,13 +58,35 @@ public class TestProcessService_integration {
     }
 
     @Test
-    public void testScheduleProcess() {
+    public void testScheduleMainProcess() {
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
         ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        processService.scheduleProcess(scheduleMainProcess);
-        // TODO
+        String processId = processService.scheduleProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertNotNull(processInfo);
+    }
+
+    @Test
+    public void testScheduleMainProcess_validationError() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("surname", "Po");
+        assertThrows(BusinessLogicException.class, () -> {
+            ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+            processService.scheduleProcess(scheduleMainProcess);
+        });
+    }
+
+    @Test
+    public void testScheduleSubProcess() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertNotNull(processInfo);
     }
 
     @Test

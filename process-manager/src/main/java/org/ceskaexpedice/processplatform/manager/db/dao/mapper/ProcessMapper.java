@@ -21,13 +21,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 
 public class ProcessMapper {
@@ -36,28 +36,60 @@ public class ProcessMapper {
 
     public static void mapProcess(PreparedStatement stmt, ProcessEntity processEntity) throws SQLException, JsonProcessingException {
         stmt.setString(1, processEntity.getProcessId());
-        stmt.setString(2, processEntity.getProfileId());
-        stmt.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
-        stmt.setInt(4, ProcessState.PLANNED.getVal());
-        stmt.setString(5, processEntity.getBatchId());
+        stmt.setString(2, processEntity.getDescription());
+        stmt.setString(3, processEntity.getProfileId());
+        stmt.setString(4, processEntity.getWorkerId());
+        stmt.setInt(5, processEntity.getPid());
+        if (processEntity.getPlanned() != null) {
+            Timestamp timestamp = new Timestamp(processEntity.getPlanned().getTime());
+            stmt.setTimestamp(6, timestamp);
+        } else {
+            stmt.setNull(6, java.sql.Types.TIMESTAMP);
+        }
+        if (processEntity.getStarted() != null) {
+            Timestamp timestamp = new Timestamp(processEntity.getStarted().getTime());
+            stmt.setTimestamp(7, timestamp);
+        } else {
+            stmt.setNull(7, java.sql.Types.TIMESTAMP);
+        }
+        if (processEntity.getFinished() != null) {
+            Timestamp timestamp = new Timestamp(processEntity.getFinished().getTime());
+            stmt.setTimestamp(8, timestamp);
+        } else {
+            stmt.setNull(8, java.sql.Types.TIMESTAMP);
+        }
+        stmt.setInt(9, processEntity.getStatus());
         String json = mapper.writeValueAsString(processEntity.getPayload());
-        stmt.setString(6, json);
-        stmt.setString(7, processEntity.getOwnerId());
+        stmt.setString(10, json);
+        stmt.setString(11, processEntity.getBatchId());
+        stmt.setString(12, processEntity.getOwner());
     }
 
     public static ProcessEntity mapProcess(ResultSet rsProcess) {
         try {
             ProcessEntity processEntity = new ProcessEntity();
             processEntity.setProcessId(rsProcess.getString("process_id"));
+            processEntity.setDescription(rsProcess.getString("description"));
             processEntity.setProfileId(rsProcess.getString("profile_id"));
-            processEntity.setBatchId(rsProcess.getString("batch_id"));
-            processEntity.setOwnerId(rsProcess.getString("owner"));
-
+            processEntity.setWorkerId(rsProcess.getString("worker_id"));
+            processEntity.setPid(rsProcess.getInt("pid"));
+            if(rsProcess.getTimestamp("started") != null){
+                processEntity.setPlanned(new Date(rsProcess.getTimestamp("planned").getTime()));
+            }
+            if(rsProcess.getTimestamp("started") != null){
+                processEntity.setStarted(new Date(rsProcess.getTimestamp("started").getTime()));
+            }
+            if(rsProcess.getTimestamp("finished") != null){
+                processEntity.setFinished(new Date(rsProcess.getTimestamp("finished").getTime()));
+            }
+            processEntity.setStatus(rsProcess.getInt("status"));
             String json = rsProcess.getString("payload");
             if(json != null){
                 Map<String, String> payloadMap = mapper.readValue(json, new TypeReference<>() {});
                 processEntity.setPayload(payloadMap);
             }
+            processEntity.setBatchId(rsProcess.getString("batch_id"));
+            processEntity.setOwner(rsProcess.getString("owner"));
             return processEntity;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.db.entity;
+package org.ceskaexpedice.processplatform.common.model;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
- * ProcessEntity
+ * ProcessInfo
  * @author ppodsednik
  */
-public class ProcessEntity {
+public class ProcessInfo {
     private String processId;
     private String description;
     private String profileId;
@@ -32,12 +32,12 @@ public class ProcessEntity {
     private Date planned;
     private Date started;
     private Date finished;
-    private int status;
+    private ProcessState status;
     private Map<String, String> payload;
     private String batchId;
     private String owner;
 
-    public ProcessEntity() {
+    public ProcessInfo() {
     }
 
     public String getProcessId() {
@@ -120,11 +120,11 @@ public class ProcessEntity {
         this.finished = finished;
     }
 
-    public int getStatus() {
+    public ProcessState getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ProcessState status) {
         this.status = status;
     }
 

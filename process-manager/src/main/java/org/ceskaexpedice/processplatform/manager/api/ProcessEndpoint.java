@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api;
 
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
 import javax.ws.rs.*;
@@ -38,17 +39,16 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProcessEndpoint {
 
+    private ProcessService processService;
+
     public ProcessEndpoint(ProcessService processService) {
+        this.processService = processService;
     }
 
     @POST
-    public Response scheduleProcess(ScheduleMainProcess scheduleProcess) {
-        String ownerId = scheduleProcess.getOwnerId(); // ownerId must be sent from Kramerius ProcessResource
-        // batch id is created here because this is main process
-        String batchId = UUID.randomUUID().toString();
-        // ownerId + batchId will be persisted to pcp-processes
-
-        return Response.ok().entity("{}").build();
+    public Response scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
+        processService.scheduleProcess(scheduleMainProcess);
+        return APIRestUtilities.ok("Main process for profile %s scheduled", scheduleMainProcess.getProfileId());
     }
 
     @GET

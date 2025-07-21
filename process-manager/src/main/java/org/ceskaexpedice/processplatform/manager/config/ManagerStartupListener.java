@@ -52,7 +52,7 @@ public class ManagerStartupListener implements ServletContextListener {
         ManagerConfiguration config = new ManagerConfiguration(props);
         DbConnectionProvider dbProvider = new DbConnectionProvider(config);
         PluginService pluginService = new PluginService(config, dbProvider);
-        ProcessService processService = new ProcessService(config, dbProvider);
+        ProcessService processService = new ProcessService(config, dbProvider, pluginService);
 
         ServletContext ctx = sce.getServletContext();
         ctx.setAttribute("pluginService", pluginService);

@@ -25,6 +25,8 @@ import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProfileMapper;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.Connection;
@@ -43,7 +45,23 @@ public class ProcessDao extends AbstractDao{
         super(dbConnectionProvider,managerConfiguration);
     }
 
-    public List<ProcessEntity> getPlannedProcesses() {
+    public ProcessEntity getProcess(String processId) {
+        try (Connection connection = getConnection()) {
+            List<ProcessEntity> processes = new JDBCQueryTemplate<ProcessEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) throws SQLException {
+                    ProcessEntity processEntity = ProcessMapper.mapProcess(rs);
+                    returnsList.add(processEntity);
+                    return false;
+                }
+            }.executeQuery("select " + "*" + " from PCP_PROCESS p  where PROCESS_ID = ?", processId);
+            return processes.size() == 1 ? processes.get(0) : null;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public List<ProcessEntity> getProcesses(int processState) {
         try (Connection connection = getConnection()) {
             List<ProcessEntity> processEntities = new JDBCQueryTemplate<ProcessEntity>(connection) {
                 @Override
@@ -52,22 +70,27 @@ public class ProcessDao extends AbstractDao{
                     returnsList.add(processEntity);
                     return true;
                 }
-            }.executeQuery("select " + "*" + " from PCP_PROCESS p  where STATUS = ?", ProcessState.PLANNED.getVal());
+            }.executeQuery("select " + "*" + " from PCP_PROCESS p  where STATUS = ?", processState);
             return processEntities;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
     }
 
-    public void createPlannedProcess(ProcessEntity processEntity) {
+    public void createProcess(ProcessEntity processEntity) {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_process(" +
                     "process_id," +
+                    "description," +
                     "profile_id," +
+                    "worker_id," +
+                    "pid," +
                     "planned," +
+                    "started," +
+                    "finished," +
                     "status," +
-                    "batch_id," +
                     "payload," +
+                    "batch_id," +
                     "owner" +
                     ")" +
                     "values " +
@@ -77,7 +100,12 @@ public class ProcessDao extends AbstractDao{
                     "    ?," +
                     "    ?," +
                     "    ?," +
+                    "    ?," +
+                    "    ?," +
+                    "    ?," +
+                    "    ?," +
                     "    ?::jsonb," +
+                    "    ?," +
                     "    ?" +
                     "  )";
             try (PreparedStatement insertStatement = connection.prepareStatement(sql)) {

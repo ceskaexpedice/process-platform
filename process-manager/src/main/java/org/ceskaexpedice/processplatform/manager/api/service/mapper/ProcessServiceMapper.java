@@ -16,9 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
-import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
-import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 public class ProcessServiceMapper {
@@ -44,12 +42,29 @@ public class ProcessServiceMapper {
     public static ScheduledProcess mapProcess(ProcessEntity processEntity) {
         if(processEntity == null) return null;
         ScheduledProcess scheduledProcess = new ScheduledProcess();
-        scheduledProcess = new ScheduledProcess();
         scheduledProcess.setProcessId(processEntity.getProcessId());
         scheduledProcess.setProfileId(processEntity.getProfileId());
-        scheduledProcess.setOwnerId(processEntity.getOwnerId());
+        scheduledProcess.setOwnerId(processEntity.getOwner());
         scheduledProcess.setBatchId(processEntity.getBatchId());
         scheduledProcess.setPayload(processEntity.getPayload());
         return scheduledProcess;
+    }
+
+    public static ProcessInfo mapProcessBasic(ProcessEntity processEntity) {
+        if(processEntity == null) return null;
+        ProcessInfo processInfo = new ProcessInfo();
+        processInfo.setProcessId(processEntity.getProcessId());
+        processInfo.setDescription(processEntity.getDescription());
+        processInfo.setProfileId(processEntity.getProfileId());
+        processInfo.setWorkerId(processEntity.getWorkerId());
+        processInfo.setPid(processEntity.getPid());
+        processInfo.setPlanned(processEntity.getPlanned());
+        processInfo.setStarted(processEntity.getStarted());
+        processInfo.setFinished(processEntity.getFinished());
+        processInfo.setStatus(ProcessState.load(processEntity.getStatus()));
+        processInfo.setPayload(processEntity.getPayload());
+        processInfo.setBatchId(processEntity.getBatchId());
+        processInfo.setOwner(processEntity.getOwner());
+        return processInfo;
     }
 }

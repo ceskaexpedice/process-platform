@@ -36,6 +36,7 @@ abstract class AbstractDao {
     }
 
 
+    // TODO
     protected Connection getConnection() {
         Connection connection = dbConnectionProvider.get();
         if (connection == null) {
