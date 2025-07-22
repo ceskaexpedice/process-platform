@@ -59,7 +59,7 @@ public class ProfileEndpoint {
     @PUT
     @Path("/{profileId}")
     public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
-        profileService.updateProfile(profile);
+        profileService.updateJvmArgs(profileId, profile.getJvmArgs());
         return APIRestUtilities.ok("Profile %s updated", profileId);
     }
 

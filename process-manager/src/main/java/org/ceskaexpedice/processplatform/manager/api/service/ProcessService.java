@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -54,7 +55,7 @@ public class ProcessService {
         this.pluginService = pluginService;
     }
 
-    public String scheduleProcess(ScheduleMainProcess scheduleMainProcess) {
+    public String scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
         validatePayload(scheduleMainProcess);
         String newProcessId = UUID.randomUUID().toString();
         String newBatchId = newProcessId;
@@ -70,10 +71,17 @@ public class ProcessService {
         return newProcessId;
     }
 
-    public String scheduleProcess(ScheduleSubProcess scheduleSubProcess) {
+    public String scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         validatePayload(scheduleSubProcess);
+        if(scheduleSubProcess.getBatchId() == null){
+            throw new BusinessLogicException("Batch id cannot be null for subprocess");
+        }
+        ProcessEntity processMain = processDao.getProcess(scheduleSubProcess.getBatchId());
+        if(processMain == null){
+            throw new BusinessLogicException("Process with id " + scheduleSubProcess.getBatchId() + " (sub process batch id) does not exist");
+        }
         String newProcessId = UUID.randomUUID().toString();
-        String ownerId = null; // TODO fetch it from owner process; use batchid to find owner/sibling
+        String ownerId = processMain.getOwner();
 
         ProcessEntity processEntity = ProcessServiceMapper.mapProcess(scheduleSubProcess);
         processEntity.setProcessId(newProcessId);
@@ -98,16 +106,18 @@ public class ProcessService {
             Set<String> tags = nodeDao.getNode(workerId).getTags();
             if(tags.contains(processEntity.getProfileId())){
                 scheduledProcess = ProcessServiceMapper.mapProcess(processEntity);
-                // TODO populate pluginId, mainClass, jvmArgs from plugin
-                scheduledProcess.setJvmArgs(null); // TODO
-                scheduledProcess.setPluginId(null); // TODO
-                scheduledProcess.setMainClass(null); // TODO
                 break;
             }
         }
-        // TODO set process state to NOT_RUNNING
-        // TODO set workerId on the process
-
+        if(scheduledProcess == null){
+            return null;
+        }
+        PluginProfileEntity profile = profileDao.getProfile(scheduledProcess.getProfileId());
+        PluginEntity plugin = pluginDao.getPlugin(profile.getPluginId());
+        scheduledProcess.setJvmArgs(profile.getJvmArgs());
+        scheduledProcess.setPluginId(profile.getPluginId());
+        scheduledProcess.setMainClass(plugin.getMainClass());
+        processDao.update(scheduledProcess.getProcessId(), workerId, ProcessState.NOT_RUNNING);
         return scheduledProcess;
     }
 

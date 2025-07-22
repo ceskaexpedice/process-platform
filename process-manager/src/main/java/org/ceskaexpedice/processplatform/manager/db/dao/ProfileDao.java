@@ -101,23 +101,23 @@ public class ProfileDao extends AbstractDao{
 
     }
 
-    public void updateProfile(PluginProfileEntity profile) {
+    public void updateJvmArgs(String profileId, List<String> jvmArgs) {
         try (Connection connection = getConnection()) {
             String sql = "UPDATE pcp_profile SET jvm_args = ? WHERE profile_id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-                if (profile.getJvmArgs() != null) {
-                    Array jvmArgsArray = connection.createArrayOf("text", profile.getJvmArgs().toArray());
+                if (jvmArgs != null) {
+                    Array jvmArgsArray = connection.createArrayOf("text", jvmArgs.toArray());
                     stmt.setArray(1, jvmArgsArray);
                 } else {
                     stmt.setNull(1, Types.ARRAY);
                 }
 
-                stmt.setString(2, profile.getProfileId()); // WHERE clause
+                stmt.setString(2, profileId);
 
                 int updated = stmt.executeUpdate();
                 if (updated == 0) {
-                    throw new DataAccessException("No profile found with ID: " + profile.getProfileId());
+                    throw new DataAccessException("No profile found with ID: " + profileId);
                 }
             }
         } catch (SQLException e) {

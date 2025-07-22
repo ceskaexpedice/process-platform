@@ -29,10 +29,7 @@ import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProfileMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -118,6 +115,23 @@ public class ProcessDao extends AbstractDao{
             throw new DataAccessException(e.toString(), e);
         }
 
+    }
+
+    public void update(String processId, String workerId, ProcessState processState) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET worker_id = ?, status = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, workerId);
+                stmt.setInt(2, processState.getVal());
+                stmt.setString(3, processId);
+                int updated = stmt.executeUpdate();
+                if (updated == 0) {
+                    throw new DataAccessException("No process found with ID: " + processId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
     }
 
 }

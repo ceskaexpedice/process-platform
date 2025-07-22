@@ -53,8 +53,8 @@ public class ProfileService {
         return profiles;
     }
 
-    public void updateProfile(PluginProfile profile) {
-        profileDao.updateProfile(ProfileServiceMapper.mapProfile(profile));
+    public void updateJvmArgs(String profileId, List<String> jvmArgs) {
+        profileDao.updateJvmArgs(profileId, jvmArgs);
     }
 
 }

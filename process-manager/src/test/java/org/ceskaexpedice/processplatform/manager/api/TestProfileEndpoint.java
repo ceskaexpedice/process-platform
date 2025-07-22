@@ -103,7 +103,7 @@ public class TestProfileEndpoint extends JerseyTest {
                 json, MediaType.APPLICATION_JSON_TYPE)));
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
-        verify(profileServiceMock, times(1)).updateProfile(any());
+        verify(profileServiceMock, times(1)).updateJvmArgs(eq(PROFILE1_ID), any());
     }
 
 }

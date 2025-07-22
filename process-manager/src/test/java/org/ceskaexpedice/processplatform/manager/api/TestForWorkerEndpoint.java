@@ -115,7 +115,7 @@ public class TestForWorkerEndpoint extends JerseyTest {
 
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
-        verify(processServiceMock, times(1)).scheduleProcess(any(ScheduleSubProcess.class));
+        verify(processServiceMock, times(1)).scheduleSubProcess(any(ScheduleSubProcess.class));
     }
 
     @Test

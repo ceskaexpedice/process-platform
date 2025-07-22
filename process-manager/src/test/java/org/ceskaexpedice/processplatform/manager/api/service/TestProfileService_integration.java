@@ -68,12 +68,12 @@ public class TestProfileService_integration {
     }
 
     @Test
-    public void testUpdateProfile() {
+    public void testUpdateJvmArgs() {
         PluginProfile profile = profileService.getProfile(PROFILE1_ID);
         Assertions.assertEquals(2, profile.getJvmArgs().size());
         List<String> args = List.of("-Xmx32g", "a", "b", "c");
         profile.setJvmArgs(args);
-        profileService.updateProfile(profile);
+        profileService.updateJvmArgs(PROFILE1_ID, args);
         profile = profileService.getProfile(PROFILE1_ID);
         Assertions.assertEquals(4, profile.getJvmArgs().size());
     }

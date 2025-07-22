@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.UUID;
 
 /**
  * ProcessEndpoint
@@ -47,7 +46,7 @@ public class ProcessEndpoint {
 
     @POST
     public Response scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
-        processService.scheduleProcess(scheduleMainProcess);
+        processService.scheduleMainProcess(scheduleMainProcess);
         return APIRestUtilities.ok("Main process for profile %s scheduled", scheduleMainProcess.getProfileId());
     }
 

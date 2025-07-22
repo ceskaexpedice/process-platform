@@ -75,7 +75,7 @@ public class ForWorkerEndpoint {
     @POST
     @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        processService.scheduleProcess(scheduleSubProcess);
+        processService.scheduleSubProcess(scheduleSubProcess);
         return APIRestUtilities.ok("Subprocess for profile %s scheduled", scheduleSubProcess.getProfileId());
     }
 

@@ -26,7 +26,7 @@ public class ProcessServiceMapper {
         ProcessEntity processEntity = new ProcessEntity();
         processEntity.setProfileId(scheduleMainProcess.getProfileId());
         processEntity.setPayload(scheduleMainProcess.getPayload());
-        processEntity.setBatchId(scheduleMainProcess.getOwnerId());;
+        processEntity.setOwner(scheduleMainProcess.getOwnerId());;
         return processEntity;
     }
 
