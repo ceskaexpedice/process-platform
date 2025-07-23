@@ -14,17 +14,30 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mockito.Mockito.mock;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * TestProcessEndpoint
@@ -32,49 +45,49 @@ import static org.mockito.Mockito.mock;
  * @author ppodsednik
  */
 public class TestProcessEndpoint extends JerseyTest {
+    private static final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private ProcessService processServiceMock;
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-        ProcessService processServiceMock = mock(ProcessService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new ProcessEndpoint(processServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
         return resourceConfig;
     }
 
-  /*
-  @AfterEach
-  public void tearDown() throws Exception {
-    //server.shutdownNow();
-  }*/
+    @Test
+    public void testScheduleMainProcess() throws JsonProcessingException {
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess();
+        scheduleMainProcess.setProfileId(PROFILE1_ID);
+        String json = mapper.writeValueAsString(scheduleMainProcess);
 
-    @Test
-    public void testGetProfiles() {
-        Response response = target("admin/profiles").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-    }
-/*
-    @Test
-    public void testGetProcessByProcessId() {
-        Response response = target("processes/by_process_id/pid")
-                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-    }
+        Response response = target("process/").request(MediaType.APPLICATION_JSON).post((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
 
-    @Test
-    public void testScheduleProcess() {
-        Response response = target("processes").request(MediaType.APPLICATION_JSON).post((Entity.entity(
-                "{\"uf\": 99}", MediaType.APPLICATION_JSON_TYPE)));
-        Assertions.assertEquals(200, response.getStatus());
         String responseBody = response.readEntity(String.class);
-        System.out.println(responseBody);
+        Assertions.assertEquals(200, response.getStatus());
+        verify(processServiceMock, times(1)).scheduleMainProcess(any(ScheduleMainProcess.class));
     }
-    */
 
+    @Test
+    public void testGetProcess() throws JsonProcessingException {
+        ProcessInfo retVal = new ProcessInfo();
+        retVal.setProcessId(PROCESS1_ID);
+        when(processServiceMock.getProcess(eq(PROCESS1_ID))).thenReturn(retVal);
+
+        Response response = target("process/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        ProcessInfo processInfo = mapper.readValue(json,ProcessInfo.class);
+        Assertions.assertEquals(PROCESS1_ID, processInfo.getProcessId());
+
+        response = target("process/" + PROCESS2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(404, response.getStatus());
+
+        verify(processServiceMock, times(2)).getProcess(any());
+    }
 
 }

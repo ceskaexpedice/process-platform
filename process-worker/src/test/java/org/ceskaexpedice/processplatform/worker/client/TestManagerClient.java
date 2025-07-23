@@ -120,9 +120,9 @@ public class TestManagerClient {
     }
 
     @Test
-    public void testUpdateProcessName() {
+    public void testUpdateProcessDescription() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.updateProcessName(PLUGIN1_PROCESS_ID, "newName");
+        managerClient.updateProcessDescription(PLUGIN1_PROCESS_ID, "newName");
         // TODO test not existing process id
     }
 

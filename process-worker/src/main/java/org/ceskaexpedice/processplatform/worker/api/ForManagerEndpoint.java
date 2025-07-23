@@ -37,7 +37,7 @@ public class ForManagerEndpoint {
     }
 
     @GET
-    @Path("{processId}/logs/out")
+    @Path("{processId}/log/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
@@ -61,26 +61,26 @@ public class ForManagerEndpoint {
     }
 
     @GET
-    @Path("{processId}/logs/err")
+    @Path("{processId}/log/err")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsErr(@PathParam("processId") String processId,
+    public Response getProcessLogErr(@PathParam("processId") String processId,
                                       @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
         return Response.ok().build();
     }
 
     @GET
-    @Path("{processId}/logs/out/lines")
+    @Path("{processId}/log/out/lines")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsOutLines(@PathParam("processId") String processId,
+    public Response getProcessLogOutLines(@PathParam("processId") String processId,
                                            @QueryParam("offset") String offsetStr,
                                            @QueryParam("limit") String limitStr) {
         return Response.ok().build();
     }
 
     @GET
-    @Path("{processId}/logs/err/lines")
+    @Path("{processId}/log/err/lines")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsErrLines(@PathParam("processId") String processId,
+    public Response getProcessLogErrLines(@PathParam("processId") String processId,
                                            @QueryParam("offset") String offsetStr,
                                            @QueryParam("limit") String limitStr) {
         return Response.ok().build();

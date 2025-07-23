@@ -141,7 +141,7 @@ public class PluginStarter implements PluginContext {
 
     @Override
     public void updateProcessName(String name) {
-        managerClient.updateProcessName(processConfiguration.get(PROCESS_ID_KEY), name);
+        managerClient.updateProcessDescription(processConfiguration.get(PROCESS_ID_KEY), name);
     }
 
     @Override

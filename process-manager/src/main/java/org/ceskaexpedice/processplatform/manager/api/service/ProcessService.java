@@ -117,20 +117,21 @@ public class ProcessService {
         scheduledProcess.setJvmArgs(profile.getJvmArgs());
         scheduledProcess.setPluginId(profile.getPluginId());
         scheduledProcess.setMainClass(plugin.getMainClass());
-        processDao.update(scheduledProcess.getProcessId(), workerId, ProcessState.NOT_RUNNING);
+        processDao.updateWorkerId(scheduledProcess.getProcessId(), workerId);
+        processDao.updateState(scheduledProcess.getProcessId(), ProcessState.NOT_RUNNING);
         return scheduledProcess;
     }
 
-    public void updateProcessPid(String processId, String pid) {
-        // TODO processDao.
+    public void updatePid(String processId, int pid) {
+        processDao.updatePid(processId, pid);
     }
 
-    public void updateProcessState(String processId, ProcessState processState) {
-        // TODO processDao.
+    public void updateState(String processId, ProcessState processState) {
+        processDao.updateState(processId, processState);
     }
 
-    public void updateProcessName(String processId, String name) {
-        // TODO processDao.
+    public void updateDescription(String processId, String description) {
+        processDao.updateDescription(processId, description);
     }
 
     private void validatePayload(ScheduleProcess scheduleProcess) {

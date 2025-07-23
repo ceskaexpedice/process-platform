@@ -120,10 +120,9 @@ public class ForWorkerTestEndpoint {
     }
 
     @PUT
-    @Path("/name/{processId}")
-    public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
-        // Store OS process ID of the spawned JVM
-        System.out.println("WorkerTestEndpoint: updateProcessName:processId-" + processId + ";name-" + name);
+    @Path("/description/{processId}")
+    public Response updateProcessDescription(@PathParam("processId") String processId, @QueryParam("description") String description) {
+        System.out.println("WorkerTestEndpoint: updateProcessDescription:processId-" + processId + ";description-" + description);
         return Response.ok().build();
     }
 

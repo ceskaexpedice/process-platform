@@ -148,4 +148,49 @@ public class TestProcessService_integration {
         Assertions.assertNull(nextScheduledProcess);
     }
 
+    @Test
+    public void testUpdate_state() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(ProcessState.PLANNED, processInfo.getStatus());
+
+        processService.updateState(processId, ProcessState.FINISHED);
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+    }
+
+    @Test
+    public void testUpdate_pid() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(0, processInfo.getPid());
+
+        processService.updatePid(processId, 123);
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(123, processInfo.getPid());
+    }
+
+    @Test
+    public void testUpdate_description() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertTrue(processInfo.getDescription().contains("Main process"));
+
+        processService.updateDescription(processId, "NewDescription");
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals("NewDescription", processInfo.getDescription());
+    }
+
 }

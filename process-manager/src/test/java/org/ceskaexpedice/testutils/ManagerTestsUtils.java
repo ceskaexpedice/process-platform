@@ -32,6 +32,7 @@ public final class ManagerTestsUtils {
     public static final String NODE_WORKER2_ID = "worker2";
 
     public static final String PROCESS1_ID = "process1";
+    public static final String PROCESS2_ID = "process2";
 
     public static final String PLUGIN1_ID = "testPlugin1";
     public static final String PLUGIN2_ID = "testPlugin2";

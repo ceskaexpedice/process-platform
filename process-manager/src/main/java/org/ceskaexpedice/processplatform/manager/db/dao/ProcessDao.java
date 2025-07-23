@@ -117,13 +117,59 @@ public class ProcessDao extends AbstractDao{
 
     }
 
-    public void update(String processId, String workerId, ProcessState processState) {
+    public void updateWorkerId(String processId, String workerId) {
         try (Connection connection = getConnection()) {
-            String sql = "UPDATE pcp_process SET worker_id = ?, status = ? WHERE process_id = ?";
+            String sql = "UPDATE pcp_process SET worker_id = ? WHERE process_id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, workerId);
-                stmt.setInt(2, processState.getVal());
-                stmt.setString(3, processId);
+                stmt.setString(2, processId);
+                int updated = stmt.executeUpdate();
+                if (updated == 0) {
+                    throw new DataAccessException("No process found with ID: " + processId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public void updateState(String processId, ProcessState processState) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET status = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setInt(1, processState.getVal());
+                stmt.setString(2, processId);
+                int updated = stmt.executeUpdate();
+                if (updated == 0) {
+                    throw new DataAccessException("No process found with ID: " + processId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public void updatePid(String processId, int pid) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET pid = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setInt(1, pid);
+                stmt.setString(2, processId);
+                int updated = stmt.executeUpdate();
+                if (updated == 0) {
+                    throw new DataAccessException("No process found with ID: " + processId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+    public void updateDescription(String processId, String description) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET description = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, description);
+                stmt.setString(2, processId);
                 int updated = stmt.executeUpdate();
                 if (updated == 0) {
                     throw new DataAccessException("No process found with ID: " + processId);

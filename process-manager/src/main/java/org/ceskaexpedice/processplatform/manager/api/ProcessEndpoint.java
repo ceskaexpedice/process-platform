@@ -16,9 +16,13 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
@@ -38,10 +42,12 @@ import java.net.URI;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProcessEndpoint {
 
-    private ProcessService processService;
+    private final ProcessService processService;
+    private final WorkerClient workerClient;
 
-    public ProcessEndpoint(ProcessService processService) {
+    public ProcessEndpoint(ProcessService processService, NodeService nodeService) {
         this.processService = processService;
+        this.workerClient = WorkerClientFactory.createWorkerClient(processService, nodeService);
     }
 
     @POST
@@ -54,73 +60,11 @@ public class ProcessEndpoint {
     @Path("{processId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProcess(@PathParam("processId") String processId) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/logs/out")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsOut(@PathParam("processId") String processId,
-                                      @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        return Response.ok().build();
-    }
-
-    // TODO this just an example here
-    @GET
-    @Path("/log/{processId}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLog(@PathParam("processId") String processId) {
-        URI workerUri = findResponsibleWorkerUri(processId); // implement your lookup logic
-        Client client = ClientBuilder.newClient();
-        Response workerResponse = client.target(workerUri)
-                .path("/agent/log/" + processId)
-                .request()
-                .get();
-
-        if (workerResponse.getStatus() != 200) {
-            return Response.status(workerResponse.getStatus()).build();
+        ProcessInfo process = processService.getProcess(processId);
+        if (process == null) {
+            return APIRestUtilities.notFound("Process not found: %s", processId);
         }
-
-        InputStream workerStream = workerResponse.readEntity(InputStream.class);
-
-        return Response.ok((StreamingOutput) output -> {
-                    try (workerStream) {
-                        workerStream.transferTo(output);
-                    }
-                }).header("Content-Disposition", "inline; filename=\"" + processId + ".log\"")
-                .build();
-    }
-
-    // TODO this just an example here
-    private URI findResponsibleWorkerUri(String processId) {
-        // Use registry, DB, etc.
-        return URI.create("http://worker-1:8080"); // placeholder
-    }
-
-    @GET
-    @Path("{processId}/logs/err")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsErr(@PathParam("processId") String processId,
-                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/logs/out/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsOutLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/logs/err/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsErrLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
+        return Response.ok(process).build();
     }
 
     @GET
@@ -155,6 +99,47 @@ public class ProcessEndpoint {
     @Path("owners")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
+        return Response.ok().build();
+    }
+
+
+    @GET
+    @Path("{processId}/log/out")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getProcessLogsOut(@PathParam("processId") String processId,
+                                      @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
+        InputStream logStream = workerClient.getProcessLog(processId, false);
+        return Response.ok((StreamingOutput) output -> {
+                    try (logStream) {
+                        logStream.transferTo(output);
+                    }
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                .build();
+    }
+
+    @GET
+    @Path("{processId}/log/err")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getProcessLogsErr(@PathParam("processId") String processId,
+                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("{processId}/log/out/lines")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProcessLogsOutLines(@PathParam("processId") String processId,
+                                           @QueryParam("offset") String offsetStr,
+                                           @QueryParam("limit") String limitStr) {
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("{processId}/log/err/lines")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProcessLogsErrLines(@PathParam("processId") String processId,
+                                           @QueryParam("offset") String offsetStr,
+                                           @QueryParam("limit") String limitStr) {
         return Response.ok().build();
     }
 

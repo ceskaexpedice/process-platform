@@ -81,23 +81,23 @@ public class ForWorkerEndpoint {
 
     @PUT
     @Path("/pid/{processId}")
-    public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
-        processService.updateProcessPid(processId, pid);
+    public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") int pid) {
+        processService.updatePid(processId, pid);
         return APIRestUtilities.ok("Process pid %s used for the process %s", pid, processId);
     }
 
     @PUT
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
-        processService.updateProcessState(processId, state);
+        processService.updateState(processId, state);
         return APIRestUtilities.ok("Process state %s used for the process %s", state, processId);
     }
 
     @PUT
-    @Path("/name/{processId}")
-    public Response updateProcessName(@PathParam("processId") String processId, @QueryParam("name") String name) {
-        processService.updateProcessName(processId, name);
-        return APIRestUtilities.ok("Process name %s used for the process %s", name, processId);
+    @Path("/description/{processId}")
+    public Response updateProcessDescription(@PathParam("processId") String processId, @QueryParam("description") String description) {
+        processService.updateDescription(processId, description);
+        return APIRestUtilities.ok("Process description %s used for the process %s", description, processId);
     }
 
 }

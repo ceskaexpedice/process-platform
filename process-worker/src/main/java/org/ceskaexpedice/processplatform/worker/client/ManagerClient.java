@@ -166,8 +166,8 @@ public class ManagerClient {
         }
     }
 
-    public void updateProcessName(String processId, String name) {
-        String url = String.format("%sworker/name/%s?name=%s", getManagerBaseUrl(), processId, name);
+    public void updateProcessDescription(String processId, String description) {
+        String url = String.format("%sworker/description/%s?description=%s", getManagerBaseUrl(), processId, description);
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;

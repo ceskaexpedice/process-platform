@@ -121,11 +121,11 @@ public class TestForWorkerEndpoint extends JerseyTest {
     @Test
     public void testUpdateProcessPid() {
         String json = "{}";
-        Response response = target("worker/pid/" + PROCESS1_ID).queryParam("pid","anyPid").request(MediaType.APPLICATION_JSON).put((Entity.entity(
+        Response response = target("worker/pid/" + PROCESS1_ID).queryParam("pid",123).request(MediaType.APPLICATION_JSON).put((Entity.entity(
                 json, MediaType.APPLICATION_JSON_TYPE)));
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
-        verify(processServiceMock, times(1)).updateProcessPid(eq(PROCESS1_ID), eq("anyPid"));
+        verify(processServiceMock, times(1)).updatePid(eq(PROCESS1_ID), eq(123));
     }
 
     @Test
@@ -135,17 +135,17 @@ public class TestForWorkerEndpoint extends JerseyTest {
                 json, MediaType.APPLICATION_JSON_TYPE)));
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
-        verify(processServiceMock, times(1)).updateProcessState(eq(PROCESS1_ID), eq(ProcessState.FINISHED));
+        verify(processServiceMock, times(1)).updateState(eq(PROCESS1_ID), eq(ProcessState.FINISHED));
     }
 
     @Test
-    public void testUpdateProcessName() throws JsonProcessingException {
+    public void testUpdateProcessDescription() {
         String json = "{}";
-        Response response = target("worker/name/" + PROCESS1_ID).queryParam("name","new name").request(MediaType.APPLICATION_JSON).put((Entity.entity(
+        Response response = target("worker/description/" + PROCESS1_ID).queryParam("description","new name").request(MediaType.APPLICATION_JSON).put((Entity.entity(
                 json, MediaType.APPLICATION_JSON_TYPE)));
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
-        verify(processServiceMock, times(1)).updateProcessName(eq(PROCESS1_ID), eq("new name"));
+        verify(processServiceMock, times(1)).updateDescription(eq(PROCESS1_ID), eq("new name"));
     }
 
 
