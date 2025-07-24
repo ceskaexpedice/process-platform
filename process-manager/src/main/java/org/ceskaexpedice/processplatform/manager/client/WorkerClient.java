@@ -76,7 +76,8 @@ public class WorkerClient {
             throw new ApplicationException(e.toString(), e);
         }
         int statusCode = -1;
-        try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
+        try {
+            CloseableHttpResponse response = closeableHttpClient.execute(get);
             int code = response.getCode();
             if (code == 200) {
                 InputStream is = response.getEntity().getContent();

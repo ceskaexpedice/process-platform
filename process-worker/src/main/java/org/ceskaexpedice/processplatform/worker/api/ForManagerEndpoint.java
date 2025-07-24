@@ -25,15 +25,17 @@ import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
 
 /**
- * AgentEndpoint
+ * ForManagerEndpoint
  * @author ppodsednik
  */
 @Path("/manager")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ForManagerEndpoint {
+    private final ForManagerService forManagerService;
 
-    public ForManagerEndpoint(ForManagerService agentService) {
+    public ForManagerEndpoint(ForManagerService forManagerService) {
+        this.forManagerService = forManagerService;
     }
 
     @GET
@@ -41,22 +43,12 @@ public class ForManagerEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        return Response.ok().build();
-    }
-
-    // TODO this just an example here
-    @GET
-    @Path("/log/{processId}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response streamLog(@PathParam("processId") String processId) {
-        //InputStream logStream = workerLogService.openLogStream(processId); // FileInputStream or similar
-        InputStream logStream = null;
-
+        InputStream logStream = forManagerService.getProcessLog(processId, false);
         return Response.ok((StreamingOutput) output -> {
                     try (logStream) {
                         logStream.transferTo(output);
                     }
-                }).header("Content-Disposition", "inline; filename=\"" + processId + ".log\"")
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
                 .build();
     }
 
@@ -65,30 +57,19 @@ public class ForManagerEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogErr(@PathParam("processId") String processId,
                                       @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/log/out/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogOutLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/log/err/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogErrLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
+        InputStream logStream = forManagerService.getProcessLog(processId, true);
+        return Response.ok((StreamingOutput) output -> {
+                    try (logStream) {
+                        logStream.transferTo(output);
+                    }
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                .build();
     }
 
     @POST
     @Path("/kill")
     public Response killJVM() {
+        // TODO
         return Response.ok().build();
     }
 }

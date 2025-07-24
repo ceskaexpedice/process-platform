@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.manager.config;
 
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
@@ -52,7 +53,8 @@ public class ManagerStartupListener implements ServletContextListener {
         ManagerConfiguration config = new ManagerConfiguration(props);
         DbConnectionProvider dbProvider = new DbConnectionProvider(config);
         PluginService pluginService = new PluginService(config, dbProvider);
-        ProcessService processService = new ProcessService(config, dbProvider, pluginService);
+        NodeService nodeService = new NodeService(config, dbProvider);
+        ProcessService processService = new ProcessService(config, dbProvider, pluginService, nodeService);
 
         ServletContext ctx = sce.getServletContext();
         ctx.setAttribute("pluginService", pluginService);

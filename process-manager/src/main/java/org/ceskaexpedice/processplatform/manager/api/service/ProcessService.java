@@ -16,9 +16,12 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
@@ -29,6 +32,10 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,14 +52,16 @@ public class ProcessService {
     private final ProfileDao profileDao;
     private final PluginDao pluginDao;
     private final PluginService pluginService;
+    private final WorkerClient workerClient;
 
-    public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider, PluginService pluginService) {
+    public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider, PluginService pluginService, NodeService nodeService) {
         this.managerConfiguration = managerConfiguration;
         this.processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
         this.nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
         this.profileDao = new ProfileDao(dbConnectionProvider, managerConfiguration);
         this.pluginDao = new PluginDao(dbConnectionProvider, managerConfiguration);
         this.pluginService = pluginService;
+        this.workerClient = WorkerClientFactory.createWorkerClient(this, nodeService);
     }
 
     public String scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
@@ -132,6 +141,11 @@ public class ProcessService {
 
     public void updateDescription(String processId, String description) {
         processDao.updateDescription(processId, description);
+    }
+
+    public InputStream getProcessLog(String processId, boolean err) {
+        InputStream logStream = workerClient.getProcessLog(processId, err);
+        return logStream;
     }
 
     private void validatePayload(ScheduleProcess scheduleProcess) {

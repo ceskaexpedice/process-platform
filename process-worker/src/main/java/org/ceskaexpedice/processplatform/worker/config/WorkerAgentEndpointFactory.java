@@ -38,7 +38,7 @@ public class WorkerAgentEndpointFactory implements Factory<ForManagerEndpoint> {
     public ForManagerEndpoint provide() {
         ServletContext ctx = request.getServletContext();
         WorkerMain workerMain = (WorkerMain) ctx.getAttribute("workerMain");
-        return new ForManagerEndpoint(new ForManagerService(workerMain));
+        return new ForManagerEndpoint(new ForManagerService(null));
     }
 
     @Override

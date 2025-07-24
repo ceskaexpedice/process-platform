@@ -16,14 +16,35 @@
  */
 package org.ceskaexpedice.processplatform.worker.api.service;
 
-import org.ceskaexpedice.processplatform.worker.WorkerMain;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
 
 /**
- * ManagerEndpointService
+ * ForManagerService
  * @author ppodsednik
  */
 public class ForManagerService {
+    private final WorkerConfiguration workerConfiguration;
 
-    public ForManagerService(WorkerMain workerMain) {
+    public ForManagerService(WorkerConfiguration workerConfiguration) {
+        this.workerConfiguration = workerConfiguration;
     }
+
+    public InputStream getProcessLog(String processId, boolean err) {
+        try {
+            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY), processId);
+            File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
+            return new FileInputStream(standardStreamFile);
+        } catch (FileNotFoundException e) {
+            throw new ApplicationException("Could not find process log file for process with id " + processId, e);
+        }
+    }
+
 }

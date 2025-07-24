@@ -35,6 +35,11 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -47,13 +52,15 @@ import static org.mockito.Mockito.*;
 public class TestProcessEndpoint extends JerseyTest {
     private static final ObjectMapper mapper = new ObjectMapper();
     @Mock
+    private NodeService nodeServiceMock;
+    @Mock
     private ProcessService processServiceMock;
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(new ProcessEndpoint(processServiceMock));
+        resourceConfig.register(new ProcessEndpoint(processServiceMock, nodeServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
         return resourceConfig;
     }
@@ -88,6 +95,32 @@ public class TestProcessEndpoint extends JerseyTest {
         Assertions.assertEquals(404, response.getStatus());
 
         verify(processServiceMock, times(2)).getProcess(any());
+    }
+
+    @Test
+    public void testGetOutLog() throws IOException {
+        InputStream is = new ByteArrayInputStream("test out content".getBytes(StandardCharsets.UTF_8));
+        when(processServiceMock.getProcessLog(eq(PROCESS1_ID), eq(false))).thenReturn(is);
+
+        Response response = target("process/" + PROCESS1_ID + "/log/out")
+                .request().accept(MediaType.APPLICATION_OCTET_STREAM).get();
+        Assertions.assertEquals(200, response.getStatus());
+        InputStream responseStream = response.readEntity(InputStream.class);
+        String resultOutLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
+        Assertions.assertTrue(resultOutLog.contains("test out content"));
+    }
+
+    @Test
+    public void testGetErrLog() throws IOException {
+        InputStream is = new ByteArrayInputStream("test err content".getBytes(StandardCharsets.UTF_8));
+        when(processServiceMock.getProcessLog(eq(PROCESS1_ID), eq(true))).thenReturn(is);
+
+        Response response = target("process/" + PROCESS1_ID + "/log/err")
+                .request().accept(MediaType.APPLICATION_OCTET_STREAM).get();
+        Assertions.assertEquals(200, response.getStatus());
+        InputStream responseStream = response.readEntity(InputStream.class);
+        String resultErrLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
+        Assertions.assertTrue(resultErrLog.contains("test err content"));
     }
 
 }

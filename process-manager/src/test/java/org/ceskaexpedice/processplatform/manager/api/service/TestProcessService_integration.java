@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.util.*;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
@@ -46,7 +47,7 @@ public class TestProcessService_integration {
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
         dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
         PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
-        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService);
+        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService);
         nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
     }
 

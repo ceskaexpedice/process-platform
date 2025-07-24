@@ -28,6 +28,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 public final class ManagerTestsUtils {
+    public static final String WORKER_BASE_URI = "http://localhost:9998/process-worker/api/";
+
     public static final String NODE_WORKER1_ID = "worker1";
     public static final String NODE_WORKER2_ID = "worker2";
 

@@ -41,7 +41,7 @@ public class ManagerApplication extends ResourceConfig {
         NodeService nodeService = (NodeService) context.getAttribute("nodeService");
 
         register(new PluginEndpoint(pluginService));
-        register(new ProcessEndpoint(processService));
+        // TODO register(new ProcessEndpoint(processService));
         register(new ForWorkerEndpoint(pluginService, processService, nodeService));
         // TODO register(GlobalExceptionMapper.class);
     }

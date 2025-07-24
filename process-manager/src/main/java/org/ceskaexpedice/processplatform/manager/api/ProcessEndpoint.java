@@ -43,11 +43,9 @@ import java.net.URI;
 public class ProcessEndpoint {
 
     private final ProcessService processService;
-    private final WorkerClient workerClient;
 
     public ProcessEndpoint(ProcessService processService, NodeService nodeService) {
         this.processService = processService;
-        this.workerClient = WorkerClientFactory.createWorkerClient(processService, nodeService);
     }
 
     @POST
@@ -106,9 +104,9 @@ public class ProcessEndpoint {
     @GET
     @Path("{processId}/log/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsOut(@PathParam("processId") String processId,
+    public Response getProcessLogOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        InputStream logStream = workerClient.getProcessLog(processId, false);
+        InputStream logStream = processService.getProcessLog(processId, false);
         return Response.ok((StreamingOutput) output -> {
                     try (logStream) {
                         logStream.transferTo(output);
@@ -120,27 +118,15 @@ public class ProcessEndpoint {
     @GET
     @Path("{processId}/log/err")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogsErr(@PathParam("processId") String processId,
+    public Response getProcessLogErr(@PathParam("processId") String processId,
                                       @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/log/out/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsOutLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("{processId}/log/err/lines")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProcessLogsErrLines(@PathParam("processId") String processId,
-                                           @QueryParam("offset") String offsetStr,
-                                           @QueryParam("limit") String limitStr) {
-        return Response.ok().build();
+        InputStream logStream = processService.getProcessLog(processId, true);
+        return Response.ok((StreamingOutput) output -> {
+                    try (logStream) {
+                        logStream.transferTo(output);
+                    }
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                .build();
     }
 
 }
