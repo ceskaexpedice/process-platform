@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
+/**
+ * DataAccessException
+ * @author ppodsednik
+ */
 public class DataAccessException extends RuntimeException {
 
     public DataAccessException(String message, Throwable cause) {

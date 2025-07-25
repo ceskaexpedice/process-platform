@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Annotation poits to default parameter value
+ * Annotation points to default parameter value
  * @author pavels
  */
 @Retention(RetentionPolicy.RUNTIME)

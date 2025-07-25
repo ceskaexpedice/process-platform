@@ -23,6 +23,7 @@ import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
  * PluginContext
  * @author ppodsednik
  */
+// TODO add javadoc
 public interface PluginContext {
 
     void updateProcessName(String name);

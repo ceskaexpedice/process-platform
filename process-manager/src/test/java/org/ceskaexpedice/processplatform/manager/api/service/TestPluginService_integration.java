@@ -16,6 +16,7 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldType;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -102,7 +103,7 @@ public class TestPluginService_integration {
 
         // TODO more tests
         Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
-        payloadFieldSpecMap.put("name", new PayloadFieldSpec("string", true));
+        payloadFieldSpecMap.put("name", new PayloadFieldSpec(PayloadFieldType.STRING, true));
         Set<String> scheduledProfiles = new HashSet<>();
         scheduledProfiles.add(PROFILE_NEW_ID);
 

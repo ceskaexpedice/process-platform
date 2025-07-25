@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.common.model;
 import java.util.List;
 
 /**
- * PluginProfileTO
+ * PluginProfile
  * @author ppodsednik
  */
 public class PluginProfile {

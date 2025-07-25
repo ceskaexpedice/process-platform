@@ -16,19 +16,23 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+/**
+ * PayloadFieldSpec
+ * @author ppodsednik
+ */
 public class PayloadFieldSpec {
-    private String type;    // e.g., "string", "boolean", "number"
+    private PayloadFieldType type;
     private boolean required;
 
     public PayloadFieldSpec() {
     }
 
-    public PayloadFieldSpec(String type, boolean required) {
+    public PayloadFieldSpec(PayloadFieldType type, boolean required) {
         this.type = type;
         this.required = required;
     }
 
-    public String getType() {
+    public PayloadFieldType getType() {
         return type;
     }
 

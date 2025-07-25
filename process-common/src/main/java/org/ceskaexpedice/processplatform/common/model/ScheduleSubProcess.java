@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.common.model;
 import java.util.Map;
 
 /**
- * ScheduleProcess
+ * ScheduleSubProcess
  * @author ppodsednik
  */
 public class ScheduleSubProcess extends ScheduleProcess{

@@ -7,6 +7,7 @@ import java.util.List;
  * 
  * @author pavels
  */
+// TODO check for validity all options in pcp
 public enum ProcessState {
 
     /**

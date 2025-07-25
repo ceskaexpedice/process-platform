@@ -67,7 +67,7 @@ public class PluginService {
     }
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
-        // TODO validate input
+        // TODO add validation on type
         PluginInfo plugin = getPlugin(pluginId);
         for (String name : plugin.getPayloadFieldSpecMap().keySet()) {
             PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);

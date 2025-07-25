@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
+/**
+ * BusinessLogicException
+ * @author ppodsednik
+ */
 public class BusinessLogicException extends RuntimeException {
 
     public BusinessLogicException(String message, Throwable cause) {

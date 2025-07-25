@@ -18,6 +18,10 @@ package org.ceskaexpedice.processplatform.common;
 
 import org.ceskaexpedice.processplatform.common.model.NodeType;
 
+/**
+ * RemoteNodeException
+ * @author ppodsednik
+ */
 public class RemoteNodeException extends RuntimeException {
     private final NodeType nodeType;
     private final int statusCode;

@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.testplugin1.plugin;
 
 import org.ceskaexpedice.processplatform.api.PluginSpi;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +44,8 @@ public class PluginSpi1SPI implements PluginSpi {
     @Override
     public Map<String, PayloadFieldSpec> getPayloadSpec() {
         Map<String, PayloadFieldSpec>  map = new HashMap<>();
-        map.put("name", new PayloadFieldSpec("string", true));
-        map.put("surname", new PayloadFieldSpec("string", true));
+        map.put("name", new PayloadFieldSpec(PayloadFieldType.STRING, true));
+        map.put("surname", new PayloadFieldSpec(PayloadFieldType.STRING, true));
         return map;
     }
 

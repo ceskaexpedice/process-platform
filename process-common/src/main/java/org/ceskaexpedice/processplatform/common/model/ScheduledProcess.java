@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ScheduledProcessTO
+ * ScheduledProcess
  * @author ppodsednik
  */
 public class ScheduledProcess {

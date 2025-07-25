@@ -6,7 +6,6 @@ package org.ceskaexpedice.processplatform.common;
  */
 public class WarningException extends RuntimeException {
 
-
 	public WarningException() {
 		super();
 	}

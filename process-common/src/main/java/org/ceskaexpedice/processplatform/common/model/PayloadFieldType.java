@@ -14,20 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.common;
+package org.ceskaexpedice.processplatform.common.model;
 
 /**
- * ApplicationException
+ * PayloadFieldType
  * @author ppodsednik
  */
-public class ApplicationException extends RuntimeException {
-
-    public ApplicationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ApplicationException(String message) {
-        super(message);
-    }
-
+public enum PayloadFieldType {
+    STRING, BOOLEAN, NUMBER, DATE
 }

@@ -22,9 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * ProcessPlugin
+ * PluginSpi
  * @author ppodsednik
  */
+// TODO add AI javadoc on all methods
 public interface PluginSpi {
 
     String getPluginId();        // e.g., "import"

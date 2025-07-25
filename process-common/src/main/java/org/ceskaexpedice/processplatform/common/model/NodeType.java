@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+/**
+ * NodeType
+ * @author ppodsednik
+ */
 public enum NodeType {
-    manager, worker
+    MANAGER, WORKER
 }

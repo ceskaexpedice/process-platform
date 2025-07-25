@@ -20,6 +20,7 @@ package org.ceskaexpedice.processplatform.api.context;
  * PluginContextHolder
  * @author ppodsednik
  */
+// TODO javadoc
 public class PluginContextHolder {
     private static PluginContext context;
 
