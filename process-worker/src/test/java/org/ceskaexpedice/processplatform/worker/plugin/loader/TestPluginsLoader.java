@@ -52,7 +52,6 @@ public class TestPluginsLoader {
         assertNotNull(testPlugin1);
         assertNotNull(testPlugin2);
 
-        // check profiles were merged:
         // profile.json from jar:
         /*
         [
@@ -80,7 +79,7 @@ public class TestPluginsLoader {
                 biggestXmx = true;
             }
         }
-        assertTrue(biggestXmx); // make sure it has been overridden in the process
+        assertTrue(biggestXmx);
 
         assertEquals(1, testPlugin2.getProfiles().size());
     }

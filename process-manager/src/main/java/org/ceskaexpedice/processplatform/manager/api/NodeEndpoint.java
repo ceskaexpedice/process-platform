@@ -25,6 +25,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+/**
+ * NodeEndpoint
+ * @author ppodsednik
+ */
 @Path("/node")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

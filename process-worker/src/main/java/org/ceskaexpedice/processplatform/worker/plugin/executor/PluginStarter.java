@@ -129,7 +129,7 @@ public class PluginStarter implements PluginContext {
                 }
             }
         } finally {
-            // TODO is it necessary to shutdown AkubraRepo here?
+            // TODO check what is to be done in finally
             /*
             String uuid = System.getProperty(ProcessStarter.UUID_KEY);
             String closeTokenFlag = System.getProperty(AUTOMATIC_CLOSE_TOKEN, "true");
@@ -173,12 +173,12 @@ public class PluginStarter implements PluginContext {
             if (processMethod == null) {
                 throw new ApplicationException("Could not find process method for class: " + mainClass);
             }
-            String[] pluginArgs = {}; // TODO
+            String[] pluginArgs = {}; // TODO remove support for non annotated methods
             if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {
                 Object[] params = ReflectionUtils.map(processMethod.getMethod(), pluginArgs, pluginPayload);
                 processMethod.getMethod().invoke(null, params);
             } else {
-                // TODO processMethod.getMethod().invoke(null, (Object) pluginArgs);
+                // TODO remove support for non annotated methods - processMethod.getMethod().invoke(null, (Object) pluginArgs);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);
@@ -186,7 +186,7 @@ public class PluginStarter implements PluginContext {
     }
 
     private static void checkErrorFile() {
-        /* TODO
+        /* TODO check this if we need it
         if (Boolean.getBoolean(ProcessStarter.SHOULD_CHECK_ERROR_STREAM)) {
             String serrFileName = System.getProperty(SERR_FILE);
             File serrFile = new File(serrFileName);

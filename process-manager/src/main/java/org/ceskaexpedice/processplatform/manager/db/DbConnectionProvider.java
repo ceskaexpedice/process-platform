@@ -14,6 +14,7 @@ import java.util.logging.Logger;
  *
  * @author pavels
  */
+// TODO check all comments and config pars in DBConnectionProvider
 public class DbConnectionProvider {
 
     private static final Logger LOGGER = Logger.getLogger(DbConnectionProvider.class.getName());

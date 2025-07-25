@@ -42,6 +42,7 @@ public class NodeService {
     }
 
     public void registerNode(Node node) {
+        // TODO is it ok to just register new node? what about updating node info like url?
         Node nodeExisting = getNode(node.getNodeId());
         if (nodeExisting != null) {
             LOGGER.info("Node with id " + node.getNodeId() + " already registered");

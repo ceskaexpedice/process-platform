@@ -8,6 +8,7 @@ import java.util.logging.Logger;
  * DbUtils
  * @author petrp
  */
+// TODO check all methods in DBUtils and clean not used ones
 public class DbUtils {
 
     private static final Logger LOGGER = Logger.getLogger(DbUtils.class.getName());

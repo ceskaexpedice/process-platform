@@ -8,13 +8,17 @@ import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 
 import java.util.HashMap;
 
+/**
+ * TestPlugin1
+ * @author ppodsednik
+ */
 public class TestPlugin1 {
 
     @ProcessMethod
     public static void createFullName(@ParameterName("name") String name, @ParameterName("surname") String surname) {
         System.out.println("TestPlugin1.createFullName:name-" + name + ",surname-" + surname);
         String fullName = join(name, surname);
-        // we might do something with "fullName" here like write it to the index
+        // we might do something with "fullName" here like writing it to the index
 
         // we can use the context too...
         PluginContext pluginContext = PluginContextHolder.getContext();

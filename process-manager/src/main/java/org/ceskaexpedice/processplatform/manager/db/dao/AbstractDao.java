@@ -36,7 +36,7 @@ abstract class AbstractDao {
     }
 
 
-    // TODO
+    // TODO check comments and clean GetConnection method
     protected Connection getConnection() {
         Connection connection = dbConnectionProvider.get();
         if (connection == null) {

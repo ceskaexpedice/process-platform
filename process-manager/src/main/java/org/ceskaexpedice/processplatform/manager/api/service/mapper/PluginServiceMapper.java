@@ -22,6 +22,10 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PluginServiceMapper
+ * @author ppodsednik
+ */
 public class PluginServiceMapper {
 
     public static PluginInfo mapPlugin(PluginEntity pluginEntity) {

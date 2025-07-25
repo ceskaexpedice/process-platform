@@ -111,7 +111,7 @@ public class TestProcessService_integration {
     public void testGetNextScheduledProcess() {
         Node node = new Node();
         node.setNodeId(NODE_WORKER1_ID);
-        node.setType(NodeType.worker);
+        node.setType(NodeType.WORKER);
         Set<String> tags = new HashSet<>();
         tags.add(PROFILE1_ID);
         node.setTags(tags);
@@ -134,7 +134,7 @@ public class TestProcessService_integration {
     public void testGetNextScheduledProcess_none() {
         Node node = new Node();
         node.setNodeId(NODE_WORKER1_ID);
-        node.setType(NodeType.worker);
+        node.setType(NodeType.WORKER);
         Set<String> tags = new HashSet<>();
         tags.add("anotherOne");
         node.setTags(tags);

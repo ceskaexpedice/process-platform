@@ -30,6 +30,11 @@ import java.util.Properties;
  * WorkerStartupListener
  * @author ppodsednik
  */
+// TODO check proper logging everywhere
+// TODO all Tomcat and Jersey like wiring
+// TODO add openapi swagger
+// TODO implement properly build plugins process via Gradle
+// TODO check all Tomcat config - like web.xml
 public class WorkerStartupListener implements ServletContextListener {
 
     @Override

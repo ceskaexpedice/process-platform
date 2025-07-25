@@ -25,6 +25,10 @@ import java.io.PrintStream;
 
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKING_DIR;
 
+/**
+ * ProcessDirUtils
+ * @author ppodsednik
+ */
 public final class ProcessDirUtils {
 
     private ProcessDirUtils() {}

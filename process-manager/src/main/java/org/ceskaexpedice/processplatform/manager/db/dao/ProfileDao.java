@@ -125,20 +125,4 @@ public class ProfileDao extends AbstractDao{
         }
     }
 
-    public void deleteProfile(String profileId) {
-        try (Connection connection = getConnection()) {
-            String sql = "DELETE FROM pcp_profile WHERE profile_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, profileId);
-
-                int deleted = stmt.executeUpdate();
-                if (deleted == 0) {
-                    throw new DataAccessException("No profile found to delete with ID: " + profileId);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        }
-    }
-
 }

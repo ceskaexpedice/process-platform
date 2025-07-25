@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * @author ppodsednik
  */
 class WorkerLoop {
-    public static final Logger LOGGER = Logger.getLogger(WorkerLoop.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WorkerLoop.class.getName());
 
     private final ManagerClient managerClient;
     private final WorkerConfiguration workerConfiguration;
@@ -65,7 +65,7 @@ class WorkerLoop {
             }
             LOGGER.info("Worker loop exited.");
         }, "WorkerPollingThread");
-        pollingThread.setDaemon(true); // optional
+        pollingThread.setDaemon(true);
         pollingThread.start();
     }
 

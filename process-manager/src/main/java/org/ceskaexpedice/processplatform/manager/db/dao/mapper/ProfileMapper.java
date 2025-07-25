@@ -23,6 +23,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * ProfileMapper
+ * @author ppodsednik
+ */
 public class ProfileMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();

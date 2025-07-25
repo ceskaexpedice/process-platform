@@ -54,7 +54,7 @@ public class TestProfileEndpoint extends JerseyTest {
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new ProfileEndpoint(profileServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
-        /* TODO
+        /* TODO test Grizzly logging
         resourceConfig.register(new LoggingFeature(
                 Logger.getLogger("HTTPLogger"),
                 LoggingFeature.Verbosity.PAYLOAD_ANY

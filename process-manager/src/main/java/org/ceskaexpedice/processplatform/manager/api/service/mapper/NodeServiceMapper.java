@@ -23,6 +23,10 @@ import org.ceskaexpedice.processplatform.manager.db.entity.NodeEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * NodeServiceMapper
+ * @author ppodsednik
+ */
 public class NodeServiceMapper {
 
     public static Node mapNode(NodeEntity nodeEntity) {

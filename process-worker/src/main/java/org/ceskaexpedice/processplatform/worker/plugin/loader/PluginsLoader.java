@@ -28,7 +28,7 @@ import java.security.CodeSource;
 import java.util.*;
 
 /**
- * PluginScanner
+ * PluginsLoader
  * @author ppodsednik
  */
 public final class PluginsLoader {

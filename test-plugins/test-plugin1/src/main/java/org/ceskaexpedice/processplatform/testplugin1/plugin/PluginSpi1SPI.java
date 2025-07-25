@@ -24,6 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * PluginSpi1SPI
+ * @author ppodsednik
+ */
 public class PluginSpi1SPI implements PluginSpi {
 
     @Override

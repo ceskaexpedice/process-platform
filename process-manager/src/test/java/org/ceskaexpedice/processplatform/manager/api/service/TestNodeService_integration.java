@@ -64,7 +64,7 @@ public class TestNodeService_integration {
         Node newNode = new Node();
         newNode.setNodeId(NODE_WORKER1_ID);
         newNode.setDescription("test node");
-        newNode.setType(NodeType.worker);
+        newNode.setType(NodeType.WORKER);
         newNode.setUrl("http://localhost");
         Set<String> tags = new HashSet<>();
         tags.add(PROFILE1_ID);
@@ -83,7 +83,7 @@ public class TestNodeService_integration {
     public void testGetNode() {
         Node newNode = new Node();
         newNode.setNodeId(NODE_WORKER1_ID);
-        newNode.setType(NodeType.worker);
+        newNode.setType(NodeType.WORKER);
         newNode.setTags(new HashSet<>());
         nodeService.registerNode(newNode);
 
@@ -98,13 +98,13 @@ public class TestNodeService_integration {
     public void testGetNodes() {
         Node newNode = new Node();
         newNode.setNodeId(NODE_WORKER1_ID);
-        newNode.setType(NodeType.worker);
+        newNode.setType(NodeType.WORKER);
         newNode.setTags(new HashSet<>());
         nodeService.registerNode(newNode);
 
         newNode = new Node();
         newNode.setNodeId(NODE_WORKER2_ID);
-        newNode.setType(NodeType.worker);
+        newNode.setType(NodeType.WORKER);
         newNode.setTags(new HashSet<>());
         nodeService.registerNode(newNode);
 

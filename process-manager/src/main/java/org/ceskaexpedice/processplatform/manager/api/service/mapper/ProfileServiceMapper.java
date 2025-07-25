@@ -22,6 +22,10 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ProfileServiceMapper
+ * @author ppodsednik
+ */
 public class ProfileServiceMapper {
 
     public static PluginProfile mapProfile(PluginProfileEntity profileEntity) {

@@ -153,5 +153,6 @@ public class ProcessService {
         PluginEntity plugin = pluginDao.getPlugin(profile.getPluginId());
         pluginService.validatePayload(plugin.getPluginId(), scheduleProcess.getPayload());
     }
+    // TODO handle batch logic here
 
 }

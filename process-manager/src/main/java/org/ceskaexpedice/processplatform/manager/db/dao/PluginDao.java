@@ -33,6 +33,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * PluginDao
+ * @author ppodsednik
+ */
 public class PluginDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());

@@ -76,6 +76,7 @@ public class ProcessEndpoint {
             @QueryParam("until") String filterUntil,
             @QueryParam("state") String filterState
     ) {
+        // TODO implement batches
         return Response.ok().build();
     }
 
@@ -83,6 +84,7 @@ public class ProcessEndpoint {
     @Path("batches/by_first_process_id/{processId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteBatch(@PathParam("processId") String processId) {
+        // TODO implement batches
         return Response.ok().build();
     }
 
@@ -90,6 +92,7 @@ public class ProcessEndpoint {
     @Path("batches/by_first_process_id/{processId}/execution")
     @Produces(MediaType.APPLICATION_JSON)
     public Response killBatch(@PathParam("processId") String processId) {
+        // TODO implement batches
         return Response.ok().build();
     }
 
@@ -97,6 +100,7 @@ public class ProcessEndpoint {
     @Path("owners")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
+        // TODO implement owners
         return Response.ok().build();
     }
 

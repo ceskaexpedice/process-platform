@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ReflectionUtils
+ * @author ppodsednik
+ */
 public final class ReflectionUtils {
 
     private ReflectionUtils() {

@@ -30,6 +30,10 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * ProcessMapper
+ * @author ppodsednik
+ */
 public class ProcessMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();

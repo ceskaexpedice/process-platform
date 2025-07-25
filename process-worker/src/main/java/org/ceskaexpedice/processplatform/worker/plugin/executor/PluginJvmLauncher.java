@@ -44,14 +44,14 @@ import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
  * @author ppodsednik
  */
 public final class PluginJvmLauncher {
-    public static final Logger LOGGER = Logger.getLogger(PluginJvmLauncher.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PluginJvmLauncher.class.getName());
 
     private PluginJvmLauncher() {
     }
 
     public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
-            // TODO List<String> command = createCommand(scheduledProcess, workerConfiguration);
+            // TODO check if the old createCommand is to be deleted: List<String> command = createCommand(scheduledProcess, workerConfiguration);
             List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));

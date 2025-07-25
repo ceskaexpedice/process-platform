@@ -33,6 +33,7 @@ import java.util.logging.Logger;
  * @author petrp
  */
 @Provider
+// TODO is it wired automatically via annotation???
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalExceptionMapper.class.getName());
@@ -40,7 +41,6 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable e) {
         UUID id = UUID.randomUUID();
-
         String msg = prepareMsg(e, id);
 
         // Customize status + message for known types

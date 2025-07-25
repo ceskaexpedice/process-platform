@@ -30,6 +30,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * NodeDao
+ * @author ppodsednik
+ */
 public class NodeDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(NodeDao.class.getName());

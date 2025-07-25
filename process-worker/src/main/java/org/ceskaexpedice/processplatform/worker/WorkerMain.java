@@ -66,11 +66,11 @@ public class WorkerMain {
     }
 
     private void registerNode() {
-        // TODO
+        // TODO check how to properly get all information for node register - from config?
         Node node = new Node();
         node.setNodeId(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
         node.setDescription("????");
-        node.setType(NodeType.worker);
+        node.setType(NodeType.WORKER);
         node.setUrl(workerConfiguration.get(WorkerConfiguration.WORKER_BASE_URL_KEY));
         Set<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_PROFILES_KEY).split(","))
                 .map(String::trim)

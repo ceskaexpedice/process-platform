@@ -30,6 +30,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * PluginMapper
+ * @author ppodsednik
+ */
 public class PluginMapper {
 
     private static final ObjectMapper mapper = new ObjectMapper();

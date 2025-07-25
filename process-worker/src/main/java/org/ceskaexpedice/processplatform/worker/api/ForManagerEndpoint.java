@@ -69,7 +69,7 @@ public class ForManagerEndpoint {
     @POST
     @Path("/kill")
     public Response killJVM() {
-        // TODO
+        // TODO check if we need this function - manager wants to kill plugins JVM
         return Response.ok().build();
     }
 }

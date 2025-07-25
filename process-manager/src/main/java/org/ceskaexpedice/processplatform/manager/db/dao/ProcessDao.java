@@ -33,6 +33,10 @@ import java.sql.*;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * ProcessDao
+ * @author ppodsednik
+ */
 public class ProcessDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(ProcessDao.class.getName());

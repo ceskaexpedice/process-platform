@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * TestWorkerEndpoint
+ * TestForWorkerEndpoint
  *
  * @author ppodsednik
  */

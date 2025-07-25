@@ -50,7 +50,7 @@ public class PluginService {
     }
 
     public PluginInfo getPlugin(String pluginId) {
-        // TODO get all scheduled processes hierarchically
+        // TODO get all scheduled profiles hierarchically - pluginInfo.scheduledProfiles
         PluginEntity pluginEntity = pluginDao.getPlugin(pluginId);
         PluginInfo pluginInfo = PluginServiceMapper.mapPlugin(pluginEntity);
         if (pluginInfo == null) {
@@ -80,6 +80,7 @@ public class PluginService {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
+        // TODO check if it is ok that no update of plugin info including profiles are allowed here
         PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
         if (pluginExisting != null) {
             LOGGER.info("Plugin with id " + pluginInfo.getPluginId() + " already registered");

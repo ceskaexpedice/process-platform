@@ -36,6 +36,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO check proper logging everywhere
+// TODO all Tomcat and Jersey like wiring
+// TODO add openapi swagger
+// TODO implement properly build plugins process via Gradle
+// TODO check all Tomcat config - like web.xml
 public class ManagerStartupListener implements ServletContextListener {
 
     public static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());

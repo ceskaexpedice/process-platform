@@ -85,10 +85,10 @@ public class WorkerClient {
             } else if(code == 404){
                 return null;
             } else {
-                throw new RemoteNodeException("Failed to get process log", NodeType.worker, statusCode);
+                throw new RemoteNodeException("Failed to get process log", NodeType.WORKER, statusCode);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 

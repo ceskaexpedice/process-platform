@@ -79,10 +79,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
-                throw new RemoteNodeException("Failed to register node", NodeType.manager, statusCode);
+                throw new RemoteNodeException("Failed to register node", NodeType.MANAGER, statusCode);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -98,10 +98,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
-                throw new RemoteNodeException("Failed to register plugin", NodeType.manager, statusCode);
+                throw new RemoteNodeException("Failed to register plugin", NodeType.MANAGER, statusCode);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -126,10 +126,10 @@ public class ManagerClient {
             } else if(code == 404){
                 return null;
             } else {
-                throw new RemoteNodeException("Failed to get next scheduled process", NodeType.manager, statusCode);
+                throw new RemoteNodeException("Failed to get next scheduled process", NodeType.MANAGER, statusCode);
             }
         } catch (IOException | ParseException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -144,10 +144,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
-                throw new RemoteNodeException("Failed to schedule sub process", NodeType.manager, statusCode);
+                throw new RemoteNodeException("Failed to schedule sub process", NodeType.MANAGER, statusCode);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -159,10 +159,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RemoteNodeException("Failed to update PID", NodeType.manager, statusCode, null);
+                throw new RemoteNodeException("Failed to update PID", NodeType.MANAGER, statusCode, null);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -174,10 +174,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RemoteNodeException("Failed to update name", NodeType.manager, statusCode, null);
+                throw new RemoteNodeException("Failed to update name", NodeType.MANAGER, statusCode, null);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 
@@ -189,10 +189,10 @@ public class ManagerClient {
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
-                throw new RemoteNodeException("Failed to update state", NodeType.manager, statusCode, null);
+                throw new RemoteNodeException("Failed to update state", NodeType.MANAGER, statusCode, null);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.manager, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         }
     }
 

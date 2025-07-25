@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker.config;
 
 import java.io.File;
 
+// TODO check if this class is necessary
 public class EffectiveWorkerConfiguration {
 
     private static final String TOMCAT_HOME = System.getProperty("catalina.home");

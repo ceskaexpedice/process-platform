@@ -23,6 +23,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * NodeMapper
+ * @author ppodsednik
+ */
 public class NodeMapper {
 
     public static void mapNode(PreparedStatement stmt, NodeEntity nodeEntity, Connection conn) throws SQLException {
