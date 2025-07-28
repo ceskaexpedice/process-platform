@@ -17,6 +17,7 @@ package org.ceskaexpedice.processplatform.manager.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.glassfish.jersey.server.ResourceConfig;

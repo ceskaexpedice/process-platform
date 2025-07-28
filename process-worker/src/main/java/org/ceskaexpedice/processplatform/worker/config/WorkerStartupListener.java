@@ -18,13 +18,17 @@ package org.ceskaexpedice.processplatform.worker.config;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
+import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.CONFIG_FILE;
 
 /**
  * WorkerStartupListener
@@ -36,11 +40,13 @@ import java.util.Properties;
 // TODO implement properly build plugins process via Gradle
 // TODO check all Tomcat config - like web.xml
 public class WorkerStartupListener implements ServletContextListener {
+    private static ServletContext ctx;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        this.ctx = sce.getServletContext();
         Properties fileProps = new Properties();
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream("worker.properties")) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in != null) {
                 fileProps.load(in);
             }
@@ -48,28 +54,27 @@ public class WorkerStartupListener implements ServletContextListener {
             throw new ApplicationException("Error loading properties file", e);
         }
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
-        setStarterClasspath(sce, config);
+        setStarterClasspath(config);
+        ForManagerService forManagerService = new ForManagerService(config);
+        ctx.setAttribute(ForManagerService.class.getSimpleName(), forManagerService);
+
         WorkerMain workerMain = new WorkerMain();
         workerMain.initialize(config);
-        sce.getServletContext().setAttribute("workerMain", workerMain);
+        ctx.setAttribute(WorkerMain.class.getSimpleName(), workerMain);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        WorkerMain wm = (WorkerMain) sce.getServletContext().getAttribute("workerMain");
+        WorkerMain wm = (WorkerMain) sce.getServletContext().getAttribute(WorkerMain.class.getSimpleName());
         if (wm != null) {
             wm.shutdown();
         }
     }
 
-    private static void setStarterClasspath(ServletContextEvent sce, WorkerConfiguration config) {
-        String libPath = sce.getServletContext().getRealPath("/WEB-INF/lib");
+    private static void setStarterClasspath(WorkerConfiguration config) {
+        String libPath = ctx.getRealPath("/WEB-INF/lib");
         String starterClasspath = buildClasspath(libPath);
-        config.set("starter.classpath", starterClasspath);
-        String envClasspath = System.getenv("STARTER_CLASSPATH");
-        if (envClasspath != null) {
-            config.set("starter.classpath", envClasspath);
-        }
+        config.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
     }
 
     private static String buildClasspath(String libDir) {
@@ -85,6 +90,10 @@ public class WorkerStartupListener implements ServletContextListener {
             }
         }
         return classpath.toString();
+    }
+
+    static ServletContext getServletContext() {
+        return ctx;
     }
 
 }

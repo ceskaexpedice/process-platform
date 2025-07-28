@@ -30,6 +30,8 @@ import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJs
  * @author ppodsednik
  */
 public class WorkerConfiguration {
+    public static final String CONFIG_FILE = "worker.properties";
+
     public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
     public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
 

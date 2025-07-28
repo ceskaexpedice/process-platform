@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api;
-
-import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.RemoteNodeException;
+package org.ceskaexpedice.processplatform.common;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

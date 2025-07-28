@@ -18,9 +18,11 @@ package org.ceskaexpedice.processplatform.manager.config;
 
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
@@ -36,6 +38,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration.*;
+
 // TODO check proper logging everywhere
 // TODO all Tomcat and Jersey like wiring
 // TODO add openapi swagger
@@ -44,30 +48,47 @@ import java.util.logging.Logger;
 public class ManagerStartupListener implements ServletContextListener {
 
     public static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
+    private static ServletContext ctx;
+    private DbConnectionProvider dbProvider;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        this.ctx = sce.getServletContext();
         Properties props = new Properties();
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream("manager.properties")) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in != null) {
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Cannot load manager.properties", e);
+            throw new ApplicationException("Cannot load properties file", e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
-        DbConnectionProvider dbProvider = new DbConnectionProvider(config);
-        PluginService pluginService = new PluginService(config, dbProvider);
+        dbProvider = new DbConnectionProvider(config);
+
+        initServices(sce, config, dbProvider);
+        initDb(dbProvider);
+    }
+
+    private void initDb(DbConnectionProvider dbProvider) {
+        /* TODO implement table check
+        makeSureTableExists(dbProvider, NODE_TABLE);
+        makeSureTableExists(dbProvider, PROCESS_TABLE);
+        makeSureTableExists(dbProvider, PLUGIN_TABLE);
+        makeSureTableExists(dbProvider, PROFILE_TABLE);
+
+         */
+    }
+
+    private static void initServices(ServletContextEvent sce, ManagerConfiguration config, DbConnectionProvider dbProvider) {
         NodeService nodeService = new NodeService(config, dbProvider);
+        PluginService pluginService = new PluginService(config, dbProvider);
+        ProfileService profileService = new ProfileService(config, dbProvider);
         ProcessService processService = new ProcessService(config, dbProvider, pluginService, nodeService);
 
-        ServletContext ctx = sce.getServletContext();
-        ctx.setAttribute("pluginService", pluginService);
-        ctx.setAttribute("processService", processService);
-
-        makeSureTableExists(dbProvider, "pcp_profile");
-        makeSureTableExists(dbProvider, "pcp_process");
-        makeSureTableExists(dbProvider, "pcp_plugin");
+        ctx.setAttribute(NodeService.class.getSimpleName(), nodeService);
+        ctx.setAttribute(PluginService.class.getSimpleName(), pluginService);
+        ctx.setAttribute(ProfileService.class.getSimpleName(), profileService);
+        ctx.setAttribute(ProcessService.class.getSimpleName(), processService);
     }
 
     private void makeSureTableExists(DbConnectionProvider dbProvider, String tableName) {
@@ -82,15 +103,19 @@ public class ManagerStartupListener implements ServletContextListener {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage(), e);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.getMessage(), e);
         }
+    }
+
+    static ServletContext getServletContext() {
+        return ctx;
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // TODO dbProvider.close();
+        dbProvider.close();
     }
 }

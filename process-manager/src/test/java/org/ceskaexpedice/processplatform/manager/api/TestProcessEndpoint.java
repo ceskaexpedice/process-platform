@@ -16,12 +16,10 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;

@@ -8,11 +8,11 @@ VALUES ('testPlugin1',
         'org.ceskaexpedice.processplatform.testplugin1.TestPlugin1',
         '{
           "name": {
-            "type": "string",
+            "type": "STRING",
             "required": true
           },
           "surname": {
-            "type": "string",
+            "type": "STRING",
             "required": true
           }
         }'::jsonb,

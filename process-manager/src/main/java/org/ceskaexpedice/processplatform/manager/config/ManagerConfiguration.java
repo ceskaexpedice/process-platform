@@ -26,6 +26,13 @@ import java.util.Properties;
  * @author ppodsednik
  */
 public class ManagerConfiguration {
+    public static final String CONFIG_FILE = "manager.properties";
+
+    public static final String NODE_TABLE = "pcp_node";
+    public static final String PLUGIN_TABLE = "pcp_plugin";
+    public static final String PROFILE_TABLE = "pcp_profile";
+    public static final String PROCESS_TABLE = "pcp_process";
+
     public static final String JDBC_URL_KEY = "jdbcUrl";
     public static final String JDBC_USER_NAME_KEY = "jdbcUsername";
     public static final String JDBC_USER_PASSWORD_KEY = "jdbcPassword";
