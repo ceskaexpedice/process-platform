@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.config;
 
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
@@ -35,19 +35,18 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration.*;
 
-// TODO check proper logging everywhere
 // TODO all Tomcat and Jersey like wiring
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
 // TODO check all Tomcat config - like web.xml
+// TODO revisit manager.properties placement and pars name convention
 public class ManagerStartupListener implements ServletContextListener {
 
-    public static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
+    private static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
     private static ServletContext ctx;
     private DbConnectionProvider dbProvider;
 
@@ -57,10 +56,11 @@ public class ManagerStartupListener implements ServletContextListener {
         Properties props = new Properties();
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in != null) {
+                LOGGER.info("Load config file [" + CONFIG_FILE + "]");
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Cannot load properties file", e);
+            throw new TechnicalException("Cannot load properties file", e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
         dbProvider = new DbConnectionProvider(config);
@@ -70,6 +70,7 @@ public class ManagerStartupListener implements ServletContextListener {
     }
 
     private void initDb(DbConnectionProvider dbProvider) {
+        // TODO use different tables for test and run
         /* TODO implement table check
         makeSureTableExists(dbProvider, NODE_TABLE);
         makeSureTableExists(dbProvider, PROCESS_TABLE);
@@ -94,19 +95,18 @@ public class ManagerStartupListener implements ServletContextListener {
     private void makeSureTableExists(DbConnectionProvider dbProvider, String tableName) {
         try {
             Connection connection = dbProvider.get();
-            boolean pcpProfile = DbUtils.tableExists(connection, tableName);
-            if (!pcpProfile) {
+            boolean tableExists = DbUtils.tableExists(connection, tableName);
+            if (!tableExists) {
+                LOGGER.info("Creating table [" + tableName + "]");
                 JDBCUpdateTemplate updateTemplate = new JDBCUpdateTemplate(connection, true);
                 InputStream is = getClass().getClassLoader().getResourceAsStream(String.format("%s.sql", tableName));
                 String sql = IOUtils.toString(is, "UTF-8");
                 updateTemplate.executeUpdate(sql);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(), e);
             throw new DataAccessException(e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(), e);
-            throw new ApplicationException(e.getMessage(), e);
+            throw new TechnicalException(e.getMessage(), e);
         }
     }
 

@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -69,7 +69,7 @@ public final class Utils {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            throw new ApplicationException(e.toString(), e);
+            throw new TechnicalException(e.toString(), e);
         }
     }
 

@@ -36,8 +36,6 @@ import java.util.logging.Logger;
  */
 public class NodeDao extends AbstractDao{
 
-    private static final Logger LOGGER = Logger.getLogger(NodeDao.class.getName());
-
     public NodeDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         super(dbConnectionProvider, managerConfiguration);
     }

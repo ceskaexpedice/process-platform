@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ForWorkerEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(ForWorkerEndpoint.class.getName());
 
     private final PluginService pluginService;
     private final ProcessService processService;
@@ -51,14 +50,14 @@ public class ForWorkerEndpoint {
     @Path("/register_node")
     public Response registerNode(Node node) {
         nodeService.registerNode(node);
-        return APIRestUtilities.ok("Node %s registered", node.getNodeId());
+        return APIRestUtilities.ok("Node [%s] registered", node.getNodeId());
     }
 
     @POST
     @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
         pluginService.registerPlugin(pluginInfo);
-        return APIRestUtilities.ok("Plugin %s registered", pluginInfo.getPluginId());
+        return APIRestUtilities.ok("Plugin [%s] registered", pluginInfo.getPluginId());
     }
 
     @GET
@@ -68,7 +67,7 @@ public class ForWorkerEndpoint {
         if (scheduledProcess != null) {
             return Response.ok(scheduledProcess).build();
         } else {
-            return APIRestUtilities.notFound("No scheduled process found for %s", workerId);
+            return APIRestUtilities.notFound("No scheduled process found for [%s]", workerId);
         }
     }
 
@@ -76,28 +75,28 @@ public class ForWorkerEndpoint {
     @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         processService.scheduleSubProcess(scheduleSubProcess);
-        return APIRestUtilities.ok("Subprocess for profile %s scheduled", scheduleSubProcess.getProfileId());
+        return APIRestUtilities.ok("Subprocess for profile [%s] scheduled", scheduleSubProcess.getProfileId());
     }
 
     @PUT
     @Path("/pid/{processId}")
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") int pid) {
         processService.updatePid(processId, pid);
-        return APIRestUtilities.ok("Process pid %s used for the process %s", pid, processId);
+        return APIRestUtilities.ok("Process pid [%s] used for the process [%s]", pid, processId);
     }
 
     @PUT
     @Path("/state/{processId}")
     public Response updateProcessState(@PathParam("processId") String processId, @QueryParam("state") ProcessState state) {
         processService.updateState(processId, state);
-        return APIRestUtilities.ok("Process state %s used for the process %s", state, processId);
+        return APIRestUtilities.ok("Process state [%s] used for the process [%s]", state, processId);
     }
 
     @PUT
     @Path("/description/{processId}")
     public Response updateProcessDescription(@PathParam("processId") String processId, @QueryParam("description") String description) {
         processService.updateDescription(processId, description);
-        return APIRestUtilities.ok("Process description %s used for the process %s", description, processId);
+        return APIRestUtilities.ok("Process description [%s] used for the process [%s]", description, processId);
     }
 
 }

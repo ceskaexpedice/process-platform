@@ -22,6 +22,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 /**
  * WorkerClientFactory
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class WorkerClientFactory {
 
+    private static final Logger LOGGER = Logger.getLogger(WorkerClientFactory.class.getName());
     private static final AtomicReference<WorkerClient> INSTANCE = new AtomicReference<>();
 
     private WorkerClientFactory() {
@@ -37,6 +39,7 @@ public final class WorkerClientFactory {
     public static WorkerClient createWorkerClient(ProcessService processService, NodeService nodeService) {
         return INSTANCE.updateAndGet(existingInstance -> {
             if (existingInstance == null) {
+                LOGGER.info("Creating new WorkerClient");
                 WorkerClient workerClient = new WorkerClient(processService, nodeService);
                 return workerClient;
             }

@@ -17,8 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
@@ -31,16 +30,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * PluginDao
  * @author ppodsednik
  */
 public class PluginDao extends AbstractDao{
-
-    private static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public PluginDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         super(dbConnectionProvider,managerConfiguration);
@@ -85,7 +80,7 @@ public class PluginDao extends AbstractDao{
                 PluginMapper.mapPlugin(stmt, plugin, connection);
                 stmt.executeUpdate();
             } catch (JsonProcessingException e) {
-                throw new ApplicationException(e.toString(), e);
+                throw new TechnicalException(e.toString(), e);
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

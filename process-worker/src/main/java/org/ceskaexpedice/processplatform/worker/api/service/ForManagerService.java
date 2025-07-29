@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api.service;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class ForManagerService {
             File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
             return new FileInputStream(standardStreamFile);
         } catch (FileNotFoundException e) {
-            throw new ApplicationException("Could not find process log file for process with id " + processId, e);
+            throw new TechnicalException("Could not find process log file for process with id " + processId, e);
         }
     }
 

@@ -81,9 +81,10 @@ public class PluginService {
 
     public void registerPlugin(PluginInfo pluginInfo) {
         // TODO check if it is ok that no update of plugin info including profiles are allowed here
+        LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));
         PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
         if (pluginExisting != null) {
-            LOGGER.info("Plugin with id " + pluginInfo.getPluginId() + " already registered");
+            LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] already registered");
             return;
         }
         pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));

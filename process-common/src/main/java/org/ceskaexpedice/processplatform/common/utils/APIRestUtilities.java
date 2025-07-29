@@ -25,7 +25,6 @@ import java.util.logging.Logger;
  * @author ppodsednik
  */
 public final class APIRestUtilities {
-    private static final Logger LOGGER = Logger.getLogger(APIRestUtilities.class.getName());
 
     private APIRestUtilities() {
     }

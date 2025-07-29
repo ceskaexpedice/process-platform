@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.api.PluginSpi;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
@@ -38,14 +38,14 @@ public final class PluginsLoader {
     public static URLClassLoader createPluginClassLoader(File pluginDir) {
         File[] jars = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jars == null || jars.length == 0) {
-            throw new ApplicationException("No JAR files found in: " + pluginDir.getAbsolutePath());
+            throw new IllegalStateException("No JAR files found in: " + pluginDir.getAbsolutePath());
         }
         URL[] urls = new URL[jars.length];
         for (int i = 0; i < jars.length; i++) {
             try {
                 urls[i] = jars[i].toURI().toURL();
             } catch (MalformedURLException e) {
-                throw new ApplicationException("Error loading JAR file: " + jars[i].getAbsolutePath(), e);
+                throw new TechnicalException("Error loading JAR file: " + jars[i].getAbsolutePath(), e);
             }
         }
         return new URLClassLoader(urls, PluginsLoader.class.getClassLoader());
@@ -54,7 +54,7 @@ public final class PluginsLoader {
     public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
         File pluginDir = new File(pluginsDir, pluginId);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
-            throw new ApplicationException("Plugin directory not found: " + pluginDir.getAbsolutePath());
+            throw new TechnicalException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
         return createPluginClassLoader(pluginDir);
     }
@@ -70,7 +70,7 @@ public final class PluginsLoader {
             ServiceLoader<PluginSpi> loader = ServiceLoader.load(PluginSpi.class, pluginClassLoader);
             for (PluginSpi plugin : loader) {
                 File pluginJar = getPluginJar(plugin);
-                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, pluginDir);
+                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar);
                 result.add(pluginInfo);
             }
         }
@@ -85,16 +85,16 @@ public final class PluginsLoader {
             try {
                 uri = codeSource.getLocation().toURI();
             } catch (URISyntaxException e) {
-                throw new ApplicationException(e.toString(), e);
+                throw new TechnicalException(e.toString(), e);
             }
             pluginJar = new File(uri);
         } else {
-            throw new ApplicationException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
+            throw new TechnicalException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
         }
         return pluginJar;
     }
 
-    private static PluginInfo resolvePlugin(PluginSpi plugin, File pluginJar, File pluginDir) {
+    private static PluginInfo resolvePlugin(PluginSpi plugin, File pluginJar) {
         String pluginId = plugin.getPluginId();
         String description = plugin.getDescription();
         String mainClass = plugin.getMainClass();

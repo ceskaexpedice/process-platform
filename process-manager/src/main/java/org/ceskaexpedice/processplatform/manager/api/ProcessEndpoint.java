@@ -51,7 +51,7 @@ public class ProcessEndpoint {
     @POST
     public Response scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
         processService.scheduleMainProcess(scheduleMainProcess);
-        return APIRestUtilities.ok("Main process for profile %s scheduled", scheduleMainProcess.getProfileId());
+        return APIRestUtilities.ok("Main process for profile [%s] scheduled", scheduleMainProcess.getProfileId());
     }
 
     @GET
@@ -60,7 +60,7 @@ public class ProcessEndpoint {
     public Response getProcess(@PathParam("processId") String processId) {
         ProcessInfo process = processService.getProcess(processId);
         if (process == null) {
-            return APIRestUtilities.notFound("Process not found: %s", processId);
+            return APIRestUtilities.notFound("Process not found: [%s]", processId);
         }
         return Response.ok(process).build();
     }

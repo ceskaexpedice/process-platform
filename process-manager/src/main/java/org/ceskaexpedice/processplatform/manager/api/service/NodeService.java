@@ -43,9 +43,10 @@ public class NodeService {
 
     public void registerNode(Node node) {
         // TODO is it ok to just register new node? what about updating node info like url?
+        LOGGER.info(String.format("Register node [%s]", node.getNodeId()));
         Node nodeExisting = getNode(node.getNodeId());
         if (nodeExisting != null) {
-            LOGGER.info("Node with id " + node.getNodeId() + " already registered");
+            LOGGER.info("Node [" + node.getNodeId() + "] already registered");
             return;
         }
         nodeDao.createNode(NodeServiceMapper.mapNode(node));

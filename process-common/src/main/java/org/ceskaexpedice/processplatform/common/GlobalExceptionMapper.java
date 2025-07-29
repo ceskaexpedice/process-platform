@@ -51,15 +51,14 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             LOGGER.log(Level.SEVERE, String.format("Remote agent call error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
-        if (e instanceof ApplicationException) {
+        if (e instanceof TechnicalException) {
             LOGGER.log(Level.SEVERE, String.format("Application error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
 
         // Default fallback — unexpected error
         LOGGER.log(Level.SEVERE, String.format("Unexpected error [%s]: %s", id, e.getMessage()), e);
-        return buildResponse(Response.Status.INTERNAL_SERVER_ERROR,
-                "Unexpected error, contact support – id " + id);
+        return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, "Unexpected error, contact support – id " + id);
     }
 
     private String prepareMsg(Throwable e, UUID id) {

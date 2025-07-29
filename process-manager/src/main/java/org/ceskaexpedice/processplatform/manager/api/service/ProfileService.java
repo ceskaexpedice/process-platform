@@ -54,6 +54,7 @@ public class ProfileService {
     }
 
     public void updateJvmArgs(String profileId, List<String> jvmArgs) {
+        LOGGER.info(String.format("update jvm args: profileId,jvmArgs [%s, %s]", profileId, jvmArgs));
         profileDao.updateJvmArgs(profileId, jvmArgs);
     }
 

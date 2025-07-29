@@ -45,7 +45,7 @@ public class NodeEndpoint {
     public Response getNode(@PathParam("nodeId") String nodeId) {
         Node node = nodeService.getNode(nodeId);
         if (node == null) {
-            return APIRestUtilities.notFound("Node not found: %s", nodeId);
+            return APIRestUtilities.notFound("Node not found: [%s]", nodeId);
         }
         return Response.ok(node).build();
     }

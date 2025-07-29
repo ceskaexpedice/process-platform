@@ -17,13 +17,14 @@
 package org.ceskaexpedice.processplatform.worker;
 
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.executor.PluginJvmLauncher;
 
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,24 +48,38 @@ class WorkerLoop {
             while (running) {
                 try {
                     Optional<ScheduledProcess> taskOpt = pollManagerForTask();
+
                     if (taskOpt.isPresent()) {
                         ScheduledProcess scheduledProcess = taskOpt.get();
-                        int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
-                        if (exitCode != 0) {
-                            throw new ApplicationException("Failed to launch JVM");
+
+                        try {
+                            int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
+                            if (exitCode != 0) {
+                                throw new TechnicalException("Failed to launch JVM, exit code: " + exitCode);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.severe("Error during task execution: " + e.getMessage());
+                            // Optionally: retry, skip, or escalate
                         }
+
                     } else {
                         int sleepSec = Integer.parseInt(workerConfiguration.get(WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY));
                         LOGGER.info("No process from the manager. Sleeping " + sleepSec + " seconds...");
-                        Thread.sleep(sleepSec * 1000);
+                        Thread.sleep(sleepSec * 1000L);
                     }
+
                 } catch (InterruptedException e) {
+                    LOGGER.info("Worker thread interrupted, stopping...");
                     Thread.currentThread().interrupt();
                     break;
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Unexpected error in polling loop", e);
+                    stop();
                 }
             }
             LOGGER.info("Worker loop exited.");
         }, "WorkerPollingThread");
+
         pollingThread.setDaemon(true);
         pollingThread.start();
     }

@@ -29,8 +29,6 @@ import java.util.Arrays;
  */
 public class ProfileMapper {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     public static void mapPluginProfile(PreparedStatement stmt, PluginProfileEntity profile, Connection conn) throws SQLException {
         stmt.setString(1, profile.getProfileId());
         stmt.setString(2, profile.getPluginId());

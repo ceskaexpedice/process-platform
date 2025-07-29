@@ -18,7 +18,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
@@ -75,7 +75,6 @@ public class PluginStarter implements PluginContext {
             System.setOut(outStream);
             setDefaultLoggingIfNecessary();
             LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
-            LOGGER.info("STARTING PROCESS WITH FILE ENCODING:"+System.getProperty("file.encoding"));
 
             PluginContext pluginContext = PluginContextFactory.createPluginContext(workerConfig, processConfig);
             PluginContextHolder.setContext(pluginContext);
@@ -171,7 +170,7 @@ public class PluginStarter implements PluginContext {
             Class<?> clz = loader.loadClass(mainClass);
             ReflectionUtils.MethodType processMethod = annotatedMethodType(clz);
             if (processMethod == null) {
-                throw new ApplicationException("Could not find process method for class: " + mainClass);
+                throw new TechnicalException("Could not find process method for class: " + mainClass);
             }
             String[] pluginArgs = {}; // TODO remove support for non annotated methods
             if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {

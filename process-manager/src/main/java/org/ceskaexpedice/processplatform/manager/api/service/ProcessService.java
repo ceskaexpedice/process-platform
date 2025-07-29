@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
@@ -32,20 +31,20 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * ProcessService
  * @author ppodsednik
  */
 public class ProcessService {
+    private static final Logger LOGGER = Logger.getLogger(ProcessService.class.getName());
+
     private final ManagerConfiguration managerConfiguration;
     private final ProcessDao processDao;
     private final NodeDao nodeDao;
@@ -65,6 +64,7 @@ public class ProcessService {
     }
 
     public String scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
+        LOGGER.info(String.format("schedule main process for the profile [%s]", scheduleMainProcess.getProfileId()));
         validatePayload(scheduleMainProcess);
         String newProcessId = UUID.randomUUID().toString();
         String newBatchId = newProcessId;
@@ -81,13 +81,14 @@ public class ProcessService {
     }
 
     public String scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
+        LOGGER.info(String.format("schedule sub process for the profile [%s]", scheduleSubProcess.getProfileId()));
         validatePayload(scheduleSubProcess);
         if(scheduleSubProcess.getBatchId() == null){
             throw new BusinessLogicException("Batch id cannot be null for subprocess");
         }
         ProcessEntity processMain = processDao.getProcess(scheduleSubProcess.getBatchId());
         if(processMain == null){
-            throw new BusinessLogicException("Process with id " + scheduleSubProcess.getBatchId() + " (sub process batch id) does not exist");
+            throw new BusinessLogicException("Not found based on sub process batch id. Process [" + scheduleSubProcess.getBatchId() + "] does not exist");
         }
         String newProcessId = UUID.randomUUID().toString();
         String ownerId = processMain.getOwner();
@@ -132,14 +133,17 @@ public class ProcessService {
     }
 
     public void updatePid(String processId, int pid) {
+        LOGGER.info(String.format("update pid: processId, pid [%s, %s]", processId, pid));
         processDao.updatePid(processId, pid);
     }
 
     public void updateState(String processId, ProcessState processState) {
+        LOGGER.info(String.format("update state: processId, process state [%s, %s]", processId, processState));
         processDao.updateState(processId, processState);
     }
 
     public void updateDescription(String processId, String description) {
+        LOGGER.info(String.format("update description: processId, description [%s, %s]", processId, description));
         processDao.updateDescription(processId, description);
     }
 

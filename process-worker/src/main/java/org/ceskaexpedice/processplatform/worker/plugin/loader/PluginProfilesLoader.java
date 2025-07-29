@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 
 import java.io.File;
@@ -57,7 +57,7 @@ final class PluginProfilesLoader {
                 }
             }
         } catch (IOException e) {
-            throw new ApplicationException(e.toString(), e);
+            throw new TechnicalException(e.toString(), e);
         }
     }
 

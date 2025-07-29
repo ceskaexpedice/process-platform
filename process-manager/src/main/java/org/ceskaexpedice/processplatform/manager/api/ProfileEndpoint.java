@@ -45,7 +45,7 @@ public class ProfileEndpoint {
     public Response getProfile(@PathParam("profileId") String profileId) {
         PluginProfile profile = profileService.getProfile(profileId);
         if (profile == null) {
-            return APIRestUtilities.notFound("Profile not found: %s", profileId);
+            return APIRestUtilities.notFound("Profile not found: [%s]", profileId);
         }
         return Response.ok(profile).build();
     }
@@ -60,7 +60,7 @@ public class ProfileEndpoint {
     @Path("/{profileId}")
     public Response updateProfile(@PathParam("profileId") String profileId, PluginProfile profile) {
         profileService.updateJvmArgs(profileId, profile.getJvmArgs());
-        return APIRestUtilities.ok("Profile %s updated", profileId);
+        return APIRestUtilities.ok("Profile [%s] updated", profileId);
     }
 
 }

@@ -52,18 +52,19 @@ public final class PluginJvmLauncher {
     public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
             // TODO check if the old createCommand is to be deleted: List<String> command = createCommand(scheduledProcess, workerConfiguration);
+            LOGGER.info(String.format("Launching JVM for the process [%s]", scheduledProcess.getProcessId()));
             List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));
             Process processR = pb.start();
-            int val = processR.waitFor();
-            if (val != 0) {
+            int exitVal = processR.waitFor();
+            if (exitVal != 0) {
                 InputStream errorStream = processR.getErrorStream();
                 String s = IOUtils.toString(errorStream, "UTF-8");
                 LOGGER.info(s);
             }
-            LOGGER.info(String.format("Return value of the exiting process %s:%d'", scheduledProcess.getProcessId(), val));
-            return val;
+            LOGGER.info(String.format("Return value of the exiting process [%s]:%d'", scheduledProcess.getProcessId(), exitVal));
+            return exitVal;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             return -1;

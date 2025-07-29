@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 
@@ -34,11 +34,11 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  * WorkerStartupListener
  * @author ppodsednik
  */
-// TODO check proper logging everywhere
 // TODO all Tomcat and Jersey like wiring
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
 // TODO check all Tomcat config - like web.xml
+// TODO revisit manager.properties placement and pars name convention
 public class WorkerStartupListener implements ServletContextListener {
     private static ServletContext ctx;
 
@@ -51,7 +51,7 @@ public class WorkerStartupListener implements ServletContextListener {
                 fileProps.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Error loading properties file", e);
+            throw new TechnicalException("Error loading properties file", e);
         }
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
         setStarterClasspath(config);

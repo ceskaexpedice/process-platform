@@ -17,30 +17,23 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
-import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProfileMapper;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * ProcessDao
  * @author ppodsednik
  */
 public class ProcessDao extends AbstractDao{
-
-    private static final Logger LOGGER = Logger.getLogger(ProcessDao.class.getName());
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public ProcessDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         super(dbConnectionProvider,managerConfiguration);
@@ -113,7 +106,7 @@ public class ProcessDao extends AbstractDao{
                 ProcessMapper.mapProcess(insertStatement, processEntity);
                 insertStatement.executeUpdate();
             } catch (JsonProcessingException e) {
-                throw new ApplicationException(e.toString(), e);
+                throw new TechnicalException(e.toString(), e);
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

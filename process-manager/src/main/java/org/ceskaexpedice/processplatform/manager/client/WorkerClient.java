@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -25,7 +24,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
@@ -73,10 +72,11 @@ public class WorkerClient {
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
-            throw new ApplicationException(e.toString(), e);
+            throw new TechnicalException(e.toString(), e);
         }
         int statusCode = -1;
         try {
+            LOGGER.info(String.format("Getting process log for processId: [%s]; url: [%s] ", processId, get.getUri().toString()));
             CloseableHttpResponse response = closeableHttpClient.execute(get);
             int code = response.getCode();
             if (code == 200) {
@@ -89,16 +89,8 @@ public class WorkerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
-        }
-    }
-
-    private String mapToJson(Object to){
-        String json;
-        try {
-            json = mapper.writeValueAsString(to);
-            return json;
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException(e.toString(), e);
+        } catch (URISyntaxException e) {
+            throw new TechnicalException(e.toString(), e);
         }
     }
 

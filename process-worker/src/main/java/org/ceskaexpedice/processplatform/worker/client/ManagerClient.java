@@ -32,7 +32,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
@@ -113,7 +113,7 @@ public class ManagerClient {
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
-            throw new ApplicationException(e.toString(), e);
+            throw new TechnicalException(e.toString(), e);
         }
         int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
@@ -153,6 +153,7 @@ public class ManagerClient {
 
     public void updateProcessPid(String processId, String pid) {
         String url = String.format("%sworker/pid/%s?pid=%s", getManagerBaseUrl(), processId, pid);
+        LOGGER.info(String.format("Update process pid at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;
@@ -168,6 +169,7 @@ public class ManagerClient {
 
     public void updateProcessDescription(String processId, String description) {
         String url = String.format("%sworker/description/%s?description=%s", getManagerBaseUrl(), processId, description);
+        LOGGER.info(String.format("Update process description at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;
@@ -183,6 +185,7 @@ public class ManagerClient {
 
     public void updateProcessState(String processId, ProcessState state) {
         String url = String.format("%sworker/state/%s?state=%s", getManagerBaseUrl(), processId, state);
+        LOGGER.info(String.format("Update process state at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;
@@ -202,7 +205,7 @@ public class ManagerClient {
             json = mapper.writeValueAsString(to);
             return json;
         } catch (JsonProcessingException e) {
-            throw new ApplicationException(e.toString(), e);
+            throw new TechnicalException(e.toString(), e);
         }
     }
 

@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.TechnicalException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
@@ -60,13 +60,14 @@ public class WorkerMain {
 
     private List<PluginInfo> scanPlugins() {
         File pluginsDir = new EffectiveWorkerConfiguration(workerConfiguration).getPluginDirectory();
-        LOGGER.info(String.format("Plugin folder is %s", pluginsDir));
+        LOGGER.info(String.format("Plugin folder is [%s]", pluginsDir));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
     private void registerNode() {
         // TODO check how to properly get all information for node register - from config?
+        LOGGER.info(String.format("Register node [%s]", workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY)));
         Node node = new Node();
         node.setNodeId(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
         node.setDescription("????");
@@ -81,9 +82,10 @@ public class WorkerMain {
     }
 
     private void registerPlugins() {
+        LOGGER.info("Register plugins");
         List<PluginInfo> pluginsList = scanPlugins();
         if (pluginsList.isEmpty()) {
-            throw new ApplicationException("No plugins found");
+            throw new TechnicalException("No plugins found");
         }
         for (PluginInfo pluginInfo : pluginsList) {
             LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());
