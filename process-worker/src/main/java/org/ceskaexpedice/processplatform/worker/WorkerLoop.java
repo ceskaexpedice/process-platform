@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker;
 
 
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -55,7 +55,7 @@ class WorkerLoop {
                         try {
                             int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
                             if (exitCode != 0) {
-                                throw new TechnicalException("Failed to launch JVM, exit code: " + exitCode);
+                                throw new ApplicationException("Failed to launch JVM, exit code: " + exitCode);
                             }
                         } catch (Exception e) {
                             LOGGER.severe("Error during task execution: " + e.getMessage());

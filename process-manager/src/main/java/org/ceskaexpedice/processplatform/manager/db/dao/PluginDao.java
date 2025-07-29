@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
@@ -80,7 +80,7 @@ public class PluginDao extends AbstractDao{
                 PluginMapper.mapPlugin(stmt, plugin, connection);
                 stmt.executeUpdate();
             } catch (JsonProcessingException e) {
-                throw new TechnicalException(e.toString(), e);
+                throw new ApplicationException(e.toString(), e);
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

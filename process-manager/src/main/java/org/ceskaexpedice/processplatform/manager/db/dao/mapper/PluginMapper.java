@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
@@ -75,7 +75,7 @@ public class PluginMapper {
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         } catch (JsonProcessingException e) {
-            throw new TechnicalException(e.toString(), e);
+            throw new ApplicationException(e.toString(), e);
         }
     }
 

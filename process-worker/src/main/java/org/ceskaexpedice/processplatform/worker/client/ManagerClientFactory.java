@@ -29,7 +29,6 @@ public final class ManagerClientFactory {
     }
 
     public static ManagerClient createManagerClient(WorkerConfiguration configuration) {
-        // TODO do something more fancy here ?
         ManagerClient managerClient = new ManagerClient(configuration);
         return managerClient;
     }

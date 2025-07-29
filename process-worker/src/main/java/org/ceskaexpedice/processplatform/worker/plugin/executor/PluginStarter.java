@@ -18,7 +18,7 @@ package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.WarningException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
@@ -128,13 +128,7 @@ public class PluginStarter implements PluginContext {
                 }
             }
         } finally {
-            // TODO check what is to be done in finally
-            /*
-            String uuid = System.getProperty(ProcessStarter.UUID_KEY);
-            String closeTokenFlag = System.getProperty(AUTOMATIC_CLOSE_TOKEN, "true");
-            if (closeTokenFlag != null && closeTokenFlag.trim().toLowerCase().equals("true")) {
-                ProcessUtils.closeToken(uuid);
-            }*/
+            // nothing yet
         }
     }
 
@@ -170,7 +164,7 @@ public class PluginStarter implements PluginContext {
             Class<?> clz = loader.loadClass(mainClass);
             ReflectionUtils.MethodType processMethod = annotatedMethodType(clz);
             if (processMethod == null) {
-                throw new TechnicalException("Could not find process method for class: " + mainClass);
+                throw new ApplicationException("Could not find process method for class: " + mainClass);
             }
             String[] pluginArgs = {}; // TODO remove support for non annotated methods
             if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {

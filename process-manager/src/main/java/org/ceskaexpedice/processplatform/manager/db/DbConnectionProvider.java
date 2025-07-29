@@ -1,7 +1,7 @@
 package org.ceskaexpedice.processplatform.manager.db;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
 import javax.sql.DataSource;
@@ -52,7 +52,7 @@ public class DbConnectionProvider {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             return connection;
         } catch (Exception e) {
-            throw new TechnicalException("Cannot get database connection from the pool.", e);
+            throw new ApplicationException("Cannot get database connection from the pool.", e);
         }
     }
 

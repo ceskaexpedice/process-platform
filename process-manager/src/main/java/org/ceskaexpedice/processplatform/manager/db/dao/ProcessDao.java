@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -106,7 +106,7 @@ public class ProcessDao extends AbstractDao{
                 ProcessMapper.mapProcess(insertStatement, processEntity);
                 insertStatement.executeUpdate();
             } catch (JsonProcessingException e) {
-                throw new TechnicalException(e.toString(), e);
+                throw new ApplicationException(e.toString(), e);
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

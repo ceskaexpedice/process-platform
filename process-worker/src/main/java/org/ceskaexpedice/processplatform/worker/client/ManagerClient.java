@@ -32,7 +32,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
@@ -113,7 +113,7 @@ public class ManagerClient {
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
-            throw new TechnicalException(e.toString(), e);
+            throw new ApplicationException(e.toString(), e);
         }
         int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
@@ -205,7 +205,7 @@ public class ManagerClient {
             json = mapper.writeValueAsString(to);
             return json;
         } catch (JsonProcessingException e) {
-            throw new TechnicalException(e.toString(), e);
+            throw new ApplicationException(e.toString(), e);
         }
     }
 

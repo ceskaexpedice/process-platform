@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
@@ -85,7 +85,7 @@ public class WorkerMain {
         LOGGER.info("Register plugins");
         List<PluginInfo> pluginsList = scanPlugins();
         if (pluginsList.isEmpty()) {
-            throw new TechnicalException("No plugins found");
+            throw new ApplicationException("No plugins found");
         }
         for (PluginInfo pluginInfo : pluginsList) {
             LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());

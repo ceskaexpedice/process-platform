@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.config;
 
 import org.apache.commons.io.IOUtils;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
@@ -39,10 +39,9 @@ import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration.*;
 
-// TODO all Tomcat and Jersey like wiring
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
-// TODO check all Tomcat config - like web.xml
+// TODO check all Tomcat config - like web.xml - include it to the build
 // TODO revisit manager.properties placement and pars name convention
 public class ManagerStartupListener implements ServletContextListener {
 
@@ -60,7 +59,7 @@ public class ManagerStartupListener implements ServletContextListener {
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new TechnicalException("Cannot load properties file", e);
+            throw new ApplicationException("Cannot load properties file", e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
         dbProvider = new DbConnectionProvider(config);
@@ -106,7 +105,7 @@ public class ManagerStartupListener implements ServletContextListener {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new TechnicalException(e.getMessage(), e);
+            throw new ApplicationException(e.getMessage(), e);
         }
     }
 

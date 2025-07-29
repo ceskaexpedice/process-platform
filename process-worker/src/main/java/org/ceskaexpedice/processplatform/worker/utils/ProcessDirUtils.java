@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils;
 
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +39,7 @@ public final class ProcessDirUtils {
         if (!processWorkingDir.exists()) {
             boolean mkdirs = processWorkingDir.mkdirs();
             if (!mkdirs){
-                throw new TechnicalException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
+                throw new ApplicationException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
             }
         }
         return processWorkingDir;
@@ -62,7 +62,7 @@ public final class ProcessDirUtils {
         if (!fldr.exists()) {
             boolean mkdirs = fldr.mkdirs();
             if (!mkdirs){
-                throw new TechnicalException("cannot create directory '" + fldr.getAbsolutePath() + "'");
+                throw new ApplicationException("cannot create directory '" + fldr.getAbsolutePath() + "'");
             }
         }
         return fldr;

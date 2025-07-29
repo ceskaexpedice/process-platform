@@ -20,14 +20,32 @@ package org.ceskaexpedice.processplatform.api.context;
 import org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess;
 
 /**
- * PluginContext
+ * Provides context access for Java plugins to communicate with the Process Platform.
+ * <p>
+ * This interface is implemented by the framework and passed to plugins at runtime.
+ * Plugins can use it to report updates or request actions such as scheduling subprocesses.
  * @author ppodsednik
  */
-// TODO add javadoc
 public interface PluginContext {
 
+    /**
+     * Updates the name of the currently running process.
+     * <p>
+     * This method allows the plugin to change the process name that is visible
+     * in logs, monitoring tools, or the user interface.
+     *
+     * @param name the new name of the process
+     */
     void updateProcessName(String name);
 
+    /**
+     * Requests the framework to schedule a new subprocess.
+     * <p>
+     * The provided {@link ScheduleSubProcess} object defines the details
+     * of the subprocess to be executed. The framework is responsible for
+     * handling the scheduling and execution.
+     *
+     * @param scheduleSubProcess an object containing the configuration of the subprocess
+     */
     void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess);
-
 }

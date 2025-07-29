@@ -20,13 +20,13 @@ package org.ceskaexpedice.processplatform.common;
  * TechnicalException
  * @author ppodsednik
  */
-public class TechnicalException extends RuntimeException {
+public class ApplicationException extends RuntimeException {
 
-    public TechnicalException(String message, Throwable cause) {
+    public ApplicationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public TechnicalException(String message) {
+    public ApplicationException(String message) {
         super(message);
     }
 

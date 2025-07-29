@@ -31,7 +31,6 @@ public final class PluginContextFactory {
     }
 
     public static PluginContext createPluginContext(WorkerConfiguration configuration, ProcessConfiguration processConfiguration) {
-        // TODO do something more fancy here ??
         PluginStarter pluginStarter = new PluginStarter(configuration, processConfiguration);
         return pluginStarter;
     }

@@ -18,7 +18,6 @@ package org.ceskaexpedice.processplatform.common;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,8 +26,6 @@ import java.util.logging.Logger;
  * GlobalExceptionMapper
  * @author petrp
  */
-@Provider
-// TODO is it wired automatically via annotation???
 public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalExceptionMapper.class.getName());
@@ -51,7 +48,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             LOGGER.log(Level.SEVERE, String.format("Remote agent call error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
-        if (e instanceof TechnicalException) {
+        if (e instanceof ApplicationException) {
             LOGGER.log(Level.SEVERE, String.format("Application error [%s]: %s", id, e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }

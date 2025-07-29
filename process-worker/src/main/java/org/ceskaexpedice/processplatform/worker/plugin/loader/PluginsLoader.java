@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import org.ceskaexpedice.processplatform.api.PluginSpi;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
@@ -45,7 +45,7 @@ public final class PluginsLoader {
             try {
                 urls[i] = jars[i].toURI().toURL();
             } catch (MalformedURLException e) {
-                throw new TechnicalException("Error loading JAR file: " + jars[i].getAbsolutePath(), e);
+                throw new ApplicationException("Error loading JAR file: " + jars[i].getAbsolutePath(), e);
             }
         }
         return new URLClassLoader(urls, PluginsLoader.class.getClassLoader());
@@ -54,7 +54,7 @@ public final class PluginsLoader {
     public static ClassLoader createPluginClassLoader(File pluginsDir, String pluginId) {
         File pluginDir = new File(pluginsDir, pluginId);
         if (!pluginDir.exists() || !pluginDir.isDirectory()) {
-            throw new TechnicalException("Plugin directory not found: " + pluginDir.getAbsolutePath());
+            throw new ApplicationException("Plugin directory not found: " + pluginDir.getAbsolutePath());
         }
         return createPluginClassLoader(pluginDir);
     }
@@ -85,11 +85,11 @@ public final class PluginsLoader {
             try {
                 uri = codeSource.getLocation().toURI();
             } catch (URISyntaxException e) {
-                throw new TechnicalException(e.toString(), e);
+                throw new ApplicationException(e.toString(), e);
             }
             pluginJar = new File(uri);
         } else {
-            throw new TechnicalException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
+            throw new ApplicationException("Cannot determine JAR file for plugin: " + plugin.getClass().getName());
         }
         return pluginJar;
     }

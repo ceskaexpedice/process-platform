@@ -24,7 +24,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.net.URIBuilder;
-import org.ceskaexpedice.processplatform.common.TechnicalException;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
@@ -72,7 +72,7 @@ public class WorkerClient {
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
-            throw new TechnicalException(e.toString(), e);
+            throw new ApplicationException(e.toString(), e);
         }
         int statusCode = -1;
         try {
@@ -90,7 +90,7 @@ public class WorkerClient {
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         } catch (URISyntaxException e) {
-            throw new TechnicalException(e.toString(), e);
+            throw new ApplicationException(e.toString(), e);
         }
     }
 
