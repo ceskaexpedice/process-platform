@@ -33,9 +33,9 @@ public class ManagerConfiguration {
     public static final String PROFILE_TABLE = "pcp_profile";
     public static final String PROCESS_TABLE = "pcp_process";
 
-    public static final String JDBC_URL_KEY = "jdbcUrl";
-    public static final String JDBC_USER_NAME_KEY = "jdbcUsername";
-    public static final String JDBC_USER_PASSWORD_KEY = "jdbcPassword";
+    private static final String JDBC_URL_KEY = "JDBC_URL";
+    private static final String JDBC_USER_NAME_KEY = "JDBC_USERNAME";
+    private static final String JDBC_USER_PASSWORD_KEY = "JDBC_PASSWORD";
 
     private final Properties props = new Properties();
 
@@ -93,5 +93,20 @@ public class ManagerConfiguration {
     public String getOrDefault(String key, String defaultValue) {
         return props.getProperty(key, defaultValue);
     }
+
+    // --- effective -------------------------------
+
+    public String getJdbcUrl() {
+        return get(JDBC_URL_KEY);
+    }
+
+    public String getJdbcUsername() {
+        return get(JDBC_USER_NAME_KEY);
+    }
+
+    public String getJdbcPassword() {
+        return get(JDBC_USER_PASSWORD_KEY);
+    }
+
 
 }

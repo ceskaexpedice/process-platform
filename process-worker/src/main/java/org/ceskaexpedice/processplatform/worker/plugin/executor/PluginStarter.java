@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.decodeWorkerConfig;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.createPrintStream;
 import static org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils.annotatedMethodType;
@@ -156,7 +155,7 @@ public class PluginStarter implements PluginContext {
         Map<String, String> pluginPayload = getPluginPayload(processConfig);
         String pluginId = processConfig.get(PLUGIN_ID_KEY);
         String mainClass = processConfig.get(MAIN_CLASS_KEY);
-        ClassLoader loader = PluginsLoader.createPluginClassLoader(new File(workerConfig.get(PLUGIN_PATH_KEY)), pluginId);
+        ClassLoader loader = PluginsLoader.createPluginClassLoader(workerConfig.getPluginDirectory(), pluginId);
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(loader);

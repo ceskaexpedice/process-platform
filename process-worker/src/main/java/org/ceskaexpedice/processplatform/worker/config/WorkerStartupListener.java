@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.CONFIG_FILE;
 
@@ -36,10 +37,9 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  */
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
-// TODO check all Tomcat config - like web.xml and include it in the build
-// TODO revisit manager.properties placement and pars name convention
 // TODO start worker and check it communicates with manager
 public class WorkerStartupListener implements ServletContextListener {
+    private static Logger LOGGER = Logger.getLogger(WorkerStartupListener.class.getName());
     private static ServletContext ctx;
 
     @Override
@@ -48,10 +48,11 @@ public class WorkerStartupListener implements ServletContextListener {
         Properties fileProps = new Properties();
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in != null) {
+                LOGGER.info("Load config file [" + CONFIG_FILE + "]");
                 fileProps.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Error loading properties file", e);
+            LOGGER.warning("Cannot load properties file:" + e);
         }
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
         setStarterClasspath(config);
@@ -74,7 +75,7 @@ public class WorkerStartupListener implements ServletContextListener {
     private static void setStarterClasspath(WorkerConfiguration config) {
         String libPath = ctx.getRealPath("/WEB-INF/lib");
         String starterClasspath = buildClasspath(libPath);
-        config.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
+        config.setStarterClasspath(starterClasspath);
     }
 
     private static String buildClasspath(String libDir) {

@@ -35,7 +35,6 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
-import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class ManagerClient {
     }
 
     public void registerNode(Node node) {
-        String url = getManagerBaseUrl() + "worker/register_node";
+        String url = workerConfiguration.getManagerBaseUrl() + "worker/register_node";
         LOGGER.info("Registering node at " + url);
 
         HttpPost post = new HttpPost(url);
@@ -87,7 +86,7 @@ public class ManagerClient {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        String url = getManagerBaseUrl() + "worker/register_plugin";
+        String url = workerConfiguration.getManagerBaseUrl() + "worker/register_plugin";
         LOGGER.info("Registering plugin at " + url);
 
         HttpPost post = new HttpPost(url);
@@ -109,7 +108,7 @@ public class ManagerClient {
         URIBuilder uriBuilder;
         HttpGet get;
         try {
-            uriBuilder = new URIBuilder(getManagerBaseUrl() + "worker/next_process/" + workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
+            uriBuilder = new URIBuilder(workerConfiguration.getManagerBaseUrl() + "worker/next_process/" + workerConfiguration.getWorkerId());
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
@@ -134,7 +133,7 @@ public class ManagerClient {
     }
 
     public void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        String url = getManagerBaseUrl() + "worker/schedule_sub_process";
+        String url = workerConfiguration.getManagerBaseUrl() + "worker/schedule_sub_process";
         LOGGER.info(String.format("Scheduling sub-process at %s", url));
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(mapToJson(scheduleSubProcess), ContentType.APPLICATION_JSON);
@@ -152,7 +151,7 @@ public class ManagerClient {
     }
 
     public void updateProcessPid(String processId, String pid) {
-        String url = String.format("%sworker/pid/%s?pid=%s", getManagerBaseUrl(), processId, pid);
+        String url = String.format("%sworker/pid/%s?pid=%s", workerConfiguration.getManagerBaseUrl(), processId, pid);
         LOGGER.info(String.format("Update process pid at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
@@ -168,7 +167,7 @@ public class ManagerClient {
     }
 
     public void updateProcessDescription(String processId, String description) {
-        String url = String.format("%sworker/description/%s?description=%s", getManagerBaseUrl(), processId, description);
+        String url = String.format("%sworker/description/%s?description=%s", workerConfiguration.getManagerBaseUrl(), processId, description);
         LOGGER.info(String.format("Update process description at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
@@ -184,7 +183,7 @@ public class ManagerClient {
     }
 
     public void updateProcessState(String processId, ProcessState state) {
-        String url = String.format("%sworker/state/%s?state=%s", getManagerBaseUrl(), processId, state);
+        String url = String.format("%sworker/state/%s?state=%s", workerConfiguration.getManagerBaseUrl(), processId, state);
         LOGGER.info(String.format("Update process state at %s", url));
         HttpPut httpPut = new HttpPut(url);
 
@@ -207,10 +206,6 @@ public class ManagerClient {
         } catch (JsonProcessingException e) {
             throw new ApplicationException(e.toString(), e);
         }
-    }
-
-    private String getManagerBaseUrl() {
-        return new EffectiveWorkerConfiguration(workerConfiguration).getManagerBaseUrl();
     }
 
 }

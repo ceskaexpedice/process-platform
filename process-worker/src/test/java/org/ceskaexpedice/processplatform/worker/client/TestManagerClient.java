@@ -49,10 +49,8 @@ public class TestManagerClient {
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(WorkerTestsUtils.MANAGER_BASE_URI), rc);
         server.start();
         workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, WorkerTestsUtils.MANAGER_BASE_URI);
-        String PROFILES = WorkerTestsUtils.PLUGIN1_PROFILE_BIG + "," + WorkerTestsUtils.PLUGIN1_PROFILE_SMALL;
-        workerConfiguration.set(WorkerConfiguration.WORKER_PROFILES_KEY, PROFILES);
-        workerConfiguration.set(WorkerConfiguration.WORKER_ID_KEY, "workerPepo");
+        workerConfiguration.setManagerBaseUrl(WorkerTestsUtils.MANAGER_BASE_URI);
+        workerConfiguration.setWorkerId("workerPepo");
     }
 
     @AfterEach

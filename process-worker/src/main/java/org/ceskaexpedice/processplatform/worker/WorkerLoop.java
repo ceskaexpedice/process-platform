@@ -63,7 +63,7 @@ class WorkerLoop {
                         }
 
                     } else {
-                        int sleepSec = Integer.parseInt(workerConfiguration.get(WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY));
+                        int sleepSec = workerConfiguration.getWorkerLoopSleepSecs();
                         LOGGER.info("No process from the manager. Sleeping " + sleepSec + " seconds...");
                         Thread.sleep(sleepSec * 1000L);
                     }

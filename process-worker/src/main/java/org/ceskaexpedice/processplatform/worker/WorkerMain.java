@@ -20,18 +20,17 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
-import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * WorkerMain
@@ -51,44 +50,46 @@ public class WorkerMain {
         LOGGER.info("Initializing...");
         this.workerConfiguration = workerConfiguration;
         managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
-        registerNode();
-        registerPlugins();
+        List<PluginInfo> pluginsList = scanPlugins();
+        if (pluginsList.isEmpty()) {
+            throw new ApplicationException("No plugins found");
+        }
+        registerNode(pluginsList);
+        registerPlugins(pluginsList);
         this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
         workerLoop.start();
         LOGGER.info("Initialized");
     }
 
     private List<PluginInfo> scanPlugins() {
-        File pluginsDir = new EffectiveWorkerConfiguration(workerConfiguration).getPluginDirectory();
+        File pluginsDir = workerConfiguration.getPluginDirectory();
         LOGGER.info(String.format("Plugin folder is [%s]", pluginsDir));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
-    private void registerNode() {
+    private void registerNode(List<PluginInfo> pluginsList) {
         // TODO check how to properly get all information for node register - from config?
-        LOGGER.info(String.format("Register node [%s]", workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY)));
+        LOGGER.info(String.format("Register node [%s]", workerConfiguration.getWorkerId()));
+        Set<String> tags = new HashSet<>();
+        for (PluginInfo pluginInfo : pluginsList) {
+            for (PluginProfile pluginProfile: pluginInfo.getProfiles()){
+                tags.add(pluginProfile.getProfileId());
+            }
+        }
         Node node = new Node();
-        node.setNodeId(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY));
-        node.setDescription("????");
+        node.setNodeId(workerConfiguration.getWorkerId());
+        node.setDescription(workerConfiguration.getWorkerId());
         node.setType(NodeType.WORKER);
-        node.setUrl(workerConfiguration.get(WorkerConfiguration.WORKER_BASE_URL_KEY));
-        Set<String> tags = Arrays.stream(workerConfiguration.get(WorkerConfiguration.WORKER_PROFILES_KEY).split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
+        node.setUrl(workerConfiguration.getWorkerBaseUrl());
         node.setTags(tags);
+
         managerClient.registerNode(node);
     }
 
-    private void registerPlugins() {
-        LOGGER.info("Register plugins");
-        List<PluginInfo> pluginsList = scanPlugins();
-        if (pluginsList.isEmpty()) {
-            throw new ApplicationException("No plugins found");
-        }
+    private void registerPlugins(List<PluginInfo> pluginsList) {
         for (PluginInfo pluginInfo : pluginsList) {
-            LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());
+            LOGGER.info("Register plugin: " + pluginInfo.getPluginId());
             managerClient.registerPlugin(pluginInfo);
         }
     }

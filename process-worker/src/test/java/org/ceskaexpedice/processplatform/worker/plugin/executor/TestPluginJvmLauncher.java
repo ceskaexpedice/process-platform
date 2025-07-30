@@ -29,8 +29,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_ID_KEY;
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 
 /**
@@ -47,11 +45,11 @@ public class TestPluginJvmLauncher {
     public void setUp() throws Exception {
         URL resource = getClass().getClassLoader().getResource("plugins");
         workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(PLUGIN_PATH_KEY, resource.getFile());
+        workerConfiguration.setPluginDirectory(resource.getFile());
         String starterClasspath = System.getProperty("java.class.path");
-        workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
-        workerConfiguration.set(WORKER_ID_KEY, "testWorker");
+        workerConfiguration.setStarterClasspath(starterClasspath);
+        workerConfiguration.setManagerBaseUrl(MANAGER_BASE_URI);
+        workerConfiguration.setWorkerId("testWorker");
 
         final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);

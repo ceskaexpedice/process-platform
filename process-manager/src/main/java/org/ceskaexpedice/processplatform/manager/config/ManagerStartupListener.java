@@ -41,8 +41,6 @@ import static org.ceskaexpedice.processplatform.manager.config.ManagerConfigurat
 
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
-// TODO check all Tomcat config - like web.xml - include it to the build
-// TODO revisit manager.properties placement and pars name convention
 public class ManagerStartupListener implements ServletContextListener {
 
     private static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
@@ -59,7 +57,7 @@ public class ManagerStartupListener implements ServletContextListener {
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Cannot load properties file", e);
+            LOGGER.warning("Cannot load properties file:" + e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
         dbProvider = new DbConnectionProvider(config);

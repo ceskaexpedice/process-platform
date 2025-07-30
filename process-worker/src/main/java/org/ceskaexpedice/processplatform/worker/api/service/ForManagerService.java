@@ -39,7 +39,7 @@ public class ForManagerService {
 
     public InputStream getProcessLog(String processId, boolean err) {
         try {
-            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY), processId);
+            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
             File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
             return new FileInputStream(standardStreamFile);
         } catch (FileNotFoundException e) {

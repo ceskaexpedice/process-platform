@@ -1,7 +1,6 @@
 plugins {
     id 'war'
 }
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -55,6 +54,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.14.2'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     testImplementation 'javax.activation:activation:1.1.1'
+}
+
+war {
+    webXml = file('web/WEB-INF/web.xml')
 }
 
 test {

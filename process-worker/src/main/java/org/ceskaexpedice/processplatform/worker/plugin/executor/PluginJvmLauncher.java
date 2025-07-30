@@ -36,7 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration.*;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE64_KEY;
+import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_CONFIG_BASE_64;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
 
 /**
@@ -129,11 +129,11 @@ public final class PluginJvmLauncher {
 
         String workerConfigJson = mapper.writeValueAsString(workerConfiguration.getAll());
         String encodedWorkerConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
-        args.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedWorkerConfig);
+        args.add("-D" + WORKER_CONFIG_BASE_64 + "=" + encodedWorkerConfig);
 
         ProcessConfiguration processConfiguration = new ProcessConfiguration();
         convert(scheduledProcess, processConfiguration);
-        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY),
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(),
                 scheduledProcess.getProcessId() + "");
         File standardStreamFile = standardOutFile(processWorkingDir);
         File errStreamFile = errorOutFile(processWorkingDir);
@@ -146,7 +146,7 @@ public final class PluginJvmLauncher {
 
         // Classpath
         args.add("-cp");
-        args.add(workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY));
+        args.add(workerConfiguration.getStarterClasspath());
 
         // Main class
         args.add(PluginStarter.class.getName());

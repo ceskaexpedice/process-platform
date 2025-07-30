@@ -26,9 +26,9 @@ public class DbConnectionProvider {
     private static DataSource createDataSource(ManagerConfiguration config) {
         HikariDataSource ds = new HikariDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-        ds.setJdbcUrl(config.get(ManagerConfiguration.JDBC_URL_KEY));
-        ds.setUsername(config.get(ManagerConfiguration.JDBC_USER_NAME_KEY));
-        ds.setPassword(config.get(ManagerConfiguration.JDBC_USER_PASSWORD_KEY));
+        ds.setJdbcUrl(config.getJdbcUrl());
+        ds.setUsername(config.getJdbcUsername());
+        ds.setPassword(config.getJdbcPassword());
 //        ds.setLeakDetectionThreshold(KConfiguration.getInstance().getConfiguration().getInt("jdbcLeakDetectionThreshold"));
 //        ds.setMaximumPoolSize(KConfiguration.getInstance().getConfiguration().getInt("jdbcMaximumPoolSize"));
 //

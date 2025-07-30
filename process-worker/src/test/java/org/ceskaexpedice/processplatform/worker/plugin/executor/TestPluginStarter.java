@@ -57,8 +57,8 @@ public class TestPluginStarter {
     public void setUp() {
         URL resource = getClass().getClassLoader().getResource("plugins");
         workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(PLUGIN_PATH_KEY, resource.getFile());
-        workerConfiguration.set(WORKER_ID_KEY, "testWorker");
+        workerConfiguration.setPluginDirectory(resource.getFile());
+        workerConfiguration.setWorkerId("testWorker");
     }
 
     @Test
@@ -73,13 +73,13 @@ public class TestPluginStarter {
             pluginContextFactoryMockedStatic.when(() -> PluginContextFactory.createPluginContext(any(), any())).thenReturn(pluginContextMock);
 
             // prepare plugin working dirs
-            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WORKER_ID_KEY), PLUGIN1_PROCESS_ID);
+            File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), PLUGIN1_PROCESS_ID);
             File standardStreamFile = standardOutFile(processWorkingDir);
             File errStreamFile = errorOutFile(processWorkingDir);
 
             String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
             String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
-            System.setProperty(WORKER_CONFIG_BASE64_KEY, encodedConfig);
+            System.setProperty(WORKER_CONFIG_BASE_64, encodedConfig);
 
             ProcessConfiguration processConfiguration = createPlugin1ProcessConfiguration(standardStreamFile, errStreamFile);
             String processConfigJson = new ObjectMapper().writeValueAsString(processConfiguration.getAll());
