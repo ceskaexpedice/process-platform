@@ -74,7 +74,7 @@ public class PluginStarter implements PluginContext {
             System.setErr(errStream);
             System.setOut(outStream);
             setDefaultLoggingIfNecessary();
-            LOGGER.info("STARTING PROCESS WITH USER HOME:"+System.getProperty("user.home"));
+            LOGGER.info("STARTING PROCESS WITH USER HOME:" + System.getProperty("user.home"));
 
             PluginContext pluginContext = PluginContextFactory.createPluginContext(workerConfig, processConfig);
             PluginContextHolder.setContext(pluginContext);
@@ -83,7 +83,6 @@ public class PluginStarter implements PluginContext {
 
             updateProcessState(ProcessState.RUNNING, managerClient, processConfig);
             runPlugin(processConfig, workerConfig);
-            checkErrorFile();
             updateProcessState(ProcessState.FINISHED, managerClient, processConfig);
         } catch (WarningException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -166,27 +165,11 @@ public class PluginStarter implements PluginContext {
             if (processMethod == null) {
                 throw new ApplicationException("Could not find process method for class: " + mainClass);
             }
-            String[] pluginArgs = {}; // TODO remove support for non annotated methods
-            if (processMethod.getType() == ReflectionUtils.MethodType.Type.ANNOTATED) {
-                Object[] params = ReflectionUtils.map(processMethod.getMethod(), pluginArgs, pluginPayload);
-                processMethod.getMethod().invoke(null, params);
-            } else {
-                // TODO remove support for non annotated methods - processMethod.getMethod().invoke(null, (Object) pluginArgs);
-            }
+            Object[] params = ReflectionUtils.map(processMethod.getMethod(), new String[]{}, pluginPayload);
+            processMethod.getMethod().invoke(null, params);
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);
         }
-    }
-
-    private static void checkErrorFile() {
-        /* TODO check this if we need it
-        if (Boolean.getBoolean(ProcessStarter.SHOULD_CHECK_ERROR_STREAM)) {
-            String serrFileName = System.getProperty(SERR_FILE);
-            File serrFile = new File(serrFileName);
-            if (serrFile.length() > 0) throw new WarningException("system error file contains errors");
-        }
-
-         */
     }
 
 }

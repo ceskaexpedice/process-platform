@@ -51,7 +51,6 @@ public final class ReflectionUtils {
     public static Object[] map(Method processMethod, String[] defaultParams, Map<String, String> processParametersProperties) {
         Annotation[][] annots = processMethod.getParameterAnnotations();
         Class<?>[] types = processMethod.getParameterTypes();
-        //if (defaultParams.length < types.length) throw new IllegalArgumentException("defaultParams.length is small array. It must have at least "+types.length+" items");
         List<Object> params = new ArrayList<Object>();
         for (int i = 0; i < types.length; i++) {
             Annotation[] ann = annots[i];

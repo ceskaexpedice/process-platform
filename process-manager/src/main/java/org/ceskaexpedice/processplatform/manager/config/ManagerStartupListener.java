@@ -64,22 +64,18 @@ public class ManagerStartupListener implements ServletContextListener {
         ManagerConfiguration config = new ManagerConfiguration(props);
         dbProvider = new DbConnectionProvider(config);
 
-        initServices(sce, config, dbProvider);
+        initServices(config, dbProvider);
         initDb(dbProvider);
     }
 
     private void initDb(DbConnectionProvider dbProvider) {
-        // TODO use different tables for test and run
-        /* TODO implement table check
         makeSureTableExists(dbProvider, NODE_TABLE);
         makeSureTableExists(dbProvider, PROCESS_TABLE);
         makeSureTableExists(dbProvider, PLUGIN_TABLE);
         makeSureTableExists(dbProvider, PROFILE_TABLE);
-
-         */
     }
 
-    private static void initServices(ServletContextEvent sce, ManagerConfiguration config, DbConnectionProvider dbProvider) {
+    private static void initServices(ManagerConfiguration config, DbConnectionProvider dbProvider) {
         NodeService nodeService = new NodeService(config, dbProvider);
         PluginService pluginService = new PluginService(config, dbProvider);
         ProfileService profileService = new ProfileService(config, dbProvider);
