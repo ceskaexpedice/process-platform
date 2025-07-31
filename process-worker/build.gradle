@@ -63,6 +63,10 @@ dependencies {
     testImplementation 'javax.activation:activation:1.1.1'
 }
 
+war {
+    webXml = file('web/WEB-INF/web.xml')
+}
+
 test {
     useJUnitPlatform()
 }

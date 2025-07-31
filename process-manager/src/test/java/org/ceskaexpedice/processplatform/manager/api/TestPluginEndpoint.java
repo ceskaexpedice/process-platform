@@ -55,12 +55,6 @@ public class TestPluginEndpoint extends JerseyTest {
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new PluginEndpoint(pluginServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
-        /* TODO check test logging on Grizzly server
-        resourceConfig.register(new LoggingFeature(
-                Logger.getLogger("HTTPLogger"),
-                LoggingFeature.Verbosity.PAYLOAD_ANY
-        ));
-         */
         return resourceConfig;
     }
 
@@ -79,21 +73,6 @@ public class TestPluginEndpoint extends JerseyTest {
         Assertions.assertEquals(404, response.getStatus());
 
         verify(pluginServiceMock, times(2)).getPlugin(any(), eq(true), eq(true));
-        /* TODO check how to test BlobalExceptionMapper
-        when(pluginServiceMock.getPlugin(anyString())).thenAnswer(invocation -> {
-            String pluginId = invocation.getArgument(0);
-            if ("testPluginError".equals(pluginId)) {
-                throw new BusinessLogicException("Plugin 'testPluginError' caused an error");
-            } else if ("testPlugin1".equals(pluginId)) {
-                return retVal;
-            }
-            return null; // Or throw for unknown IDs
-        });
-         */
-        /*
-        assertThrows(BusinessLogicException.class, () -> {
-            pluginServiceMock.getPlugin("testPluginError");
-        });*/
     }
 
     @Test

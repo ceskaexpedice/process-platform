@@ -40,7 +40,6 @@ import java.util.logging.Logger;
 import static org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration.*;
 
 // TODO add openapi swagger
-// TODO implement properly build plugins process via Gradle
 public class ManagerStartupListener implements ServletContextListener {
 
     private static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
