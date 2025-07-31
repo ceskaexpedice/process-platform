@@ -27,6 +27,33 @@ INSERT INTO pcp_plugin (plugin_id,
         'org.ceskaexpedice.processplatform.testplugin2.TestPlugin2',
         NULL,
         ARRAY['testPlugin3']);
+INSERT INTO pcp_plugin (plugin_id,
+                        description,
+                        main_class,
+                        payload_field_spec_map,
+                        scheduled_profiles)
+VALUES ('testPlugin3',
+        'Testing plugin 3',
+        'org.ceskaexpedice.processplatform.testplugin3.TestPlugin3',
+        '{
+          "stringField": {
+            "type": "STRING",
+            "required": false
+          },
+          "booleanField": {
+            "type": "BOOLEAN",
+            "required": false
+          },
+          "numberField": {
+            "type": "NUMBER",
+            "required": false
+          },
+          "dateField": {
+            "type": "DATE",
+            "required": false
+          }
+        }'::jsonb,
+        NULL);
 
 INSERT INTO pcp_profile (profile_id,
                          description,

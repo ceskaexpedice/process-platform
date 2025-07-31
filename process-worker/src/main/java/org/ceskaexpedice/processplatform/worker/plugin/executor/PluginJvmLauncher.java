@@ -51,7 +51,6 @@ public final class PluginJvmLauncher {
 
     public static int launchJvm(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) {
         try {
-            // TODO check if the old createCommand is to be deleted: List<String> command = createCommand(scheduledProcess, workerConfiguration);
             LOGGER.info(String.format("Launching JVM for the process [%s]", scheduledProcess.getProcessId()));
             List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
@@ -71,42 +70,6 @@ public final class PluginJvmLauncher {
         }
     }
 
-
-//    private static List<String> createCommand(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws JsonProcessingException {
-//        List<String> command = new ArrayList<>();
-//        command.add("java");
-//        command.add("-Duser.home=" + System.getProperty("user.home"));
-//        command.add("-Dfile.encoding=UTF-8");
-//        List<String> javaProcessParameters = scheduledProcess.getJvmArgs();
-//        for (String jpParam : javaProcessParameters) {
-//            command.add(jpParam);
-//        }
-//
-//        String workerConfigJson = new ObjectMapper().writeValueAsString(workerConfiguration.getAll());
-//        String encodedConfig = Base64.getEncoder().encodeToString(workerConfigJson.getBytes(StandardCharsets.UTF_8));
-//        command.add("-D" + WORKER_CONFIG_BASE64_KEY + "=" + encodedConfig);
-//
-//        ProcessConfiguration processConfiguration = new ProcessConfiguration();
-//        convert(scheduledProcess, processConfiguration);
-//        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.get(WorkerConfiguration.WORKER_ID_KEY),
-//                scheduledProcess.getProcessId() + "");
-//        File standardStreamFile = standardOutFile(processWorkingDir);
-//        File errStreamFile = errorOutFile(processWorkingDir);
-//        processConfiguration.set(SOUT_FILE_KEY, standardStreamFile.getAbsolutePath());
-//        processConfiguration.set(SERR_FILE_KEY, errStreamFile.getAbsolutePath());
-//        String processConfigJson = new ObjectMapper().writeValueAsString(processConfiguration.getAll());
-//        String encodedProcessConfig = Base64.getEncoder().encodeToString(processConfigJson.getBytes(StandardCharsets.UTF_8));
-//        command.add("-D" + PROCESS_CONFIG_BASE64_KEY + "=" + encodedProcessConfig);
-//
-//        command.add("-cp");
-//        String starterClasspath = workerConfiguration.get(WorkerConfiguration.STARTER_CLASSPATH_KEY);
-//        command.add(starterClasspath);
-//
-//        command.add(PluginStarter.class.getName());
-//        return command;
-//    }
-//
-
     private static List<String> createCommandJVMArgs(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
         Path argFile = generateJvmArgsFile(scheduledProcess, workerConfiguration);
         return List.of("java", "@" + argFile.toAbsolutePath());
@@ -124,7 +87,7 @@ public final class PluginJvmLauncher {
             args.addAll(javaProcessParameters);
         }
 
-        // Base64 configy
+        // Base64 configs
         ObjectMapper mapper = new ObjectMapper();
 
         String workerConfigJson = mapper.writeValueAsString(workerConfiguration.getAll());
@@ -151,7 +114,7 @@ public final class PluginJvmLauncher {
         // Main class
         args.add(PluginStarter.class.getName());
 
-        // Zápis do souboru
+        // write to the file
         Path argsFile = Files.createTempFile("jvm", ".args");
         Files.write(argsFile, args, StandardCharsets.UTF_8);
         return argsFile;

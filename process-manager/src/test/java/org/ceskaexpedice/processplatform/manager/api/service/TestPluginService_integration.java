@@ -119,16 +119,42 @@ public class TestPluginService_integration {
 
     @Test
     public void testValidatePayload() {
+        // check required
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
         pluginService.validatePayload(PLUGIN1_ID, payload);
-
         payload.remove("surname");
         assertThrows(BusinessLogicException.class, () -> {
             pluginService.validatePayload(PLUGIN1_ID, payload);
         });
-        // TODO test more
+
+        // check boolean
+        payload.clear();
+        payload.put("booleanField", "true");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("booleanField", "notBoolean");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
+
+        // check number
+        payload.clear();
+        payload.put("numberField", "123");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("numberField", "12notNumber");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
+
+        // check date
+        payload.clear();
+        payload.put("dateField", "1960-11-12");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("dateField", "1960-99-12");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
 
     }
 
@@ -137,7 +163,6 @@ public class TestPluginService_integration {
         PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID, false, false);
         Assertions.assertNull(pluginInfo);
 
-        // TODO more tests
         Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
         payloadFieldSpecMap.put("name", new PayloadFieldSpec(PayloadFieldType.STRING, true));
         Set<String> scheduledProfiles = new HashSet<>();

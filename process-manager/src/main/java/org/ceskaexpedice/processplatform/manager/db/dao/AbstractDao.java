@@ -20,7 +20,6 @@ import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * AbstractDao
@@ -35,19 +34,8 @@ abstract class AbstractDao {
         this.managerConfiguration = managerConfiguration;
     }
 
-
-    // TODO check comments and clean GetConnection method
     protected Connection getConnection() {
         Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
         return connection;
     }
 

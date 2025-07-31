@@ -69,7 +69,6 @@ public class WorkerMain {
     }
 
     private void registerNode(List<PluginInfo> pluginsList) {
-        // TODO check how to properly get all information for node register - from config?
         LOGGER.info(String.format("Register node [%s]", workerConfiguration.getWorkerId()));
         Set<String> tags = new HashSet<>();
         for (PluginInfo pluginInfo : pluginsList) {
@@ -79,7 +78,7 @@ public class WorkerMain {
         }
         Node node = new Node();
         node.setNodeId(workerConfiguration.getWorkerId());
-        node.setDescription(workerConfiguration.getWorkerId());
+        node.setDescription(String.format("Worker [%s]", workerConfiguration.getWorkerId()));
         node.setType(NodeType.WORKER);
         node.setUrl(workerConfiguration.getWorkerBaseUrl());
         node.setTags(tags);

@@ -29,6 +29,8 @@ import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -78,17 +80,51 @@ public class PluginService {
     }
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
-        // TODO add validation on type
         PluginInfo plugin = getPlugin(pluginId, false, false);
-        for (String name : plugin.getPayloadFieldSpecMap().keySet()) {
-            PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);
-            if (payloadFieldSpec.isRequired()) {
-                if (!payload.containsKey(name)) {
-                    throw new BusinessLogicException("Payload field " + name + " is missing");
+        for (Map.Entry<String, PayloadFieldSpec> entry : plugin.getPayloadFieldSpecMap().entrySet()) {
+            String name = entry.getKey();
+            PayloadFieldSpec payloadFieldSpec = entry.getValue();
+
+            String payloadValue = payload.get(name);
+
+            // Check required
+            if (payloadFieldSpec.isRequired() && (payloadValue == null || payloadValue.isEmpty())) {
+                throw new BusinessLogicException("Payload field '" + name + "' is missing");
+            }
+
+            // Skip type check if value is null or empty (but not required)
+            if (payloadValue == null || payloadValue.isEmpty()) {
+                continue;
+            }
+
+            // Type validation
+            try {
+                switch (payloadFieldSpec.getType()) {
+                    case STRING:
+                        // No specific check for strings
+                        break;
+                    case BOOLEAN:
+                        if (!payloadValue.equalsIgnoreCase("true") && !payloadValue.equalsIgnoreCase("false")) {
+                            throw new BusinessLogicException("Payload field '" + name + "' must be a boolean (true/false)");
+                        }
+                        break;
+                    case NUMBER:
+                        Double.parseDouble(payloadValue); // Will throw if invalid
+                        break;
+                    case DATE:
+                        // Customize the expected format as needed
+                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                        LocalDate.parse(payloadValue, formatter);
+                        break;
+                    default:
+                        throw new BusinessLogicException("Unknown payload field type for field '" + name + "'");
                 }
+            } catch (Exception e) {
+                throw new BusinessLogicException("Invalid value for field '" + name + "' of type " + payloadFieldSpec.getType() + ": " + payloadValue);
             }
         }
     }
+
 
     public void registerPlugin(PluginInfo pluginInfo) {
         LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));

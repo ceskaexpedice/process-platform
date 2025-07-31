@@ -38,6 +38,7 @@ public final class ManagerTestsUtils {
 
     public static final String PLUGIN1_ID = "testPlugin1";
     public static final String PLUGIN2_ID = "testPlugin2";
+    public static final String PLUGIN3_ID = "testPlugin3";
     public static final String PLUGIN_NEW_ID = "newPluginId";
 
     public static final String PROFILE1_ID = "testPlugin1-big";
