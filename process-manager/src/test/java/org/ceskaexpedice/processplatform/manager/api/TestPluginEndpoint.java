@@ -67,7 +67,7 @@ public class TestPluginEndpoint extends JerseyTest {
     @Test
     public void testGetPlugin() throws JsonProcessingException {
         PluginInfo retVal = new PluginInfo(PLUGIN1_ID, null, null, null, null, null);
-        when(pluginServiceMock.getPlugin(eq(PLUGIN1_ID))).thenReturn(retVal);
+        when(pluginServiceMock.getPlugin(eq(PLUGIN1_ID), eq(true), eq(true))).thenReturn(retVal);
 
         Response response = target("plugin/" + PLUGIN1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
@@ -78,7 +78,7 @@ public class TestPluginEndpoint extends JerseyTest {
         response = target("plugin/" + PLUGIN2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(404, response.getStatus());
 
-        verify(pluginServiceMock, times(2)).getPlugin(any());
+        verify(pluginServiceMock, times(2)).getPlugin(any(), eq(true), eq(true));
         /* TODO check how to test BlobalExceptionMapper
         when(pluginServiceMock.getPlugin(anyString())).thenAnswer(invocation -> {
             String pluginId = invocation.getArgument(0);

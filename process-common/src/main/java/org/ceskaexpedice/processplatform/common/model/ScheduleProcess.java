@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public abstract class ScheduleProcess {
     private String profileId;
-    private Map<String, String> payload;
+    private Map<String, String> payload =  new HashMap<>();
 
     public ScheduleProcess() {
     }

@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,7 +28,7 @@ public class Node {
     private String description;
     private NodeType type;
     private String url;
-    private Set<String> tags;
+    private Set<String> tags =  new HashSet<>();
 
     public Node() {
     }

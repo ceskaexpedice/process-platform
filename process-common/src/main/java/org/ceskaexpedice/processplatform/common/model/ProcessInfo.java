@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.common.model;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,7 +34,7 @@ public class ProcessInfo {
     private Date started;
     private Date finished;
     private ProcessState status;
-    private Map<String, String> payload;
+    private Map<String, String> payload = new HashMap<>();
     private String batchId;
     private String owner;
 

@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ public class PluginProfile {
     private String profileId;
     private String description;
     private String pluginId;
-    private List<String> jvmArgs;
+    private List<String> jvmArgs = new ArrayList<>();
 
     public PluginProfile() {
     }

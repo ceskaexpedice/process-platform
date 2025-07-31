@@ -27,9 +27,9 @@ import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
 import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
+import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -49,15 +49,26 @@ public class PluginService {
         this.profileDao = new ProfileDao(dbConnectionProvider, managerConfiguration);
     }
 
-    public PluginInfo getPlugin(String pluginId) {
-        // TODO get all scheduled profiles hierarchically - pluginInfo.scheduledProfiles
+    public PluginInfo getPlugin(String pluginId, boolean includeProfiles, boolean scheduledProfilesRecursive) {
         PluginEntity pluginEntity = pluginDao.getPlugin(pluginId);
         PluginInfo pluginInfo = PluginServiceMapper.mapPlugin(pluginEntity);
         if (pluginInfo == null) {
             return null;
         }
+        if (!includeProfiles) {
+            return pluginInfo;
+        }
         List<PluginProfile> profiles = ProfileServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
         pluginInfo.setProfiles(profiles);
+        if (!scheduledProfilesRecursive) {
+            return pluginInfo;
+        }
+
+        // get all scheduled profiles recursive
+        Set<String> visitedPlugins = new HashSet<>();
+        Set<String> resultProfiles = new LinkedHashSet<>();
+        collectScheduledProfilesRecursive(pluginEntity, visitedPlugins, resultProfiles);
+        pluginInfo.setScheduledProfiles(resultProfiles);
         return pluginInfo;
     }
 
@@ -68,7 +79,7 @@ public class PluginService {
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
         // TODO add validation on type
-        PluginInfo plugin = getPlugin(pluginId);
+        PluginInfo plugin = getPlugin(pluginId, false, false);
         for (String name : plugin.getPayloadFieldSpecMap().keySet()) {
             PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);
             if (payloadFieldSpec.isRequired()) {
@@ -80,9 +91,8 @@ public class PluginService {
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        // TODO check if it is ok that no update of plugin info including profiles are allowed here
         LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));
-        PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
+        PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId(), false, false);
         if (pluginExisting != null) {
             LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] already registered");
             return;
@@ -90,6 +100,28 @@ public class PluginService {
         pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
         for (PluginProfile profile : pluginInfo.getProfiles()) {
             profileDao.createProfile(ProfileServiceMapper.mapProfile(profile));
+        }
+    }
+
+    private void collectScheduledProfilesRecursive(PluginEntity pluginEntity, Set<String> visitedPlugins, Set<String> resultProfiles) {
+        if (pluginEntity == null) {
+            return;
+        }
+        // avoid loops
+        if (!visitedPlugins.add(pluginEntity.getPluginId())) {
+            return;
+        }
+        Set<String> scheduledProfiles = pluginEntity.getScheduledProfiles();
+        if (scheduledProfiles == null) {
+            return;
+        }
+        for (String profileId : scheduledProfiles) {
+            resultProfiles.add(profileId);
+            PluginProfileEntity profileEntity = profileDao.getProfile(profileId);
+            if (profileEntity != null) {
+                PluginEntity nextPlugin = pluginDao.getPlugin(profileEntity.getPluginId());
+                collectScheduledProfilesRecursive(nextPlugin, visitedPlugins, resultProfiles);
+            }
         }
     }
 

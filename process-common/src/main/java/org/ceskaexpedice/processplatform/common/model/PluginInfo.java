@@ -16,9 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * PluginInfo
@@ -28,9 +26,9 @@ public class PluginInfo {
     private String pluginId;
     private String description;
     private String mainClass;
-    private Map<String, PayloadFieldSpec> payloadFieldSpecMap;
-    private Set<String> scheduledProfiles;
-    private List<PluginProfile> profiles;
+    private Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
+    private Set<String> scheduledProfiles =  new HashSet<>();
+    private List<PluginProfile> profiles = new ArrayList<>();
 
     public PluginInfo() {
     }

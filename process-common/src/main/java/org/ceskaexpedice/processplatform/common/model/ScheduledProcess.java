@@ -16,6 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +30,8 @@ public class ScheduledProcess {
     private String profileId;
     private String pluginId;
     private String mainClass;
-    private Map<String, String> payload;
-    private List<String> jvmArgs;
+    private Map<String, String> payload =  new HashMap<>();
+    private List<String> jvmArgs  = new ArrayList<>();
     private String batchId;
     private String ownerId;
 

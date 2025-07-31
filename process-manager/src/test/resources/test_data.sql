@@ -48,7 +48,7 @@ INSERT INTO pcp_profile (profile_id,
                          description,
                          plugin_id,
                          jvm_args)
-  VALUES ('testPlugin2-default',
+  VALUES ('testPlugin2',
           'Default profile',
         'testPlugin2',
         ARRAY ['-Xms1g']);

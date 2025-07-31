@@ -43,7 +43,7 @@ public class PluginEndpoint {
     @GET
     @Path("/{pluginId}")
     public Response getPlugin(@PathParam("pluginId") String pluginId) {
-        PluginInfo pluginInfo = pluginService.getPlugin(pluginId);
+        PluginInfo pluginInfo = pluginService.getPlugin(pluginId, true, true);
         if (pluginInfo == null) {
             return APIRestUtilities.notFound("Plugin not found: [%s]", pluginId);
         }
