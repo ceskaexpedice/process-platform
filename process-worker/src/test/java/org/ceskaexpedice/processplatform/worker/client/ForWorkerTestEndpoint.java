@@ -108,6 +108,9 @@ public class ForWorkerTestEndpoint {
     public Response updateProcessPid(@PathParam("processId") String processId, @QueryParam("pid") String pid) {
         // Store OS process ID of the spawned JVM
         System.out.println("WorkerTestEndpoint: updateProcessPid:processId-" + processId + ";pid-" + pid);
+        if(processId.equals(WorkerTestsUtils.PROCESS_ID_NOT_EXISTS)){
+            return APIRestUtilities.notFound("No process found for %s", processId);
+        }
         return Response.ok().build();
     }
 

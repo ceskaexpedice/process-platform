@@ -23,6 +23,7 @@ public final class WorkerTestsUtils {
     public static final String NODE_WORKER1_ID = "worker1";
     public static final String NODE_WORKER2_ID = "worker2";
 
+    public static final String PROCESS_ID_NOT_EXISTS = "processIdNotExists";
     public static final String PLUGIN1_PROCESS_ID = "testPlugin1ProcessId";
     public static final String PLUGIN1_ID = "testPlugin1";
     public static final String PLUGIN1_MAIN_CLASS = "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1";

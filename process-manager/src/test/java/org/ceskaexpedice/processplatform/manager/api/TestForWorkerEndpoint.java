@@ -16,6 +16,8 @@ package org.ceskaexpedice.processplatform.manager.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
@@ -127,6 +129,18 @@ public class TestForWorkerEndpoint extends JerseyTest {
         String responseBody = response.readEntity(String.class);
         Assertions.assertEquals(200, response.getStatus());
         verify(processServiceMock, times(1)).updatePid(eq(PROCESS1_ID), eq(123));
+    }
+
+    @Test
+    public void testUpdateProcessPid_error() {
+        doThrow(new BusinessLogicException("Not found", ErrorCode.NOT_FOUND))
+                .when(processServiceMock).updatePid(eq(PROCESS_ID_NOT_EXISTS), anyInt());
+        String json = "{}";
+        Response response = target("worker/pid/" + PROCESS_ID_NOT_EXISTS).queryParam("pid",123).request(MediaType.APPLICATION_JSON).put((Entity.entity(
+                json, MediaType.APPLICATION_JSON_TYPE)));
+        String responseBody = response.readEntity(String.class);
+        Assertions.assertEquals(404, response.getStatus());
+        verify(processServiceMock, times(1)).updatePid(eq(PROCESS_ID_NOT_EXISTS), eq(123));
     }
 
     @Test

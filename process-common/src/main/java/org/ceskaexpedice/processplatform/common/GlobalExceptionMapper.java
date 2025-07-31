@@ -37,7 +37,11 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
         // Customize status + message for known types
         if (e instanceof BusinessLogicException) {
-            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s", id, e.getMessage()));
+            BusinessLogicException be = (BusinessLogicException) e;
+            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s,%s", id, e.getMessage(), be.getErrorCode()));
+            if(be.getErrorCode() == ErrorCode.NOT_FOUND){
+                return buildResponse(Response.Status.NOT_FOUND, msg);
+            }
             return buildResponse(Response.Status.BAD_REQUEST, msg);
         }
         if (e instanceof DataAccessException) {

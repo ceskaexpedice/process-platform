@@ -17,18 +17,10 @@
 package org.ceskaexpedice.processplatform.common;
 
 /**
- * BusinessLogicException
+ * ErrorCode
  * @author ppodsednik
  */
-public class BusinessLogicException extends RuntimeException {
-    private final ErrorCode errorCode;
-
-    public BusinessLogicException(String message, ErrorCode errorCode) {
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
+public enum ErrorCode {
+    NOT_FOUND,
+    INVALID_INPUT
 }

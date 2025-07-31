@@ -177,6 +177,11 @@ public class TestProcessService_integration {
         processService.updatePid(processId, 123);
         processInfo = processService.getProcess(processId);
         Assertions.assertEquals(123, processInfo.getPid());
+
+        assertThrows(BusinessLogicException.class, () -> {
+            processService.updatePid("processIdNotExistent", 123);
+        });
+
     }
 
     @Test

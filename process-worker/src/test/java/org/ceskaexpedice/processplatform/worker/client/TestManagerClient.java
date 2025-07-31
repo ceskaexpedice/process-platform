@@ -14,6 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * TestManagerClient
@@ -107,21 +110,26 @@ public class TestManagerClient {
     public void testUpdateProcessPid() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.updateProcessPid(PLUGIN1_PROCESS_ID, "333");
-        // TODO test not existing process id
+    }
+
+    @Test
+    public void testUpdateProcessPid_error() {
+        ManagerClient managerClient = new ManagerClient(workerConfiguration);
+        assertThrows(RemoteNodeException.class, () -> {
+            managerClient.updateProcessPid(PROCESS_ID_NOT_EXISTS, "333");
+        });
     }
 
     @Test
     public void testUpdateProcessState() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.updateProcessState(PLUGIN1_PROCESS_ID, ProcessState.FINISHED);
-        // TODO test not existing process id
     }
 
     @Test
     public void testUpdateProcessDescription() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         managerClient.updateProcessDescription(PLUGIN1_PROCESS_ID, "newName");
-        // TODO test not existing process id
     }
 
 }

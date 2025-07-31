@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.PluginProfile;
@@ -89,7 +90,7 @@ public class PluginService {
 
             // Check required
             if (payloadFieldSpec.isRequired() && (payloadValue == null || payloadValue.isEmpty())) {
-                throw new BusinessLogicException("Payload field '" + name + "' is missing");
+                throw new BusinessLogicException("Payload field '" + name + "' is missing", ErrorCode.INVALID_INPUT);
             }
 
             // Skip type check if value is null or empty (but not required)
@@ -105,7 +106,7 @@ public class PluginService {
                         break;
                     case BOOLEAN:
                         if (!payloadValue.equalsIgnoreCase("true") && !payloadValue.equalsIgnoreCase("false")) {
-                            throw new BusinessLogicException("Payload field '" + name + "' must be a boolean (true/false)");
+                            throw new BusinessLogicException("Payload field '" + name + "' must be a boolean (true/false)", ErrorCode.INVALID_INPUT);
                         }
                         break;
                     case NUMBER:
@@ -117,14 +118,13 @@ public class PluginService {
                         LocalDate.parse(payloadValue, formatter);
                         break;
                     default:
-                        throw new BusinessLogicException("Unknown payload field type for field '" + name + "'");
+                        throw new BusinessLogicException("Unknown payload field type for field '" + name + "'", ErrorCode.INVALID_INPUT);
                 }
             } catch (Exception e) {
-                throw new BusinessLogicException("Invalid value for field '" + name + "' of type " + payloadFieldSpec.getType() + ": " + payloadValue);
+                throw new BusinessLogicException("Invalid value for field '" + name + "' of type " + payloadFieldSpec.getType() + ": " + payloadValue, ErrorCode.INVALID_INPUT);
             }
         }
     }
-
 
     public void registerPlugin(PluginInfo pluginInfo) {
         LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));

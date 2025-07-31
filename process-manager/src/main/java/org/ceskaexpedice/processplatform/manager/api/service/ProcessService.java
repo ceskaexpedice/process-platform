@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
@@ -84,11 +85,11 @@ public class ProcessService {
         LOGGER.info(String.format("schedule sub process for the profile [%s]", scheduleSubProcess.getProfileId()));
         validatePayload(scheduleSubProcess);
         if(scheduleSubProcess.getBatchId() == null){
-            throw new BusinessLogicException("Batch id cannot be null for subprocess");
+            throw new BusinessLogicException("Batch id cannot be null for subprocess", ErrorCode.INVALID_INPUT);
         }
         ProcessEntity processMain = processDao.getProcess(scheduleSubProcess.getBatchId());
         if(processMain == null){
-            throw new BusinessLogicException("Not found based on sub process batch id. Process [" + scheduleSubProcess.getBatchId() + "] does not exist");
+            throw new BusinessLogicException("Not found based on sub process batch id. Process [" + scheduleSubProcess.getBatchId() + "] does not exist", ErrorCode.NOT_FOUND);
         }
         String newProcessId = UUID.randomUUID().toString();
         String ownerId = processMain.getOwner();
@@ -134,17 +135,26 @@ public class ProcessService {
 
     public void updatePid(String processId, int pid) {
         LOGGER.info(String.format("update pid: processId, pid [%s, %s]", processId, pid));
-        processDao.updatePid(processId, pid);
+        boolean updated = processDao.updatePid(processId, pid);
+        if (!updated) {
+            throw new BusinessLogicException("Process with id [" + processId + "] not found", ErrorCode.NOT_FOUND);
+        }
     }
 
     public void updateState(String processId, ProcessState processState) {
         LOGGER.info(String.format("update state: processId, process state [%s, %s]", processId, processState));
-        processDao.updateState(processId, processState);
+        boolean updated = processDao.updateState(processId, processState);
+        if (!updated) {
+            throw new BusinessLogicException("Process with id [" + processId + "] not found", ErrorCode.NOT_FOUND);
+        }
     }
 
     public void updateDescription(String processId, String description) {
         LOGGER.info(String.format("update description: processId, description [%s, %s]", processId, description));
-        processDao.updateDescription(processId, description);
+        boolean updated = processDao.updateDescription(processId, description);
+        if (!updated) {
+            throw new BusinessLogicException("Process with id [" + processId + "] not found", ErrorCode.NOT_FOUND);
+        }
     }
 
     public InputStream getProcessLog(String processId, boolean err) {
