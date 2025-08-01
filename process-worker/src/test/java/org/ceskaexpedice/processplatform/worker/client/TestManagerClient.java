@@ -85,6 +85,7 @@ public class TestManagerClient {
 
     @Test
     public void testGetNextScheduledProcess() {
+        ForWorkerTestEndpoint.counter = 0;
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
         ScheduledProcess nextProcess = managerClient.getNextScheduledProcess();
         Assertions.assertEquals(PLUGIN1_PROCESS_ID, nextProcess.getProcessId());

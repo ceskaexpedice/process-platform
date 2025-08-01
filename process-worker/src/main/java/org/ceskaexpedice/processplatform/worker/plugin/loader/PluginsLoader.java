@@ -102,6 +102,9 @@ public final class PluginsLoader {
         Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
 
         List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar);
+        for(PluginProfile profile : profiles){
+            profile.setPluginId(pluginId);
+        }
         if(profiles.isEmpty()){
             PluginProfile defaultProfile = new PluginProfile(pluginId, pluginId, pluginId, new ArrayList<>());
             profiles.add(defaultProfile);

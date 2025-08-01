@@ -12,7 +12,7 @@
  * information or reproduction of this material is strictly forbidden unless
  * prior written permission is obtained from Accenture and/or its affiliates.
  */
-package org.ceskaexpedice.processplatform.manager.api.db;
+package org.ceskaexpedice.processplatform.manager.db;
 
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
@@ -21,10 +21,7 @@ import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -67,6 +64,14 @@ public class TestDbUtils_integration {
             tableExists = DbUtils.tableExists(connection, ManagerConfiguration.PLUGIN_TABLE);
             Assertions.assertFalse(tableExists);
         }
+    }
+
+    @Disabled
+    @Test
+    public void testCreateEmptyDb() {
+        ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
+        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
+        createTables(dbConnectionProvider);
     }
 
     private static void dropTables(Connection connection) {

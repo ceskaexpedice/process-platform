@@ -36,7 +36,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ForWorkerTestEndpoint {
-    private static int counter;
+    public static int counter;
 
     @POST
     @Path("/register_node")

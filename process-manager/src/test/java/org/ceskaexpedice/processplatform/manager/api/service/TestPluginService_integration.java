@@ -114,7 +114,7 @@ public class TestPluginService_integration {
     @Test
     public void testGetPlugins() {
         List<PluginInfo> plugins = pluginService.getPlugins();
-        Assertions.assertEquals(2, plugins.size());
+        Assertions.assertEquals(3, plugins.size());
     }
 
     @Test

@@ -74,7 +74,10 @@ public class WorkerStartupListener implements ServletContextListener {
 
     private static void setStarterClasspath(WorkerConfiguration config) {
         String libPath = ctx.getRealPath("/WEB-INF/lib");
+        String classesPath = ctx.getRealPath("/WEB-INF/classes");
         String starterClasspath = buildClasspath(libPath);
+        starterClasspath = starterClasspath + File.pathSeparator;
+        starterClasspath = starterClasspath + classesPath;
         config.setStarterClasspath(starterClasspath);
     }
 

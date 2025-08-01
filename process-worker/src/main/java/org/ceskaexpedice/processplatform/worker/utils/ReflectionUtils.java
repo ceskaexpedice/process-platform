@@ -49,6 +49,7 @@ public final class ReflectionUtils {
     }
 
     public static Object[] map(Method processMethod, String[] defaultParams, Map<String, String> processParametersProperties) {
+        // TODO supported types: String, Boolean, number, date
         Annotation[][] annots = processMethod.getParameterAnnotations();
         Class<?>[] types = processMethod.getParameterTypes();
         List<Object> params = new ArrayList<Object>();
