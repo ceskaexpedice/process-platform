@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.utils;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.logging.Logger;
@@ -39,6 +40,7 @@ public final class APIRestUtilities {
     public static Response ok(String fmt, Object... args) {
         return Response.ok().entity(jsonMessage(fmt, args)).build();
     }
+
     /**
      * Create a JAX response for a Not Found (404) message
      *
@@ -84,6 +86,16 @@ public final class APIRestUtilities {
     }
 
     /**
+     * Create an "ok" (200) response with a Json payload
+     *
+     * @param jsonPayload the payload
+     * @return the JAX response
+     */
+    public static Response jsonPayload(String jsonPayload) {
+        return Response.ok(jsonPayload, MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
      * Create a json style error message
      *
      * @return the json
@@ -92,7 +104,6 @@ public final class APIRestUtilities {
         String msg = args == null || args.length == 0 ? fmt : String.format(fmt, args);
         return String.format("{\"error\":{\"message\": \"%s\"}}", msg);
     }
-
 
 
     private static String jsonMessage(String fmt, Object... args) {

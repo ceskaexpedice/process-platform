@@ -48,7 +48,7 @@ public class ForManagerEndpoint {
                     try (logStream) {
                         logStream.transferTo(output);
                     }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
                 .build();
     }
 
@@ -62,14 +62,8 @@ public class ForManagerEndpoint {
                     try (logStream) {
                         logStream.transferTo(output);
                     }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
                 .build();
     }
 
-    @POST
-    @Path("/kill")
-    public Response killJVM() {
-        // TODO check if we need this function - manager wants to kill plugins JVM
-        return Response.ok().build();
-    }
 }

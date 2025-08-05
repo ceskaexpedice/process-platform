@@ -65,6 +65,7 @@ public class TestProcessEndpoint extends JerseyTest {
 
     @Test
     public void testScheduleMainProcess() throws JsonProcessingException {
+        when(processServiceMock.scheduleMainProcess(any())).thenReturn(PROCESS1_ID);
         ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess();
         scheduleMainProcess.setProfileId(PROFILE1_ID);
         String json = mapper.writeValueAsString(scheduleMainProcess);

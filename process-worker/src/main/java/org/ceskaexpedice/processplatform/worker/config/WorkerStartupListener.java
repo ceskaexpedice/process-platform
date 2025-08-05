@@ -37,7 +37,6 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  */
 // TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
-// TODO start worker and check it communicates with manager
 public class WorkerStartupListener implements ServletContextListener {
     private static Logger LOGGER = Logger.getLogger(WorkerStartupListener.class.getName());
     private static ServletContext ctx;

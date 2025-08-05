@@ -21,6 +21,7 @@ import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -74,8 +75,10 @@ public class ForWorkerEndpoint {
     @POST
     @Path("/schedule_sub_process")
     public Response scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
-        processService.scheduleSubProcess(scheduleSubProcess);
-        return APIRestUtilities.ok("Subprocess for profile [%s] scheduled", scheduleSubProcess.getProfileId());
+        String processId = processService.scheduleSubProcess(scheduleSubProcess);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("processId", processId);
+        return APIRestUtilities.jsonPayload(jsonObject.toString());
     }
 
     @PUT

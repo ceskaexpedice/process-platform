@@ -23,6 +23,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
@@ -50,8 +51,10 @@ public class ProcessEndpoint {
 
     @POST
     public Response scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {
-        processService.scheduleMainProcess(scheduleMainProcess);
-        return APIRestUtilities.ok("Main process for profile [%s] scheduled", scheduleMainProcess.getProfileId());
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("processId", processId);
+        return APIRestUtilities.jsonPayload(jsonObject.toString());
     }
 
     @GET
@@ -115,7 +118,7 @@ public class ProcessEndpoint {
                     try (logStream) {
                         logStream.transferTo(output);
                     }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
                 .build();
     }
 
@@ -129,7 +132,7 @@ public class ProcessEndpoint {
                     try (logStream) {
                         logStream.transferTo(output);
                     }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + ".log\"")
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
                 .build();
     }
 

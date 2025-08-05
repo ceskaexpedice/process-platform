@@ -70,12 +70,12 @@ public final class ManagerTestsUtils {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
 
-            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_process.sql");
+            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_node.sql");
             sql = IOUtils.toString(is, StandardCharsets.UTF_8);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
 
-            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_node.sql");
+            is = TestPluginService_integration.class.getClassLoader().getResourceAsStream("pcp_process.sql");
             sql = IOUtils.toString(is, StandardCharsets.UTF_8);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();

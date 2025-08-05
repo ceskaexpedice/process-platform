@@ -82,6 +82,9 @@ public class PluginService {
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
         PluginInfo plugin = getPlugin(pluginId, false, false);
+        if(plugin == null || plugin.getPayloadFieldSpecMap() == null) {
+            return;
+        }
         for (Map.Entry<String, PayloadFieldSpec> entry : plugin.getPayloadFieldSpecMap().entrySet()) {
             String name = entry.getKey();
             PayloadFieldSpec payloadFieldSpec = entry.getValue();
