@@ -11,6 +11,5 @@ CREATE TABLE pcp_process
     status         INTEGER,
     payload        JSONB,
     batch_id       TEXT,
-    batch_status   INTEGER,
     owner          TEXT
 );

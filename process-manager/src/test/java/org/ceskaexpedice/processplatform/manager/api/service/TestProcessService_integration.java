@@ -130,6 +130,38 @@ public class TestProcessService_integration {
         Assertions.assertEquals(ProcessState.NOT_RUNNING, processInfo.getStatus());
     }
 
+    // TODO batch
+    @Test
+    public void testGetMainProcess() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleMainProcess scheduleMainProcess2 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId2 = processService.scheduleMainProcess(scheduleMainProcess2);
+
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.WARNING);
+
+
+        List<Batch> batches = processService.getBatches(null,0, 50);
+        System.out.println();
+    }
+
     @Test
     public void testGetNextScheduledProcess_none() {
         Node node = new Node();

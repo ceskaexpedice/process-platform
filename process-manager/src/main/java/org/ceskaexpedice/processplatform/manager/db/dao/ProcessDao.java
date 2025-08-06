@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.manager.db.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
+import org.ceskaexpedice.processplatform.common.model.BatchFilter;
 import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
@@ -43,12 +44,12 @@ public class ProcessDao extends AbstractDao{
         try (Connection connection = getConnection()) {
             List<ProcessEntity> processes = new JDBCQueryTemplate<ProcessEntity>(connection) {
                 @Override
-                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) throws SQLException {
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
                     ProcessEntity processEntity = ProcessMapper.mapProcess(rs);
                     returnsList.add(processEntity);
                     return false;
                 }
-            }.executeQuery("select " + "*" + " from PCP_PROCESS p  where PROCESS_ID = ?", processId);
+            }.executeQuery("select " + "*" + " from pcp_process p  where process_id = ?", processId);
             return processes.size() == 1 ? processes.get(0) : null;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
@@ -64,7 +65,42 @@ public class ProcessDao extends AbstractDao{
                     returnsList.add(processEntity);
                     return true;
                 }
-            }.executeQuery("select " + "*" + " from PCP_PROCESS p  where STATUS = ?", processState);
+            }.executeQuery("select " + "*" + " from pcp_process p  where status = ?", processState);
+            return processEntities;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    // TODO batch
+    public List<ProcessEntity> getBatchHeaders(BatchFilter batchFilter, int offset, int limit) {
+        try (Connection connection = getConnection()) {
+            List<ProcessEntity> processEntities = new JDBCQueryTemplate<ProcessEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
+                    ProcessEntity processEntity = ProcessMapper.mapProcess(rs);
+                    returnsList.add(processEntity);
+                    return true;
+                }
+            }.executeQuery("select " + "*" + " from pcp_process p where process_id = batch_id ORDER BY planned DESC LIMIT ? OFFSET ?",
+                    limit, offset);
+            return processEntities;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    // TODO batch
+    public List<ProcessEntity> getBatch(String batchId) {
+        try (Connection connection = getConnection()) {
+            List<ProcessEntity> processEntities = new JDBCQueryTemplate<ProcessEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
+                    ProcessEntity processEntity = ProcessMapper.mapProcess(rs);
+                    returnsList.add(processEntity);
+                    return true;
+                }
+            }.executeQuery("select " + "*" + " from pcp_process p  where batch_id = ? ORDER BY planned", batchId);
             return processEntities;
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);

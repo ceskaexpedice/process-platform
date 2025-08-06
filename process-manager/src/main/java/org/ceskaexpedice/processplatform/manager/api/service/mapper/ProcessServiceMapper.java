@@ -54,6 +54,19 @@ public class ProcessServiceMapper {
         return scheduledProcess;
     }
 
+    public static Batch mapFirstProcessToBatch(ProcessEntity processEntity) {
+        if(processEntity == null) return null;
+        Batch batch = new Batch();
+        batch.setBatchId(processEntity.getBatchId());
+        batch.setFirstProcessId(processEntity.getProcessId());
+        batch.setStatus(ProcessState.load(processEntity.getStatus()));
+        batch.setPlanned(processEntity.getPlanned());
+        batch.setStarted(processEntity.getStarted());
+        batch.setFinished(processEntity.getFinished());
+        batch.setOwner(processEntity.getOwner());
+        return batch;
+    }
+
     public static ProcessInfo mapProcessBasic(ProcessEntity processEntity) {
         if(processEntity == null) return null;
         ProcessInfo processInfo = new ProcessInfo();

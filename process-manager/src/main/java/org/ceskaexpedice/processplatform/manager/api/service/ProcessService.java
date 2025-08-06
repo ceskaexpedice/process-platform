@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.utils.StringUtils;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
@@ -33,10 +34,7 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -45,6 +43,8 @@ import java.util.logging.Logger;
  */
 public class ProcessService {
     private static final Logger LOGGER = Logger.getLogger(ProcessService.class.getName());
+    private static final Integer GET_BATCHES_DEFAULT_OFFSET = 0;
+    private static final Integer GET_BATCHES_DEFAULT_LIMIT = 10;
 
     private final ManagerConfiguration managerConfiguration;
     private final ProcessDao processDao;
@@ -133,6 +133,27 @@ public class ProcessService {
         return scheduledProcess;
     }
 
+    // TODO handle batch logic here
+    // TODO add filter
+    public List<Batch> getBatches(BatchFilter batchFilter, int offset, int limit) {
+        List<Batch> batches = new ArrayList<>();
+        List<ProcessEntity> batchHeaders = processDao.getBatchHeaders(batchFilter, offset, limit);
+        for (ProcessEntity processHeaderEntity : batchHeaders) {
+            List<ProcessState> processStates = new ArrayList<>();
+            Batch batch = ProcessServiceMapper.mapFirstProcessToBatch(processHeaderEntity);
+            List<ProcessEntity> processes = processDao.getBatch(processHeaderEntity.getBatchId());
+            for (ProcessEntity processEntity : processes) {
+                ProcessInfo processInfo = ProcessServiceMapper.mapProcessBasic(processEntity);
+                batch.getProcesses().add(processInfo);
+                processStates.add(processInfo.getStatus());
+            }
+            ProcessState batchState = ProcessState.calculateBatchState(processStates);
+            batch.setStatus(batchState);
+            batches.add(batch);
+        }
+        return batches;
+    }
+
     public void updatePid(String processId, int pid) {
         LOGGER.info(String.format("update pid: processId, pid [%s, %s]", processId, pid));
         boolean updated = processDao.updatePid(processId, pid);
@@ -162,11 +183,59 @@ public class ProcessService {
         return logStream;
     }
 
+    // TODO batch
+    public int getBatchOffset(String offsetStr){
+        int offset = GET_BATCHES_DEFAULT_OFFSET;
+        if (StringUtils.isAnyString(offsetStr)) {
+            try {
+                offset = Integer.valueOf(offsetStr);
+                if (offset < 0) {
+                    throw new BusinessLogicException(String.format("offset must be zero or a positive number, '%s' is not", offsetStr), ErrorCode.INVALID_INPUT);
+                }
+            } catch (NumberFormatException e) {
+                throw new BusinessLogicException(String.format("offset must be a number, '%s' is not", offsetStr), ErrorCode.INVALID_INPUT);
+            }
+        }
+        return offset;
+    }
+
+    // TODO batch
+    public static int getBatchLimit(String limitStr){
+        int limit = GET_BATCHES_DEFAULT_LIMIT;
+        if (StringUtils.isAnyString(limitStr)) {
+            try {
+                limit = Integer.valueOf(limitStr);
+                if (limit < 1) {
+                    throw new BusinessLogicException(String.format("limit must be a positive number, '%s' is not", limitStr), ErrorCode.INVALID_INPUT);
+                }
+            } catch (NumberFormatException e) {
+                throw new BusinessLogicException(String.format("limit must be a number, '%s' is not", limitStr), ErrorCode.INVALID_INPUT);
+            }
+        }
+        return limit;
+    }
+
+    // TODO batch
+    public BatchFilter createBatchFilter(String owner, String processState, String from, String to){
+        BatchFilter filter = new BatchFilter();
+        if (StringUtils.isAnyString(filterOwner)) {
+            filter.owner = filterOwner;
+        }
+        if (StringUtils.isAnyString(filterFrom)) {
+            filter.from = parseLocalDateTime(filterFrom);
+        }
+        if (StringUtils.isAnyString(filterUntil)) {
+            filter.until = parseLocalDateTime(filterUntil);
+        }
+        if (StringUtils.isAnyString(filterState)) {
+            filter.stateCode = toBatchStateCode(filterState);
+        }
+    }
+
     private void validatePayload(ScheduleProcess scheduleProcess) {
         PluginProfileEntity profile = profileDao.getProfile(scheduleProcess.getProfileId());
         PluginEntity plugin = pluginDao.getPlugin(profile.getPluginId());
         pluginService.validatePayload(plugin.getPluginId(), scheduleProcess.getPayload());
     }
-    // TODO handle batch logic here
 
 }

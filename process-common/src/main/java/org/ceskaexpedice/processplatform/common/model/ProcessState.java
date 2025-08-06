@@ -7,7 +7,6 @@ import java.util.List;
  * 
  * @author pavels
  */
-// TODO check for validity all options in pcp
 public enum ProcessState {
 
     /**
@@ -43,34 +42,8 @@ public enum ProcessState {
     /**
      * Finished with some errors
      */
-    WARNING(9),
+    WARNING(9);
     
-    /*
-     * WARNING(10)
-     */
-    
-    /**
-     * Batch process started (contains child processes and all of them are
-     * PLANNED or RUNNING).
-     */
-    @Deprecated
-    BATCH_STARTED(6),
-
-    
-    /**
-     * Batch process failed (some of child process FAILED)
-     */
-    @Deprecated
-    BATCH_FAILED(7),
-
-    /**
-     * Batch process finished (all child processes finished with state FINISH)
-     */
-    @Deprecated
-    BATCH_FINISHED(8);
-
-    
-
     /**
      * Load state from value
      * @param v Given value of state
@@ -94,22 +67,29 @@ public enum ProcessState {
         return val;
     }
 
-//    /**
-//     * Calculate master batch process state
-//     * @param childStates Child process states
-//     * @return
-//     */
-//    public static States calculateBatchState(List<States> childStates) {
-//        // ve stavu planned nebo running
-//        if (one(childStates, FAILED)) {
-//            return BATCH_FAILED;
-//        } else {
-//            if (one(childStates, PLANNED, RUNNING)) {
-//                return BATCH_STARTED;
-//            }
-//            return BATCH_FINISHED;
-//        }
-//    }
+    /**
+     * Calculate master batch process state
+     * @param childStates Child process states
+     * @return
+     */
+    public static ProcessState calculateBatchState(List<ProcessState> childStates) {
+        if(all(childStates, FINISHED)){
+            return FINISHED;
+        }
+        if (one(childStates, FAILED)) {
+            return FAILED;
+        }
+        if (one(childStates, WARNING)) {
+            return WARNING;
+        }
+        if (one(childStates, RUNNING)) {
+            return RUNNING;
+        }
+        if (one(childStates, NOT_RUNNING)) {
+            return NOT_RUNNING;
+        }
+        return PLANNED;
+    }
 
     /**
      * Returns true if one of given childStates contains any expecting state
@@ -161,6 +141,6 @@ public enum ProcessState {
      * @return
      */
     public static boolean notRunningState(ProcessState realProcessState) {
-        return expect(realProcessState, ProcessState.FAILED, ProcessState.FINISHED, ProcessState.KILLED, ProcessState.NOT_RUNNING, ProcessState.WARNING, ProcessState.BATCH_FAILED, ProcessState.BATCH_FINISHED, ProcessState.BATCH_STARTED);
+        return expect(realProcessState, ProcessState.FAILED, ProcessState.FINISHED, ProcessState.KILLED, ProcessState.NOT_RUNNING, ProcessState.WARNING);
     }
 }
