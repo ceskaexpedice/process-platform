@@ -43,6 +43,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
+import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;
+
 /**
  * ProcessEndpoint
  * @author ppodsednik
@@ -101,7 +103,7 @@ public class ProcessEndpoint {
         result.put("total_size", totalSize);
 
         //batch & process data
-        List<Batch> batches = processService.getBatches(null, 0, 50);
+        List<Batch> batches = processService.getBatches(batchFilter, offset, limit);
         JSONArray batchesJson = new JSONArray();
         for (Batch batch : batches) {
             JSONObject batchJson = batchToJson(batch);
@@ -187,18 +189,7 @@ public class ProcessEndpoint {
         }
     }
 
-    // TODO batch
-    public static String toFormattedStringOrNull(Date dateTime) {
-        LocalDateTime localDateTime = dateTime.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        if (dateTime == null) {
-            return null;
-        } else {
-            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime);
-        }
-    }
-
+    // TODO some good delete API needed
     @DELETE
     @Path("batches/by_first_process_id/{processId}")
     @Produces(MediaType.APPLICATION_JSON)

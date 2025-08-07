@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,9 +30,9 @@ public class ProcessEntity {
     private String profileId;
     private String workerId;
     private int pid;
-    private Date planned;
-    private Date started;
-    private Date finished;
+    private LocalDateTime planned;
+    private LocalDateTime started;
+    private LocalDateTime finished;
     private int status;
     private Map<String, String> payload;
     private String batchId;
@@ -96,27 +97,27 @@ public class ProcessEntity {
         this.workerId = workerId;
     }
 
-    public Date getPlanned() {
+    public LocalDateTime getPlanned() {
         return planned;
     }
 
-    public void setPlanned(Date planned) {
+    public void setPlanned(LocalDateTime planned) {
         this.planned = planned;
     }
 
-    public Date getStarted() {
+    public LocalDateTime getStarted() {
         return started;
     }
 
-    public void setStarted(Date started) {
+    public void setStarted(LocalDateTime started) {
         this.started = started;
     }
 
-    public Date getFinished() {
+    public LocalDateTime getFinished() {
         return finished;
     }
 
-    public void setFinished(Date finished) {
+    public void setFinished(LocalDateTime finished) {
         this.finished = finished;
     }
 

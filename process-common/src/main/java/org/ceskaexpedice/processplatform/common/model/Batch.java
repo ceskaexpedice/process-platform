@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,9 +26,9 @@ public class Batch {
     private String batchId;
     private String firstProcessId;
     private ProcessState status;
-    private Date planned;
-    private Date started;
-    private Date finished;
+    private LocalDateTime planned;
+    private LocalDateTime started;
+    private LocalDateTime finished;
     private String owner;
     private List<ProcessInfo> processes = new ArrayList<>();
 
@@ -55,27 +56,27 @@ public class Batch {
         this.status = status;
     }
 
-    public Date getPlanned() {
+    public LocalDateTime getPlanned() {
         return planned;
     }
 
-    public void setPlanned(Date planned) {
+    public void setPlanned(LocalDateTime planned) {
         this.planned = planned;
     }
 
-    public Date getStarted() {
+    public LocalDateTime getStarted() {
         return started;
     }
 
-    public void setStarted(Date started) {
+    public void setStarted(LocalDateTime started) {
         this.started = started;
     }
 
-    public Date getFinished() {
+    public LocalDateTime getFinished() {
         return finished;
     }
 
-    public void setFinished(Date finished) {
+    public void setFinished(LocalDateTime finished) {
         this.finished = finished;
     }
 

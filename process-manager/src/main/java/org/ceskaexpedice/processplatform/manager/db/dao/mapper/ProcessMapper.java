@@ -45,19 +45,19 @@ public class ProcessMapper {
         stmt.setString(4, processEntity.getWorkerId());
         stmt.setInt(5, processEntity.getPid());
         if (processEntity.getPlanned() != null) {
-            Timestamp timestamp = new Timestamp(processEntity.getPlanned().getTime());
+            Timestamp timestamp = Timestamp.valueOf(processEntity.getPlanned());
             stmt.setTimestamp(6, timestamp);
         } else {
             stmt.setNull(6, java.sql.Types.TIMESTAMP);
         }
         if (processEntity.getStarted() != null) {
-            Timestamp timestamp = new Timestamp(processEntity.getStarted().getTime());
+            Timestamp timestamp = Timestamp.valueOf(processEntity.getStarted());
             stmt.setTimestamp(7, timestamp);
         } else {
             stmt.setNull(7, java.sql.Types.TIMESTAMP);
         }
         if (processEntity.getFinished() != null) {
-            Timestamp timestamp = new Timestamp(processEntity.getFinished().getTime());
+            Timestamp timestamp = Timestamp.valueOf(processEntity.getFinished());
             stmt.setTimestamp(8, timestamp);
         } else {
             stmt.setNull(8, java.sql.Types.TIMESTAMP);
@@ -78,13 +78,13 @@ public class ProcessMapper {
             processEntity.setWorkerId(rsProcess.getString("worker_id"));
             processEntity.setPid(rsProcess.getInt("pid"));
             if(rsProcess.getTimestamp("started") != null){
-                processEntity.setPlanned(new Date(rsProcess.getTimestamp("planned").getTime()));
+                processEntity.setPlanned(rsProcess.getTimestamp("planned").toLocalDateTime());
             }
             if(rsProcess.getTimestamp("started") != null){
-                processEntity.setStarted(new Date(rsProcess.getTimestamp("started").getTime()));
+                processEntity.setPlanned(rsProcess.getTimestamp("started").toLocalDateTime());
             }
             if(rsProcess.getTimestamp("finished") != null){
-                processEntity.setFinished(new Date(rsProcess.getTimestamp("finished").getTime()));
+                processEntity.setPlanned(rsProcess.getTimestamp("finished").toLocalDateTime());
             }
             processEntity.setStatus(rsProcess.getInt("status"));
             String json = rsProcess.getString("payload");

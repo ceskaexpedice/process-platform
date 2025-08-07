@@ -25,7 +25,9 @@ import java.util.Stack;
  * String utilities
  * @author pavels
  */
-public class StringUtils {
+public final class StringUtils {
+
+    private StringUtils() {}
 
     /**
      * Minus operator

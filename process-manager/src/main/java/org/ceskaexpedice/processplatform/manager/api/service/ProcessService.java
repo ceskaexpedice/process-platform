@@ -34,8 +34,11 @@ import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
+
+import static org.ceskaexpedice.processplatform.common.utils.DateUtils.parseLocalDateTime;
 
 /**
  * ProcessService
@@ -74,7 +77,7 @@ public class ProcessService {
         processEntity.setProcessId(newProcessId);
         processEntity.setDescription("Main process for the profile " + scheduleMainProcess.getProfileId());
         processEntity.setStatus(ProcessState.PLANNED.getVal());
-        processEntity.setPlanned(new Date());
+        processEntity.setPlanned(LocalDateTime.now());
         processEntity.setBatchId(newBatchId);
 
         processDao.createProcess(processEntity);
@@ -98,7 +101,7 @@ public class ProcessService {
         processEntity.setProcessId(newProcessId);
         processEntity.setDescription("Sub process for the profile " + scheduleSubProcess.getProfileId());
         processEntity.setStatus(ProcessState.PLANNED.getVal());
-        processEntity.setPlanned(new Date());
+        processEntity.setPlanned(LocalDateTime.now());
         processEntity.setOwner(ownerId);
 
         processDao.createProcess(processEntity);
@@ -218,17 +221,26 @@ public class ProcessService {
     // TODO batch
     public BatchFilter createBatchFilter(String owner, String processState, String from, String to){
         BatchFilter filter = new BatchFilter();
-        if (StringUtils.isAnyString(filterOwner)) {
-            filter.owner = filterOwner;
+        if (StringUtils.isAnyString(owner)) {
+            filter.setOwner(owner);
         }
-        if (StringUtils.isAnyString(filterFrom)) {
-            filter.from = parseLocalDateTime(filterFrom);
+        if (StringUtils.isAnyString(from)) {
+            filter.setFrom(parseLocalDateTime(from));
         }
-        if (StringUtils.isAnyString(filterUntil)) {
-            filter.until = parseLocalDateTime(filterUntil);
+        if (StringUtils.isAnyString(to)) {
+            filter.setTo(parseLocalDateTime(to));
         }
-        if (StringUtils.isAnyString(filterState)) {
-            filter.stateCode = toBatchStateCode(filterState);
+        if (StringUtils.isAnyString(processState)) {
+            try {
+                filter.setProcessState(ProcessState.valueOf(processState));
+            } catch (IllegalArgumentException e) {
+                throw new BusinessLogicException(e.toString(), ErrorCode.INVALID_INPUT);
+            }
+        }
+        if(filter.isEmpty()){
+            return null;
+        }else{
+            return filter;
         }
     }
 

@@ -48,4 +48,6 @@ public interface PluginContext {
      * @param scheduleSubProcess an object containing the configuration of the subprocess
      */
     void scheduleSubProcess(ScheduleSubProcess scheduleSubProcess);
+
+    // TODO we need somehow propagate DistributedLocksException
 }
