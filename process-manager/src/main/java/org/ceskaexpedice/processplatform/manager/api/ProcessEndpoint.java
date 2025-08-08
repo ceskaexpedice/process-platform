@@ -21,26 +21,16 @@ import org.ceskaexpedice.processplatform.common.model.BatchFilter;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
-import org.ceskaexpedice.processplatform.common.utils.StringUtils;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
-import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
-import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.ws.rs.*;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;

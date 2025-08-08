@@ -17,7 +17,6 @@
 package org.ceskaexpedice.processplatform.manager.db.entity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
 
 /**

@@ -19,11 +19,9 @@ package org.ceskaexpedice.processplatform.worker.config;
 import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.worker.api.ForManagerEndpoint;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.ApplicationPath;
 
 /**
  * WorkerApplication

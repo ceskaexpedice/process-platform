@@ -34,7 +34,8 @@ import java.util.Set;
  * PluginMapper
  * @author ppodsednik
  */
-public class PluginMapper {
+public final class PluginMapper {
+    private PluginMapper(){}
 
     private static final ObjectMapper mapper = new ObjectMapper();
 

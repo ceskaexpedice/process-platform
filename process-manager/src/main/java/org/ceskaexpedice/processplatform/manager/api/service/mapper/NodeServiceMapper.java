@@ -27,7 +27,8 @@ import java.util.List;
  * NodeServiceMapper
  * @author ppodsednik
  */
-public class NodeServiceMapper {
+public final class NodeServiceMapper {
+    private NodeServiceMapper(){}
 
     public static Node mapNode(NodeEntity nodeEntity) {
         if(nodeEntity == null) return null;

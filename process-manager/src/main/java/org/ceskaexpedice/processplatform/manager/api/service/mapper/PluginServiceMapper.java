@@ -26,7 +26,8 @@ import java.util.List;
  * PluginServiceMapper
  * @author ppodsednik
  */
-public class PluginServiceMapper {
+public final class PluginServiceMapper {
+    private PluginServiceMapper(){}
 
     public static PluginInfo mapPlugin(PluginEntity pluginEntity) {
         if(pluginEntity == null) return null;

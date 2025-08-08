@@ -26,7 +26,8 @@ import java.util.List;
  * ProfileServiceMapper
  * @author ppodsednik
  */
-public class ProfileServiceMapper {
+public final class ProfileServiceMapper {
+    private ProfileServiceMapper(){}
 
     public static PluginProfile mapProfile(PluginProfileEntity profileEntity) {
         if(profileEntity == null) return null;

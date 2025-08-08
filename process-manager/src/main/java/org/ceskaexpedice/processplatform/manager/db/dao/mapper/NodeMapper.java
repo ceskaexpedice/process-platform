@@ -27,7 +27,8 @@ import java.util.Set;
  * NodeMapper
  * @author ppodsednik
  */
-public class NodeMapper {
+public final class NodeMapper {
+    private NodeMapper(){}
 
     public static void mapNode(PreparedStatement stmt, NodeEntity nodeEntity, Connection conn) throws SQLException {
         stmt.setString(1, nodeEntity.getNodeId());

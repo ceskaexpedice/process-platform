@@ -31,7 +31,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 

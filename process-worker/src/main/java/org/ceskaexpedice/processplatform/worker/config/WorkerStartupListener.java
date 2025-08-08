@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 

@@ -27,7 +27,10 @@ import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**

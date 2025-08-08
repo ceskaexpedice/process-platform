@@ -14,7 +14,6 @@
  */
 package org.ceskaexpedice.processplatform.worker.client;
 
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;

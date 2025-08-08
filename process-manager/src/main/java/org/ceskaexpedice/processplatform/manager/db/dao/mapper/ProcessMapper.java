@@ -27,14 +27,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Map;
 
 /**
  * ProcessMapper
  * @author ppodsednik
  */
-public class ProcessMapper {
+public final class ProcessMapper {
+    private ProcessMapper(){}
 
     private static final ObjectMapper mapper = new ObjectMapper();
 

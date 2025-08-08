@@ -18,7 +18,6 @@ import org.ceskaexpedice.processplatform.worker.client.ForWorkerTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
-import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -31,7 +30,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.*;
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 
 /**

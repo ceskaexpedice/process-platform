@@ -29,7 +29,6 @@ import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
 import org.ceskaexpedice.processplatform.worker.utils.ReflectionUtils;
 
-import java.io.File;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;

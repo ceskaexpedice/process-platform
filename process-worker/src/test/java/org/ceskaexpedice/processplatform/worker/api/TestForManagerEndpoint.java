@@ -15,7 +15,6 @@
 package org.ceskaexpedice.processplatform.worker.api;
 
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
-import org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +25,6 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PLUGIN1_PROCESS_ID;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**

@@ -14,24 +14,16 @@
  */
 package org.ceskaexpedice.processplatform.manager.db;
 
-import org.ceskaexpedice.processplatform.common.model.Node;
-import org.ceskaexpedice.processplatform.common.model.NodeType;
-import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
-import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
-import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.createTables;
 
 /**
  * TestDbUtils_integration

@@ -16,7 +16,6 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.dao.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
@@ -27,7 +26,8 @@ import java.util.Arrays;
  * ProfileMapper
  * @author ppodsednik
  */
-public class ProfileMapper {
+public final class ProfileMapper {
+    private ProfileMapper(){}
 
     public static void mapPluginProfile(PreparedStatement stmt, PluginProfileEntity profile, Connection conn) throws SQLException {
         stmt.setString(1, profile.getProfileId());
