@@ -1,33 +1,34 @@
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * Processes states
- * 
+ *
  * @author pavels
  */
 public enum ProcessState {
 
     /**
-     * Not running process
+     * Planned (process is waiting to start)
      */
-    NOT_RUNNING(0),
+    PLANNED(0),
+
+    /**
+     * Not running process but assigned to a worker
+     */
+    NOT_RUNNING(1),
 
     /**
      * Running proces
      */
-    RUNNING(1),
+    RUNNING(2),
 
     /**
-     * Correct finished proces
+     * Correctly finished process
      */
-    FINISHED(2),
-
-    /**
-     * FAiled with some errors
-     */
-    FAILED(3),
+    FINISHED(3),
 
     /**
      * Killed process
@@ -35,15 +36,16 @@ public enum ProcessState {
     KILLED(4),
 
     /**
-     * Planned (process is waiting to start)
+     * Finished with some warnings
      */
-    PLANNED(5),
+    WARNING(5),
 
     /**
-     * Finished with some errors
+     * FAiled with some errors
      */
-    WARNING(9);
-    
+    FAILED(6);
+
+
     /**
      * Load state from value
      * @param v Given value of state
@@ -73,22 +75,9 @@ public enum ProcessState {
      * @return
      */
     public static ProcessState calculateBatchState(List<ProcessState> childStates) {
-        if(all(childStates, FINISHED)){
-            return FINISHED;
-        }
-        if (one(childStates, FAILED)) {
-            return FAILED;
-        }
-        if (one(childStates, WARNING)) {
-            return WARNING;
-        }
-        if (one(childStates, RUNNING)) {
-            return RUNNING;
-        }
-        if (one(childStates, NOT_RUNNING)) {
-            return NOT_RUNNING;
-        }
-        return PLANNED;
+        return childStates.stream()
+                .max(Comparator.comparingInt(ProcessState::getVal))
+                .orElse(ProcessState.PLANNED); // default if empty list
     }
 
     /**
@@ -133,8 +122,7 @@ public enum ProcessState {
         return false;
     }
 
-    
-    
+
     /**
      * Returns true given state is not running state
      * @param realProcessState

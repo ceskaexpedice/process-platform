@@ -17,7 +17,9 @@ package org.ceskaexpedice.processplatform.manager.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
+import org.ceskaexpedice.processplatform.common.model.Batch;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
@@ -36,6 +38,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,6 +97,45 @@ public class TestProcessEndpoint extends JerseyTest {
         Assertions.assertEquals(404, response.getStatus());
 
         verify(processServiceMock, times(2)).getProcess(any());
+    }
+
+    @Test
+    public void testBatches() {
+        List<Batch> batches = new ArrayList<>();
+        Batch batch1 = new Batch();
+        batch1.setMainProcessId(PROCESS1_ID);
+        batch1.setStatus(ProcessState.WARNING);
+        ProcessInfo processInfo1 = new ProcessInfo();
+        processInfo1.setProcessId(PROCESS1_ID);
+        processInfo1.setBatchId(PROCESS1_ID);
+        processInfo1.setStatus(ProcessState.FINISHED);
+        batch1.getProcesses().add(processInfo1);
+        ProcessInfo processInfo2 = new ProcessInfo();
+        processInfo2.setProcessId(PROCESS2_ID);
+        processInfo2.setBatchId(PROCESS1_ID);
+        processInfo2.setStatus(ProcessState.WARNING);
+        batch1.getProcesses().add(processInfo2);
+        batches.add(batch1);
+
+        Batch batch2 = new Batch();
+        batch2.setMainProcessId(PROCESS3_ID);
+        batch1.setStatus(ProcessState.PLANNED);
+        ProcessInfo processInfo21 = new ProcessInfo();
+        processInfo21.setProcessId(PROCESS3_ID);
+        processInfo21.setBatchId(PROCESS3_ID);
+        processInfo21.setStatus(ProcessState.PLANNED);
+        batch2.getProcesses().add(processInfo21);
+        batches.add(batch2);
+
+        when(processServiceMock.countBatchHeaders(any())).thenReturn(2);
+        when(processServiceMock.getBatches(any(), eq(0), eq(10))).thenReturn(batches);
+
+        Response response = target("process/batches").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+
+        verify(processServiceMock, times(1)).countBatchHeaders(any());
+        verify(processServiceMock, times(1)).getBatches(any(), eq(0), eq(10));
     }
 
     @Test

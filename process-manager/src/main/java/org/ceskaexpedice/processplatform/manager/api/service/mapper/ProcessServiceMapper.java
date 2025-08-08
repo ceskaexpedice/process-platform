@@ -16,14 +16,23 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;
 
 /**
  * ProcessServiceMapper
  * @author ppodsednik
  */
 public final class ProcessServiceMapper {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     private ProcessServiceMapper(){}
 
     public static ProcessEntity mapProcess(ScheduleMainProcess scheduleMainProcess) {
@@ -58,8 +67,7 @@ public final class ProcessServiceMapper {
     public static Batch mapFirstProcessToBatch(ProcessEntity processEntity) {
         if(processEntity == null) return null;
         Batch batch = new Batch();
-        batch.setBatchId(processEntity.getBatchId());
-        batch.setFirstProcessId(processEntity.getProcessId());
+        batch.setMainProcessId(processEntity.getProcessId());
         batch.setStatus(ProcessState.load(processEntity.getStatus()));
         batch.setPlanned(processEntity.getPlanned());
         batch.setStarted(processEntity.getStarted());
@@ -85,4 +93,15 @@ public final class ProcessServiceMapper {
         processInfo.setOwner(processEntity.getOwner());
         return processInfo;
     }
+
+    public static JSONObject mapBatchToJson(Batch batch) {
+        try {
+            String jsonString = mapper.writeValueAsString(batch);
+            JSONObject json = new JSONObject(jsonString);
+            return json;
+        } catch (JsonProcessingException e) {
+            throw new ApplicationException(e.toString(), e);
+        }
+    }
+
 }

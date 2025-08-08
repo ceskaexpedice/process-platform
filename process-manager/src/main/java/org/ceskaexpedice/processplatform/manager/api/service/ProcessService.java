@@ -139,8 +139,6 @@ public class ProcessService {
         return scheduledProcess;
     }
 
-    // TODO handle batch logic here
-    // TODO add filter
     public List<Batch> getBatches(BatchFilter batchFilter, int offset, int limit) {
         List<Batch> batches = new ArrayList<>();
         List<ProcessEntity> batchHeaders = processDao.getBatchHeaders(batchFilter, offset, limit);
@@ -158,6 +156,11 @@ public class ProcessService {
             batches.add(batch);
         }
         return batches;
+    }
+
+    public int countBatchHeaders(BatchFilter batchFilter) {
+        int counter = processDao.countBatchHeaders(batchFilter);
+        return counter;
     }
 
     public void updatePid(String processId, int pid) {
@@ -189,7 +192,6 @@ public class ProcessService {
         return logStream;
     }
 
-    // TODO batch
     public int getBatchOffset(String offsetStr){
         int offset = GET_BATCHES_DEFAULT_OFFSET;
         if (StringUtils.isAnyString(offsetStr)) {
@@ -205,7 +207,6 @@ public class ProcessService {
         return offset;
     }
 
-    // TODO batch
     public static int getBatchLimit(String limitStr){
         int limit = GET_BATCHES_DEFAULT_LIMIT;
         if (StringUtils.isAnyString(limitStr)) {
@@ -221,7 +222,6 @@ public class ProcessService {
         return limit;
     }
 
-    // TODO batch
     public BatchFilter createBatchFilter(String owner, String processState, String from, String to){
         BatchFilter filter = new BatchFilter();
         if (StringUtils.isAnyString(owner)) {

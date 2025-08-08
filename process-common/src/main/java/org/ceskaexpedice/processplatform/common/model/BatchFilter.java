@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
  * BatchFilter
  * @author ppodsednik
  */
-// TODO batch
 public class BatchFilter {
     private String owner;
     private LocalDateTime from;

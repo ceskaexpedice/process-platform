@@ -23,6 +23,7 @@ import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -69,7 +70,6 @@ public class ProcessEndpoint {
         return Response.ok(process).build();
     }
 
-    // TODO batch
     @GET
     @Path("batches")
     @Produces(MediaType.APPLICATION_JSON)
@@ -84,99 +84,20 @@ public class ProcessEndpoint {
         int offset = processService.getBatchOffset(offsetStr);
         int limit = processService.getBatchLimit(limitStr);
         BatchFilter batchFilter = processService.createBatchFilter(owner, from, to, state);
-        // TODO implement batches
-        // TODO int totalSize = this.processManager.getBatchesCount(filter);
-        int totalSize = 0;
+        int totalSize = processService.countBatchHeaders(batchFilter);
         JSONObject result = new JSONObject();
-        // TODO result.put("offset", offset);
-        // TODO result.put("limit", limit);
+        result.put("offset", offset);
+        result.put("limit", limit);
         result.put("total_size", totalSize);
 
-        //batch & process data
         List<Batch> batches = processService.getBatches(batchFilter, offset, limit);
         JSONArray batchesJson = new JSONArray();
         for (Batch batch : batches) {
-            JSONObject batchJson = batchToJson(batch);
+            JSONObject batchJson = ProcessServiceMapper.mapBatchToJson(batch);
             batchesJson.put(batchJson);
         }
         result.put("batches", batchesJson);
         return APIRestUtilities.jsonPayload(result.toString());
-    }
-
-    // TODO batch
-    private JSONObject batchToJson(Batch batchWithProcesses) {
-        JSONObject json = new JSONObject();
-        //batch
-        JSONObject batchJson = new JSONObject();
-        batchJson.put("token", batchWithProcesses.getBatchId());
-        batchJson.put("id", batchWithProcesses.getFirstProcessId());
-        batchJson.put("state", toBatchStateName(batchWithProcesses.getStatus().getVal()));
-
-        batchJson.put("planned", toFormattedStringOrNull(batchWithProcesses.getPlanned()));
-        batchJson.put("started", toFormattedStringOrNull(batchWithProcesses.getStarted()));
-        batchJson.put("finished", toFormattedStringOrNull(batchWithProcesses.getFinished()));
-        batchJson.put("owner_id", batchWithProcesses.getOwner());
-
-
-        json.put("batch", batchJson);
-        //processes
-        JSONArray processArray = new JSONArray();
-        for (ProcessInfo process : batchWithProcesses.getProcesses()) {
-            JSONObject processJson = new JSONObject();
-            processJson.put("id", process.getProcessId());
-            processJson.put("uuid", process.getProcessId());
-            processJson.put("defid", process.getProfileId());
-            processJson.put("name", process.getDescription());
-            processJson.put("state", toProcessStateName(process.getStatus().getVal()));
-            processJson.put("planned", toFormattedStringOrNull(process.getPlanned()));
-            processJson.put("started", toFormattedStringOrNull(process.getStarted()));
-            processJson.put("finished", toFormattedStringOrNull(process.getFinished()));
-            processArray.put(processJson);
-        }
-        json.put("processes", processArray);
-        return json;
-    }
-
-    // TODO batch
-    private String toProcessStateName(Integer stateCode) {
-        switch (stateCode) {
-            case 0:
-                return "NOT_RUNNING";
-            case 1:
-                return "RUNNING";
-            case 2:
-                return "FINISHED";
-            case 3:
-                return "FAILED";
-            case 4:
-                return "KILLED";
-            case 5:
-                return "PLANNED";
-            case 9:
-                return "WARNING";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    // TODO batch
-    private String toBatchStateName(Integer batchStateCode) {
-        switch (batchStateCode) {
-            case 0:
-                return "PLANNED";
-            case 1:
-                return "RUNNING";
-            case 2:
-                return "FINISHED";
-            case 3:
-                return "FAILED";
-            case 4:
-                return "KILLED";
-            case 5:
-                return "WARNING";
-            default:
-                return "UNKNOWN";
-        }
     }
 
     // TODO some good delete API needed

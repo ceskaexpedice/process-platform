@@ -20,10 +20,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO batch
+/**
+ * Batch
+ * @author ppodsednik
+ */
 public class Batch {
-    private String batchId;
-    private String firstProcessId;
+    private String mainProcessId;
     private ProcessState status;
     private LocalDateTime planned;
     private LocalDateTime started;
@@ -31,20 +33,12 @@ public class Batch {
     private String owner;
     private List<ProcessInfo> processes = new ArrayList<>();
 
-    public String getBatchId() {
-        return batchId;
+    public String getMainProcessId() {
+        return mainProcessId;
     }
 
-    public void setBatchId(String batchId) {
-        this.batchId = batchId;
-    }
-
-    public String getFirstProcessId() {
-        return firstProcessId;
-    }
-
-    public void setFirstProcessId(String firstProcessId) {
-        this.firstProcessId = firstProcessId;
+    public void setMainProcessId(String mainProcessId) {
+        this.mainProcessId = mainProcessId;
     }
 
     public ProcessState getStatus() {

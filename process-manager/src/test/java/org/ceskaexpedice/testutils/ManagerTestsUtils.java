@@ -35,6 +35,7 @@ public final class ManagerTestsUtils {
 
     public static final String PROCESS1_ID = "process1";
     public static final String PROCESS2_ID = "process2";
+    public static final String PROCESS3_ID = "process3";
     public static final String PROCESS_ID_NOT_EXISTS = "processIdNotExists";
 
     public static final String PLUGIN1_ID = "testPlugin1";

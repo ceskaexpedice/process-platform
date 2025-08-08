@@ -129,9 +129,8 @@ public class TestProcessService_integration {
         Assertions.assertEquals(ProcessState.NOT_RUNNING, processInfo.getStatus());
     }
 
-    // TODO batch
     @Test
-    public void testGetMainProcess() {
+    public void testGetBatches() {
         Node node = new Node();
         node.setNodeId(NODE_WORKER1_ID);
         node.setType(NodeType.WORKER);
@@ -143,22 +142,47 @@ public class TestProcessService_integration {
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
-
+        // schedule main process + subprocess; set state Finished and Warning
         ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
         String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
-        ScheduleMainProcess scheduleMainProcess2 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        String processId2 = processService.scheduleMainProcess(scheduleMainProcess2);
-
         ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
         scheduleSubProcess11.setBatchId(processId1);
         String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
-
         processService.updateState(processId1, ProcessState.FINISHED);
         processService.updateState(subProcessId11, ProcessState.WARNING);
+        // schedule another main process - default state is Planned
+        ScheduleMainProcess scheduleMainProcess2 = new ScheduleMainProcess(PROFILE1_ID, payload, "Fiki");
+        processService.scheduleMainProcess(scheduleMainProcess2);
 
-
+        int countBatchHeaders = processService.countBatchHeaders(null);
+        Assertions.assertEquals(2, countBatchHeaders);
         List<Batch> batches = processService.getBatches(null,0, 50);
-        System.out.println();
+        Assertions.assertEquals(2, batches.size());
+        Assertions.assertEquals("Fiki", batches.get(0).getOwner());
+        Assertions.assertEquals(1, batches.get(0).getProcesses().size());
+        Assertions.assertEquals("PePo", batches.get(1).getOwner());
+        Assertions.assertEquals(2, batches.get(1).getProcesses().size());
+        batches = processService.getBatches(null,0, 1);
+        Assertions.assertEquals(1, batches.size());
+
+        BatchFilter batchFilter = new BatchFilter();
+        batchFilter.setProcessState(ProcessState.WARNING);
+        countBatchHeaders = processService.countBatchHeaders(batchFilter);
+        Assertions.assertEquals(1, countBatchHeaders);
+        batches = processService.getBatches(batchFilter,0, 50);
+        Assertions.assertEquals(1, batches.size());
+        Assertions.assertEquals(2, batches.get(0).getProcesses().size());
+        int counter = 0;
+        for (ProcessInfo processInfo : batches.get(0).getProcesses()) {
+            if(processInfo.getProcessId().equals(processInfo.getBatchId())){
+                Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+                ++counter;
+            }else{
+                Assertions.assertEquals(ProcessState.WARNING, processInfo.getStatus());
+                ++counter;
+            }
+        }
+        Assertions.assertEquals(2, counter);
     }
 
     @Test
