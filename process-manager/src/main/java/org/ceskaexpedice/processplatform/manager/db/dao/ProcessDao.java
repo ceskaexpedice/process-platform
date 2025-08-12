@@ -131,6 +131,27 @@ public class ProcessDao extends AbstractDao{
         }
     }
 
+    public List<String> getOwners() {
+        try (Connection connection = getConnection()) {
+            List<String> owners = new JDBCQueryTemplate<String>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<String> returnsList) {
+                    String owner;
+                    try {
+                        owner = rs.getString("owner");
+                    } catch (SQLException e) {
+                        throw new DataAccessException(e.toString(), e);
+                    }
+                    returnsList.add(owner);
+                    return true;
+                }
+            }.executeQuery("SELECT DISTINCT owner FROM pcp_process ORDER BY owner ASC");
+            return owners;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
     public void createProcess(ProcessEntity processEntity) {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_process(" +

@@ -25,6 +25,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -100,7 +101,7 @@ public class TestProcessEndpoint extends JerseyTest {
     }
 
     @Test
-    public void testBatches() {
+    public void testGetBatches() {
         List<Batch> batches = new ArrayList<>();
         Batch batch1 = new Batch();
         batch1.setMainProcessId(PROCESS1_ID);
@@ -133,9 +134,27 @@ public class TestProcessEndpoint extends JerseyTest {
         Response response = target("process/batches").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertEquals(2, jsonObject.getJSONArray("batches").length());
 
         verify(processServiceMock, times(1)).countBatchHeaders(any());
         verify(processServiceMock, times(1)).getBatches(any(), eq(0), eq(10));
+    }
+
+    @Test
+    public void testGetOwners() {
+        List<String> owners = new ArrayList<>();
+        owners.add("PaSt");
+        owners.add("PePo");
+        when(processServiceMock.getOwners()).thenReturn(owners);
+
+        Response response = target("process/owners").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertEquals(2, jsonObject.getJSONArray("owners").length());
+
+        verify(processServiceMock, times(1)).getOwners();
     }
 
     @Test

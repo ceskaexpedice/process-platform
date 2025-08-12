@@ -121,8 +121,16 @@ public class ProcessEndpoint {
     @Path("owners")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
-        // TODO implement owners
-        return Response.ok().build();
+        List<String> owners = processService.getOwners();
+        JSONArray ownersJson = new JSONArray();
+        for (String owner : owners) {
+            JSONObject ownerJson = new JSONObject();
+            ownerJson.put("owner", owner);
+            ownersJson.put(ownerJson);
+        }
+        JSONObject result = new JSONObject();
+        result.put("owners", ownersJson);
+        return APIRestUtilities.jsonPayload(result.toString());
     }
 
 

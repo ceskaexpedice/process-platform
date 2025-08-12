@@ -127,7 +127,6 @@ public class PluginStarter implements PluginContext {
         } finally {
             // nothing yet
         }
-        // TODO distributedLocksException???
     }
 
     @Override

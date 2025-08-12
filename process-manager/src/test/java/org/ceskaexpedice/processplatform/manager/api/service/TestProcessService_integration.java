@@ -205,6 +205,24 @@ public class TestProcessService_integration {
     }
 
     @Test
+    public void testGetOwners() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PaSt");
+        processService.scheduleMainProcess(scheduleMainProcess);
+
+        List<String> owners = processService.getOwners();
+        Assertions.assertEquals(2, owners.size());
+        Assertions.assertEquals("PaSt", owners.get(0));
+        Assertions.assertEquals("PePo", owners.get(1));
+    }
+
+    @Test
     public void testUpdate_state() {
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");

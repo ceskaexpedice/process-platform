@@ -158,6 +158,11 @@ public class ProcessService {
         return batches;
     }
 
+    public List<String> getOwners() {
+        List<String> owners = processDao.getOwners();
+        return owners;
+    }
+
     public int countBatchHeaders(BatchFilter batchFilter) {
         int counter = processDao.countBatchHeaders(batchFilter);
         return counter;
