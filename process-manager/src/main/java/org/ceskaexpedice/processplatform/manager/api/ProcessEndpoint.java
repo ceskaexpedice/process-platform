@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.Batch;
 import org.ceskaexpedice.processplatform.common.model.BatchFilter;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
@@ -100,20 +101,76 @@ public class ProcessEndpoint {
         return APIRestUtilities.jsonPayload(result.toString());
     }
 
-    // TODO some good delete API needed
     @DELETE
-    @Path("batches/by_first_process_id/{processId}")
+    @Path("batches/{mainProcessId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteBatch(@PathParam("processId") String processId) {
-        // TODO implement batches
+    public Response deleteBatch(@PathParam("mainProcessId") String mainProcessId) {
+        // TODO delete batch with all processes finished (deletable batch state)
+        Batch batch = processService.getBatch(mainProcessId);
+        // test batch.getStatus() is
+        /*
+ private boolean isDeletableState(String batchState) {
+        String[] deletableStates = new String[]{"FINISHED", "FAILED", "KILLED"};
+        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
+    }
+                    if (!isDeletableState(batchState)) {
+                throw new BusinessLogicException("batch in state %s cannot be deleted", batchState);
+            }
+                        int deleted = this.processManager.deleteBatchByBatchToken(batch.token);
+
+            if (deleted == lrs.size()) {
+                List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
+                folders.stream().forEach(f-> {
+                    IOUtils.cleanDirectory(f);
+                    f.delete();
+                });
+            } else {
+                LOGGER.log(Level.INFO, "Cannot delete directory for processes "+batch.token);
+            }
+
+            JSONObject result = new JSONObject();
+            result.put("batch_id", batch.firstProcessId);
+            result.put("batch_token", batch.token);
+            result.put("processes_deleted", deleted);
+
+            return Response.ok().entity(result.toString()).build();
+
+         */
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("batches/by_first_process_id/{processId}/execution")
+    @Path("batches/{mainProcessId}/execution")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response killBatch(@PathParam("processId") String processId) {
-        // TODO batch
+    public Response killBatch(@PathParam("mainProcessId") String mainProcessId) {
+        // TODO delete batch and kill processes (killable batch state)
+        Batch batch = processService.getBatch(mainProcessId);
+        /*
+            private boolean isKillableState(String batchState) {
+        String[] deletableStates = new String[]{"PLANNED", "RUNNING"};
+        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
+    }
+
+            //kill all processes in batch if possible
+            String batchState = toBatchStateName(batch.stateCode);
+            if (isKillableState(batchState)) {
+                List<ProcessInBatch> processes = processManager.getProcessesInBatchByFirstProcessId(processIdInt);
+                for (ProcessInBatch process : processes) {
+                    String uuid = process.processUuid;
+                    //LRProcess lrProcess = lrProcessManager.getLongRunningProcess(uuid);
+                    if (lrProcess != null && !States.notRunningState(lrProcess.getProcessState())) { //process in batch is running
+                        try {
+                            lrProcess.stopMe();
+                            lrProcessManager.updateLongRunningProcessFinishedDate(lrProcess);
+                        } catch (Throwable e) { //because AbstractLRProcessImpl.stopMe() throws java.lang.IllegalStateException: cannot stop this process! No PID associated
+                            e.printStackTrace();
+                        }
+                    } else { //process in batch not running
+                        //System.out.println(lrProcess.getProcessState());
+                    }
+                }
+            }
+         */
         return Response.ok().build();
     }
 

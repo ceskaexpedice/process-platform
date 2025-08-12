@@ -186,6 +186,44 @@ public class TestProcessService_integration {
     }
 
     @Test
+    public void testGetBatch() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        // schedule main process + subprocess; set state Finished and Warning
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.WARNING);
+
+        Batch batch = processService.getBatch(processId1);
+        Assertions.assertEquals(ProcessState.WARNING, batch.getStatus());
+        Assertions.assertEquals(2, batch.getProcesses().size());
+        int counter = 0;
+        for (ProcessInfo processInfo : batch.getProcesses()) {
+            if(processInfo.getProcessId().equals(processInfo.getBatchId())){
+                Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+                ++counter;
+            }else{
+                Assertions.assertEquals(ProcessState.WARNING, processInfo.getStatus());
+                ++counter;
+            }
+        }
+        Assertions.assertEquals(2, counter);
+    }
+
+    @Test
     public void testGetNextScheduledProcess_none() {
         Node node = new Node();
         node.setNodeId(NODE_WORKER1_ID);

@@ -66,4 +66,34 @@ public class ForManagerEndpoint {
                 .build();
     }
 
+    @DELETE
+    @Path("{processId}/directory")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProcessWorkingDirectory(@PathParam("processId") String processId) {
+        // TODO delete process working directory
+        /*
+          List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
+                folders.stream().forEach(f-> {
+                    IOUtils.cleanDirectory(f);
+                    f.delete();
+                });
+         */
+        return null;
+    }
+
+    @DELETE
+    @Path("{pid}/kill")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response killProcessJVM(@PathParam("pid") String pid) {
+        // TODO kill process JVM
+        /*
+          List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
+                folders.stream().forEach(f-> {
+                    IOUtils.cleanDirectory(f);
+                    f.delete();
+                });
+         */
+        return null;
+    }
+
 }

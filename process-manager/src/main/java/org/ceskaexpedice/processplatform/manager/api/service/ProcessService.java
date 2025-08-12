@@ -158,6 +158,24 @@ public class ProcessService {
         return batches;
     }
 
+    public Batch getBatch(String mainProcessId) {
+        ProcessEntity mainProcessEntity = processDao.getProcess(mainProcessId);
+        if(mainProcessEntity == null){
+            throw new BusinessLogicException(String.format("Main process does not exist [%s]", mainProcessId), ErrorCode.NOT_FOUND);
+        }
+        Batch batch = ProcessServiceMapper.mapFirstProcessToBatch(mainProcessEntity);
+        List<ProcessState> processStates = new ArrayList<>();
+        List<ProcessEntity> processes = processDao.getBatch(mainProcessId);
+        for (ProcessEntity processEntity : processes) {
+            ProcessInfo processInfo = ProcessServiceMapper.mapProcessBasic(processEntity);
+            batch.getProcesses().add(processInfo);
+            processStates.add(processInfo.getStatus());
+        }
+        ProcessState batchState = ProcessState.calculateBatchState(processStates);
+        batch.setStatus(batchState);
+        return batch;
+    }
+
     public List<String> getOwners() {
         List<String> owners = processDao.getOwners();
         return owners;
