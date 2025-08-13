@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * TestForManagerService
@@ -63,7 +65,6 @@ public class TestForManagerService {
         workerConfiguration.setWorkerId("testWorker");
 
         forManagerService = new ForManagerService(workerConfiguration);
-
     }
 
     @AfterEach
@@ -84,11 +85,11 @@ public class TestForManagerService {
 
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, false);
             String outLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Assertions.assertTrue(outLog.contains(OUT_LOG_PART));
+            assertTrue(outLog.contains(OUT_LOG_PART));
 
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, true);
             String errLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Assertions.assertFalse(errLog.contains(ERR_LOG_PART));
+            assertFalse(errLog.contains(ERR_LOG_PART));
         }finally {
             is.close();
         }
@@ -103,14 +104,38 @@ public class TestForManagerService {
 
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, true);
             String errLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Assertions.assertTrue(errLog.contains(ERR_LOG_PART));
+            assertTrue(errLog.contains(ERR_LOG_PART));
 
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, false);
             String outLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Assertions.assertFalse(outLog.contains(OUT_LOG_PART));
+            assertFalse(outLog.contains(OUT_LOG_PART));
         }finally {
             is.close();
         }
+    }
+
+    @Test
+    public void testKillProcessJvm() throws IOException, InterruptedException {
+        String classpath = System.getProperty("java.class.path");
+        ProcessBuilder builder = new ProcessBuilder(
+                "java",
+                "-cp", classpath,
+                "org.ceskaexpedice.processplatform.worker.api.service.SleepyTest"
+        );
+        builder.redirectErrorStream(true);
+
+        Process process = builder.start();
+        long pid = process.pid();
+        System.out.println("Spawned JVM PID: " + pid);
+        Thread.sleep(2000); // give it time to start
+
+        boolean killedFirst = forManagerService.killProcessJvm(String.valueOf(pid));
+        System.out.println("First kill attempt: " + killedFirst);
+        assertTrue(killedFirst);
+
+        boolean killedSecond = forManagerService.killProcessJvm(String.valueOf(pid));
+        System.out.println("Second kill attempt: " + killedSecond);
+        assertFalse(killedSecond);
     }
 
     private void launchPlugin1() {

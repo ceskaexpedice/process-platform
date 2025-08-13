@@ -16,7 +16,9 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -84,16 +86,13 @@ public class ForManagerEndpoint {
     @DELETE
     @Path("{pid}/kill")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response killProcessJVM(@PathParam("pid") String pid) {
-        // TODO kill process JVM
-        /*
-          List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
-                folders.stream().forEach(f-> {
-                    IOUtils.cleanDirectory(f);
-                    f.delete();
-                });
-         */
-        return null;
+    public Response killProcessJvm(@PathParam("pid") String pid) {
+        boolean killed = forManagerService.killProcessJvm(pid);
+        if(!killed){
+            return APIRestUtilities.notFound("Process JVM not found [%s]", pid);
+        }else{
+            return APIRestUtilities.ok("Process JVM Killed [%s]", pid);
+        }
     }
 
 }

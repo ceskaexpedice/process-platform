@@ -17,6 +17,8 @@
 package org.ceskaexpedice.processplatform.worker.api.service;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandler;
+import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandlerFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
 import java.io.File;
@@ -47,5 +49,20 @@ public class ForManagerService {
         }
     }
 
+    public boolean killProcessJvm(String pid){
+        OSHandler osHandler = OSHandlerFactory.createOSHandler(pid);
+        boolean processAlive = osHandler.isProcessAlive();
+        if(!processAlive){
+            return false;
+        }
+        osHandler.killProcess();
+        try {
+            Thread.sleep(500); // give it a moment
+        } catch (InterruptedException e) {
+            return false;
+        }
+        processAlive = osHandler.isProcessAlive();
+        return !processAlive;
+    }
 
 }

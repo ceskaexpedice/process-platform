@@ -17,6 +17,7 @@ package org.ceskaexpedice.processplatform.worker.api;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -31,6 +32,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PLUGIN1_PROCESS_ID;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PROCESS_PID;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -74,6 +77,18 @@ public class TestForManagerEndpoint extends JerseyTest {
         InputStream responseStream = response.readEntity(InputStream.class);
         String resultErrLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(resultErrLog.contains("test err content"));
+    }
+
+    @Test
+    public void testKillProcessJvm() {
+        when(forManagerServiceMock.killProcessJvm(eq(PROCESS_PID))).thenReturn(true);
+
+        Response response = target("manager/" + PROCESS_PID + "/kill")
+                .request().accept(MediaType.APPLICATION_JSON).delete();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertTrue(((String)jsonObject.get("message")).contains(PROCESS_PID));
     }
 
 }

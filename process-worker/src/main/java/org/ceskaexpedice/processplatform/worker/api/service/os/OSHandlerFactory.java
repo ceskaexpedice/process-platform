@@ -35,4 +35,5 @@ public final class OSHandlerFactory {
         } else if (SystemUtils.IS_OS_WINDOWS) {
             return new WindowsHandler(pid);
         } else throw new UnsupportedOperationException("unsupported OS");
-    }}
+    }
+}

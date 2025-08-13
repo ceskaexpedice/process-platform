@@ -34,6 +34,8 @@ public final class WorkerTestsUtils {
     public static final String PLUGIN2_ID = "testPlugin2";
     public static final String PLUGIN2_MAIN_CLASS = "org.ceskaexpedice.processplatform.testplugin2.TestPlugin2";
 
+    public static final String PROCESS_PID = "1234";
+
     private WorkerTestsUtils() {}
 
 }
