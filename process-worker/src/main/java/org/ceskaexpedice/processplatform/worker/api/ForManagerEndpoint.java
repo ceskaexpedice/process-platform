@@ -72,15 +72,8 @@ public class ForManagerEndpoint {
     @Path("{processId}/directory")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteProcessWorkingDirectory(@PathParam("processId") String processId) {
-        // TODO delete process working directory
-        /*
-          List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
-                folders.stream().forEach(f-> {
-                    IOUtils.cleanDirectory(f);
-                    f.delete();
-                });
-         */
-        return null;
+        forManagerService.deleteWorkingDir(processId);
+        return APIRestUtilities.ok("Process [%s] working directory deleted or does not exist", processId);
     }
 
     @DELETE

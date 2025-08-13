@@ -20,11 +20,13 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandler;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandlerFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
+import org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
 
@@ -47,6 +49,11 @@ public class ForManagerService {
         } catch (FileNotFoundException e) {
             throw new ApplicationException("Could not find process log file for process with id " + processId, e);
         }
+    }
+
+    public void deleteWorkingDir(String processId){
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
+        ProcessDirUtils.deleteRecursively(processWorkingDir);
     }
 
     public boolean killProcessJvm(String pid){

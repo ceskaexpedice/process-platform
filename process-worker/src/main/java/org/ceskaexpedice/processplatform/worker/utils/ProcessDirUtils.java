@@ -18,10 +18,9 @@ package org.ceskaexpedice.processplatform.worker.utils;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKING_DIR;
 
@@ -31,26 +30,46 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  */
 public final class ProcessDirUtils {
 
-    private ProcessDirUtils() {}
+    private ProcessDirUtils() {
+    }
 
     public static File prepareProcessWorkingDirectory(String workerId, String processId) {
         String workdir = WORKING_DIR + File.separator + workerId + File.separator + processId;
         File processWorkingDir = new File(workdir);
         if (!processWorkingDir.exists()) {
             boolean mkdirs = processWorkingDir.mkdirs();
-            if (!mkdirs){
+            if (!mkdirs) {
                 throw new ApplicationException("cannot create directory '" + processWorkingDir.getAbsolutePath() + "'");
             }
         }
         return processWorkingDir;
     }
 
+    public static void deleteRecursively(File processWorkingDir) {
+        try {
+            Path dir = processWorkingDir.toPath();
+            if (Files.exists(dir)) {
+                Files.walk(dir) // walk the file tree
+                        .sorted((p1, p2) -> p2.compareTo(p1)) // delete children before parents
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                throw new ApplicationException(e.getMessage(), e);
+                            }
+                        });
+            }
+        } catch (IOException e) {
+            throw new ApplicationException(e.getMessage(), e);
+        }
+    }
+
     public static File errorOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgErr"),"sterr.err");
+        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgErr"), "sterr.err");
     }
 
     public static File standardOutFile(File processWorkingDir) {
-        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"),"stout.out");
+        return new File(createFolderIfNotExists(processWorkingDir + File.separator + "plgOut"), "stout.out");
     }
 
     public static PrintStream createPrintStream(String file) throws FileNotFoundException {
@@ -61,7 +80,7 @@ public final class ProcessDirUtils {
         File fldr = new File(folder);
         if (!fldr.exists()) {
             boolean mkdirs = fldr.mkdirs();
-            if (!mkdirs){
+            if (!mkdirs) {
                 throw new ApplicationException("cannot create directory '" + fldr.getAbsolutePath() + "'");
             }
         }

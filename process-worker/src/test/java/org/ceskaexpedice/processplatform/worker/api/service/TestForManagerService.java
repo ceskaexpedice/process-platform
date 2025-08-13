@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
+import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.prepareProcessWorkingDirectory;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -112,6 +114,15 @@ public class TestForManagerService {
         }finally {
             is.close();
         }
+    }
+
+    @Test
+    public void testDeleteWorkingDirectory() {
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), PLUGIN1_PROCESS_ID);
+        assertTrue(processWorkingDir.exists());
+        launchPlugin1(); // to create logs
+        forManagerService.deleteWorkingDir(PLUGIN1_PROCESS_ID);
+        assertFalse(processWorkingDir.exists());
     }
 
     @Test

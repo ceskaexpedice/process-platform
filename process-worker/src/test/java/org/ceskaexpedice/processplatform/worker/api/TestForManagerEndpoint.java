@@ -35,7 +35,7 @@ import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtil
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PROCESS_PID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * TestForManagerEndpoint
@@ -77,6 +77,18 @@ public class TestForManagerEndpoint extends JerseyTest {
         InputStream responseStream = response.readEntity(InputStream.class);
         String resultErrLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(resultErrLog.contains("test err content"));
+    }
+
+    @Test
+    public void testDeleteProcessWorkingDirectory() {
+        Response response = target("manager/" + PLUGIN1_PROCESS_ID + "/directory")
+                .request().accept(MediaType.APPLICATION_JSON).delete();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertTrue(((String)jsonObject.get("message")).contains(PLUGIN1_PROCESS_ID));
+        verify(forManagerServiceMock, times(1)).deleteWorkingDir(eq(PLUGIN1_PROCESS_ID));
+
     }
 
     @Test
