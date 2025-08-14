@@ -22,5 +22,6 @@ package org.ceskaexpedice.processplatform.common;
  */
 public enum ErrorCode {
     NOT_FOUND,
-    INVALID_INPUT
+    INVALID_INPUT,
+    INVALID_STATE
 }

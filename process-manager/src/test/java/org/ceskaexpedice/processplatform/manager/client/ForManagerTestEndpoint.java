@@ -15,6 +15,8 @@
 package org.ceskaexpedice.processplatform.manager.client;
 
 
+import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,4 +65,22 @@ public class ForManagerTestEndpoint {
                 .build();
     }
 
+    @DELETE
+    @Path("{processId}/directory")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProcessWorkingDirectory(@PathParam("processId") String processId) {
+        return APIRestUtilities.ok("Process [%s] working directory deleted", processId);
+    }
+
+    @DELETE
+    @Path("{pid}/kill")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response killProcessJvm(@PathParam("pid") String pid) {
+        boolean killed = true;
+        if(!killed){
+            return APIRestUtilities.notFound("Process JVM not found [%s]", pid);
+        }else{
+            return APIRestUtilities.ok("Process JVM Killed [%s]", pid);
+        }
+    }
 }

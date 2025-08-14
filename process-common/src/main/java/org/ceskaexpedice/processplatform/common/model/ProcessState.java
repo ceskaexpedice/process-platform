@@ -11,24 +11,24 @@ import java.util.List;
 public enum ProcessState {
 
     /**
-     * Planned (process is waiting to start)
+     * Not running process
      */
-    PLANNED(0),
-
-    /**
-     * Not running process but assigned to a worker
-     */
-    NOT_RUNNING(1),
+    NOT_RUNNING(0),
 
     /**
      * Running proces
      */
-    RUNNING(2),
+    RUNNING(1),
 
     /**
-     * Correctly finished process
+     * Correct finished proces
      */
-    FINISHED(3),
+    FINISHED(2),
+
+    /**
+     * FAiled with some errors
+     */
+    FAILED(3),
 
     /**
      * Killed process
@@ -36,15 +36,14 @@ public enum ProcessState {
     KILLED(4),
 
     /**
-     * Finished with some warnings
+     * Planned (process is waiting to start)
      */
-    WARNING(5),
+    PLANNED(5),
 
     /**
-     * FAiled with some errors
+     * Finished with some errors
      */
-    FAILED(6);
-
+    WARNING(9);
 
     /**
      * Load state from value

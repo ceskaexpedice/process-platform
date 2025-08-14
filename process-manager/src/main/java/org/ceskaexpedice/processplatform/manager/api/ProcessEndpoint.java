@@ -89,7 +89,7 @@ public class ProcessEndpoint {
         JSONObject result = new JSONObject();
         result.put("offset", offset);
         result.put("limit", limit);
-        result.put("total_size", totalSize);
+        result.put("totalSize", totalSize);
 
         List<Batch> batches = processService.getBatches(batchFilter, offset, limit);
         JSONArray batchesJson = new JSONArray();
@@ -105,38 +105,11 @@ public class ProcessEndpoint {
     @Path("batches/{mainProcessId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteBatch(@PathParam("mainProcessId") String mainProcessId) {
-        // TODO delete batch with all processes finished (deletable batch state)
-        Batch batch = processService.getBatch(mainProcessId);
-        // test batch.getStatus() is
-        /*
- private boolean isDeletableState(String batchState) {
-        String[] deletableStates = new String[]{"FINISHED", "FAILED", "KILLED"};
-        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
-    }
-                    if (!isDeletableState(batchState)) {
-                throw new BusinessLogicException("batch in state %s cannot be deleted", batchState);
-            }
-                        int deleted = this.processManager.deleteBatchByBatchToken(batch.token);
-
-            if (deleted == lrs.size()) {
-                List<File> folders = lrs.stream().map(LRProcess::processWorkingDirectory).collect(Collectors.toList());
-                folders.stream().forEach(f-> {
-                    IOUtils.cleanDirectory(f);
-                    f.delete();
-                });
-            } else {
-                LOGGER.log(Level.INFO, "Cannot delete directory for processes "+batch.token);
-            }
-
-            JSONObject result = new JSONObject();
-            result.put("batch_id", batch.firstProcessId);
-            result.put("batch_token", batch.token);
-            result.put("processes_deleted", deleted);
-
-            return Response.ok().entity(result.toString()).build();
-
-         */
-        return Response.ok().build();
+        int deleted = processService.deleteBatch(mainProcessId);
+        JSONObject result = new JSONObject();
+        result.put("mainProcessId", mainProcessId);
+        result.put("deleted", deleted);
+        return APIRestUtilities.jsonPayload(result.toString());
     }
 
     @DELETE

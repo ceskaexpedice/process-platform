@@ -35,10 +35,7 @@ import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static org.ceskaexpedice.processplatform.common.utils.DateUtils.parseLocalDateTime;
@@ -90,11 +87,11 @@ public class ProcessService {
     public String scheduleSubProcess(ScheduleSubProcess scheduleSubProcess) {
         LOGGER.info(String.format("schedule sub process for the profile [%s]", scheduleSubProcess.getProfileId()));
         validatePayload(scheduleSubProcess);
-        if(scheduleSubProcess.getBatchId() == null){
+        if (scheduleSubProcess.getBatchId() == null) {
             throw new BusinessLogicException("Batch id cannot be null for subprocess", ErrorCode.INVALID_INPUT);
         }
         ProcessEntity processMain = processDao.getProcess(scheduleSubProcess.getBatchId());
-        if(processMain == null){
+        if (processMain == null) {
             throw new BusinessLogicException("Not found based on sub process batch id. Process [" + scheduleSubProcess.getBatchId() + "] does not exist", ErrorCode.NOT_FOUND);
         }
         String newProcessId = UUID.randomUUID().toString();
@@ -121,12 +118,12 @@ public class ProcessService {
         ScheduledProcess scheduledProcess = null;
         for (ProcessEntity processEntity : processes) {
             Set<String> tags = nodeDao.getNode(workerId).getTags();
-            if(tags.contains(processEntity.getProfileId())){
+            if (tags.contains(processEntity.getProfileId())) {
                 scheduledProcess = ProcessServiceMapper.mapProcess(processEntity);
                 break;
             }
         }
-        if(scheduledProcess == null){
+        if (scheduledProcess == null) {
             return null;
         }
         PluginProfileEntity profile = profileDao.getProfile(scheduledProcess.getProfileId());
@@ -160,7 +157,7 @@ public class ProcessService {
 
     public Batch getBatch(String mainProcessId) {
         ProcessEntity mainProcessEntity = processDao.getProcess(mainProcessId);
-        if(mainProcessEntity == null){
+        if (mainProcessEntity == null) {
             throw new BusinessLogicException(String.format("Main process does not exist [%s]", mainProcessId), ErrorCode.NOT_FOUND);
         }
         Batch batch = ProcessServiceMapper.mapFirstProcessToBatch(mainProcessEntity);
@@ -174,6 +171,28 @@ public class ProcessService {
         ProcessState batchState = ProcessState.calculateBatchState(processStates);
         batch.setStatus(batchState);
         return batch;
+    }
+
+    public int deleteBatch(String mainProcessId) {
+        Batch batch = getBatch(mainProcessId);
+        if(!isDeletableState(batch.getStatus())) {
+            throw new BusinessLogicException(String.format("Cannot delete batch [%s] with state [%s]", mainProcessId, batch.getStatus().name()),
+                    ErrorCode.INVALID_STATE);
+        }
+        deleteBatchWorkerDirs(batch);
+        int deleted = deleteBatchInDb(mainProcessId);
+        return deleted;
+    }
+
+    public int deleteBatchInDb(String mainProcessId) {
+        int deleted = processDao.deleteBatch(mainProcessId);
+        return deleted;
+    }
+
+    public void deleteBatchWorkerDirs(Batch batch) {
+        for(ProcessInfo processInfo: batch.getProcesses()) {
+            workerClient.deleteProcessWorkerDir(processInfo.getProcessId());
+        }
     }
 
     public List<String> getOwners() {
@@ -215,7 +234,7 @@ public class ProcessService {
         return logStream;
     }
 
-    public int getBatchOffset(String offsetStr){
+    public int getBatchOffset(String offsetStr) {
         int offset = GET_BATCHES_DEFAULT_OFFSET;
         if (StringUtils.isAnyString(offsetStr)) {
             try {
@@ -230,7 +249,7 @@ public class ProcessService {
         return offset;
     }
 
-    public static int getBatchLimit(String limitStr){
+    public static int getBatchLimit(String limitStr) {
         int limit = GET_BATCHES_DEFAULT_LIMIT;
         if (StringUtils.isAnyString(limitStr)) {
             try {
@@ -245,7 +264,7 @@ public class ProcessService {
         return limit;
     }
 
-    public BatchFilter createBatchFilter(String owner, String processState, String from, String to){
+    public BatchFilter createBatchFilter(String owner, String processState, String from, String to) {
         BatchFilter filter = new BatchFilter();
         if (StringUtils.isAnyString(owner)) {
             filter.setOwner(owner);
@@ -263,9 +282,9 @@ public class ProcessService {
                 throw new BusinessLogicException(e.toString(), ErrorCode.INVALID_INPUT);
             }
         }
-        if(filter.isEmpty()){
+        if (filter.isEmpty()) {
             return null;
-        }else{
+        } else {
             return filter;
         }
     }
@@ -276,4 +295,8 @@ public class ProcessService {
         pluginService.validatePayload(plugin.getPluginId(), scheduleProcess.getPayload());
     }
 
+    private boolean isDeletableState(ProcessState batchState) {
+        ProcessState[] deletableStates = new ProcessState[]{ProcessState.FINISHED, ProcessState.FAILED, ProcessState.KILLED};
+        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
+    }
 }

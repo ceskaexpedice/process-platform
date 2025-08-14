@@ -73,7 +73,7 @@ public class ForManagerEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteProcessWorkingDirectory(@PathParam("processId") String processId) {
         forManagerService.deleteWorkingDir(processId);
-        return APIRestUtilities.ok("Process [%s] working directory deleted or does not exist", processId);
+        return APIRestUtilities.ok("Process [%s] working directory deleted", processId);
     }
 
     @DELETE

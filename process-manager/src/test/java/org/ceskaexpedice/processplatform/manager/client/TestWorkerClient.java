@@ -54,18 +54,6 @@ public class TestWorkerClient {
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        final ResourceConfig rc = new ResourceConfig(ForManagerTestEndpoint.class);
-        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(ManagerTestsUtils.WORKER_BASE_URI), rc);
-        server.start();
-    }
-
-    @AfterEach
-    public void tearDown() throws Exception {
-        server.shutdownNow();
-    }
-
-    @Test
-    public void testGetProcessLog() throws IOException {
         ProcessInfo processInfo = new ProcessInfo();
         processInfo.setProcessId(ManagerTestsUtils.PROCESS1_ID);
         processInfo.setWorkerId(ManagerTestsUtils.NODE_WORKER1_ID);
@@ -75,9 +63,27 @@ public class TestWorkerClient {
         node.setUrl(ManagerTestsUtils.WORKER_BASE_URI);
         when(nodeServiceMock.getNode(eq(ManagerTestsUtils.NODE_WORKER1_ID))).thenReturn(node);
 
+        final ResourceConfig rc = new ResourceConfig(ForManagerTestEndpoint.class);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(ManagerTestsUtils.WORKER_BASE_URI), rc);
+        server.start();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        server.shutdownNow();
+    }
+
+    @Test
+    public void testGetProcessLog() throws IOException {
         WorkerClient workerClient = new WorkerClient(processServiceMock, nodeServiceMock);
         InputStream processLog = workerClient.getProcessLog(ManagerTestsUtils.PROCESS1_ID, false);
         String outLog = new String(processLog.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(outLog.contains(OUT_LOG_PART));
+    }
+
+    @Test
+    public void testDeleteProcessWorkerDir() {
+        WorkerClient workerClient = new WorkerClient(processServiceMock, nodeServiceMock);
+        workerClient.deleteProcessWorkerDir(ManagerTestsUtils.PROCESS1_ID);
     }
 }

@@ -142,6 +142,20 @@ public class TestProcessEndpoint extends JerseyTest {
     }
 
     @Test
+    public void testDeleteBatch() {
+        when(processServiceMock.deleteBatch(eq(PROCESS1_ID))).thenReturn(3);
+
+        Response response = target("process/batches/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).delete();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertEquals(3, jsonObject.get("deleted"));
+        Assertions.assertEquals(PROCESS1_ID, jsonObject.get("mainProcessId"));
+
+        verify(processServiceMock, times(1)).deleteBatch(eq(PROCESS1_ID));
+    }
+
+    @Test
     public void testGetOwners() {
         List<String> owners = new ArrayList<>();
         owners.add("PaSt");

@@ -17,21 +17,27 @@
 package org.ceskaexpedice.processplatform.manager.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -62,6 +68,21 @@ public class WorkerClient {
                 .build();
         this.processService = processService;
         this.nodeService = nodeService;
+    }
+
+    public void deleteProcessWorkerDir(String processId) {
+        String url = getWorkerBaseUrl(processId) + "manager/" + processId + "/directory";
+        LOGGER.info("Delete process working dir at " + url);
+        HttpDelete httpDelete = new HttpDelete(url);
+        int statusCode = -1;
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpDelete)) {
+            statusCode = response.getCode();
+            if (statusCode != 200) {
+                throw new RemoteNodeException("Failed to delete process worker dir", NodeType.WORKER, statusCode);
+            }
+        } catch (IOException e) {
+            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
+        }
     }
 
     public InputStream getProcessLog(String processId, boolean err) {

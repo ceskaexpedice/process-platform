@@ -131,6 +131,17 @@ public class ProcessDao extends AbstractDao{
         }
     }
 
+    public int deleteBatch(String batchId) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement prepareStatement = connection.prepareStatement("DELETE FROM pcp_process WHERE batch_id = ?");
+            prepareStatement.setString(1, batchId);
+            int deleted = prepareStatement.executeUpdate();
+            return deleted;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
     public List<String> getOwners() {
         try (Connection connection = getConnection()) {
             List<String> owners = new JDBCQueryTemplate<String>(connection) {
