@@ -85,6 +85,21 @@ public class WorkerClient {
         }
     }
 
+    public void killProcessJvm(String processId, String pid) {
+        String url = getWorkerBaseUrl(processId) + "manager/" + pid + "/kill";
+        LOGGER.info("Kill worker JVM process at " + url);
+        HttpDelete httpDelete = new HttpDelete(url);
+        int statusCode = -1;
+        try (CloseableHttpResponse response = closeableHttpClient.execute(httpDelete)) {
+            statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 404) {
+                throw new RemoteNodeException("Failed to kill process JVM", NodeType.WORKER, statusCode);
+            }
+        } catch (IOException e) {
+            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
+        }
+    }
+
     public InputStream getProcessLog(String processId, boolean err) {
         String suffix = err ? "err" : "out";
         URIBuilder uriBuilder;

@@ -116,35 +116,11 @@ public class ProcessEndpoint {
     @Path("batches/{mainProcessId}/execution")
     @Produces(MediaType.APPLICATION_JSON)
     public Response killBatch(@PathParam("mainProcessId") String mainProcessId) {
-        // TODO delete batch and kill processes (killable batch state)
-        Batch batch = processService.getBatch(mainProcessId);
-        /*
-            private boolean isKillableState(String batchState) {
-        String[] deletableStates = new String[]{"PLANNED", "RUNNING"};
-        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
-    }
-
-            //kill all processes in batch if possible
-            String batchState = toBatchStateName(batch.stateCode);
-            if (isKillableState(batchState)) {
-                List<ProcessInBatch> processes = processManager.getProcessesInBatchByFirstProcessId(processIdInt);
-                for (ProcessInBatch process : processes) {
-                    String uuid = process.processUuid;
-                    //LRProcess lrProcess = lrProcessManager.getLongRunningProcess(uuid);
-                    if (lrProcess != null && !States.notRunningState(lrProcess.getProcessState())) { //process in batch is running
-                        try {
-                            lrProcess.stopMe();
-                            lrProcessManager.updateLongRunningProcessFinishedDate(lrProcess);
-                        } catch (Throwable e) { //because AbstractLRProcessImpl.stopMe() throws java.lang.IllegalStateException: cannot stop this process! No PID associated
-                            e.printStackTrace();
-                        }
-                    } else { //process in batch not running
-                        //System.out.println(lrProcess.getProcessState());
-                    }
-                }
-            }
-         */
-        return Response.ok().build();
+        int killed = processService.killBatch(mainProcessId);
+        JSONObject result = new JSONObject();
+        result.put("mainProcessId", mainProcessId);
+        result.put("killed", killed);
+        return APIRestUtilities.jsonPayload(result.toString());
     }
 
     @GET

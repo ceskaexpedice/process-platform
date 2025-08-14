@@ -1,5 +1,6 @@
 package org.ceskaexpedice.processplatform.common.model;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -11,29 +12,29 @@ import java.util.List;
 public enum ProcessState {
 
     /**
-     * Not running process
-     */
-    NOT_RUNNING(0),
-
-    /**
-     * Running proces
-     */
-    RUNNING(1),
-
-    /**
      * Correct finished proces
      */
-    FINISHED(2),
+    FINISHED(0),
 
     /**
      * FAiled with some errors
      */
-    FAILED(3),
+    FAILED(1),
 
     /**
      * Killed process
      */
-    KILLED(4),
+    KILLED(2),
+
+    /**
+     * Finished with some errors
+     */
+    WARNING(3),
+
+    /**
+     * Not running process
+     */
+    NOT_RUNNING(4),
 
     /**
      * Planned (process is waiting to start)
@@ -41,9 +42,9 @@ public enum ProcessState {
     PLANNED(5),
 
     /**
-     * Finished with some errors
+     * Running proces
      */
-    WARNING(9);
+    RUNNING(6);
 
     /**
      * Load state from value
@@ -130,4 +131,17 @@ public enum ProcessState {
     public static boolean notRunningState(ProcessState realProcessState) {
         return expect(realProcessState, ProcessState.FAILED, ProcessState.FINISHED, ProcessState.KILLED, ProcessState.NOT_RUNNING, ProcessState.WARNING);
     }
+
+    public static boolean isBatchStateKillable(ProcessState batchState) {
+        return expect(batchState, ProcessState.PLANNED, ProcessState.NOT_RUNNING, ProcessState.RUNNING);
+    }
+
+    public static boolean isBatchStateDeletable(ProcessState batchState) {
+        return expect(batchState, ProcessState.PLANNED, ProcessState.FAILED, ProcessState.KILLED);
+    }
+
+    public static boolean completedState(ProcessState realProcessState) {
+        return expect(realProcessState, ProcessState.FAILED, ProcessState.FINISHED, ProcessState.KILLED, ProcessState.WARNING);
+    }
+
 }

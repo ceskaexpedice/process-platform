@@ -86,4 +86,11 @@ public class TestWorkerClient {
         WorkerClient workerClient = new WorkerClient(processServiceMock, nodeServiceMock);
         workerClient.deleteProcessWorkerDir(ManagerTestsUtils.PROCESS1_ID);
     }
+
+    @Test
+    public void testKillProcessJvm() {
+        WorkerClient workerClient = new WorkerClient(processServiceMock, nodeServiceMock);
+        workerClient.killProcessJvm(ManagerTestsUtils.PROCESS1_ID, "1234");
+    }
+
 }

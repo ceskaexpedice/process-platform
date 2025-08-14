@@ -269,13 +269,63 @@ public class TestProcessService_integration {
         scheduleSubProcess11.setBatchId(processId1);
         String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
         processService.updateState(processId1, ProcessState.FINISHED);
-        processService.updateState(subProcessId11, ProcessState.PLANNED);
+        processService.updateState(subProcessId11, ProcessState.RUNNING);
 
         assertThrows(BusinessLogicException.class, () -> {
             processService.deleteBatch(processId1);
         });
     }
 
+    @Test
+    public void testKillBatch() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.RUNNING);
+
+        int killed = processService.killBatch(processId1);
+        Assertions.assertEquals(0, killed);
+    }
+
+    @Test
+    public void testKillBatch_wrongState() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.FINISHED);
+
+        assertThrows(BusinessLogicException.class, () -> {
+            processService.killBatch(processId1);
+        });
+    }
 
     @Test
     public void testGetNextScheduledProcess_none() {

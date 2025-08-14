@@ -175,13 +175,30 @@ public class ProcessService {
 
     public int deleteBatch(String mainProcessId) {
         Batch batch = getBatch(mainProcessId);
-        if(!isDeletableState(batch.getStatus())) {
+        if(!ProcessState.isBatchStateDeletable(batch.getStatus())) {
             throw new BusinessLogicException(String.format("Cannot delete batch [%s] with state [%s]", mainProcessId, batch.getStatus().name()),
                     ErrorCode.INVALID_STATE);
         }
         deleteBatchWorkerDirs(batch);
         int deleted = deleteBatchInDb(mainProcessId);
         return deleted;
+    }
+
+    public int killBatch(String mainProcessId) {
+        Batch batch = getBatch(mainProcessId);
+        if(!ProcessState.isBatchStateKillable(batch.getStatus())) {
+            throw new BusinessLogicException(String.format("Cannot kill batch [%s] with state [%s]", mainProcessId, batch.getStatus().name()),
+                    ErrorCode.INVALID_STATE);
+        }
+        int counter = 0;
+        for(ProcessInfo processInfo: batch.getProcesses()) {
+            if(processInfo.getPid() != 0 && processInfo.getStatus() == ProcessState.RUNNING){
+                workerClient.killProcessJvm(processInfo.getProcessId(), String.valueOf(processInfo.getPid()));
+                counter++;
+            }
+            updateState(processInfo.getProcessId(), ProcessState.KILLED);
+        }
+        return counter;
     }
 
     public int deleteBatchInDb(String mainProcessId) {
@@ -218,6 +235,11 @@ public class ProcessService {
         boolean updated = processDao.updateState(processId, processState);
         if (!updated) {
             throw new BusinessLogicException("Process with id [" + processId + "] not found", ErrorCode.NOT_FOUND);
+        }
+        if(processState == ProcessState.RUNNING) {
+            processDao.updateStarted(processId);
+        }else if(ProcessState.completedState(processState)) {
+            processDao.updateFinished(processId);
         }
     }
 
@@ -295,8 +317,4 @@ public class ProcessService {
         pluginService.validatePayload(plugin.getPluginId(), scheduleProcess.getPayload());
     }
 
-    private boolean isDeletableState(ProcessState batchState) {
-        ProcessState[] deletableStates = new ProcessState[]{ProcessState.FINISHED, ProcessState.FAILED, ProcessState.KILLED};
-        return batchState != null && Arrays.asList(deletableStates).contains(batchState);
-    }
 }

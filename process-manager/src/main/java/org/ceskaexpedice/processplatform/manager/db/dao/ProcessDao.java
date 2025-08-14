@@ -28,6 +28,7 @@ import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProcessMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -225,6 +226,36 @@ public class ProcessDao extends AbstractDao{
             String sql = "UPDATE pcp_process SET status = ? WHERE process_id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setInt(1, processState.getVal());
+                stmt.setString(2, processId);
+                int updated = stmt.executeUpdate();
+                return updated > 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public boolean updateStarted(String processId) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET started = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+                stmt.setTimestamp(1, timestamp);
+                stmt.setString(2, processId);
+                int updated = stmt.executeUpdate();
+                return updated > 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public boolean updateFinished(String processId) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_process SET finished = ? WHERE process_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
+                stmt.setTimestamp(1, timestamp);
                 stmt.setString(2, processId);
                 int updated = stmt.executeUpdate();
                 return updated > 0;
