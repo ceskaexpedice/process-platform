@@ -17,19 +17,19 @@ public enum ProcessState {
     FINISHED(0),
 
     /**
-     * FAiled with some errors
-     */
-    FAILED(1),
-
-    /**
      * Killed process
      */
-    KILLED(2),
+    KILLED(1),
 
     /**
      * Finished with some errors
      */
-    WARNING(3),
+    WARNING(2),
+
+    /**
+     * FAiled with some errors
+     */
+    FAILED(3),
 
     /**
      * Not running process
