@@ -20,8 +20,10 @@ import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.ErrorCode;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 public final class DateUtils {
 
@@ -45,6 +47,15 @@ public final class DateUtils {
                 throw new BusinessLogicException(String.format("incorrect date-time format '%s'", string), ErrorCode.INVALID_INPUT);
             }
         }
+    }
+
+    public static Date convert(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        ZoneId zone = ZoneId.systemDefault();
+        Date date = Date.from(localDateTime.atZone(zone).toInstant());
+        return date;
     }
 
 }

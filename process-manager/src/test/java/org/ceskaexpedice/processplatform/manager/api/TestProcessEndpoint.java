@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
@@ -86,6 +87,7 @@ public class TestProcessEndpoint extends JerseyTest {
     public void testGetProcess() throws JsonProcessingException {
         ProcessInfo retVal = new ProcessInfo();
         retVal.setProcessId(PROCESS1_ID);
+        retVal.setPlanned(new Date());
         when(processServiceMock.getProcess(eq(PROCESS1_ID))).thenReturn(retVal);
 
         Response response = target("process/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
@@ -107,6 +109,7 @@ public class TestProcessEndpoint extends JerseyTest {
         batch1.setMainProcessId(PROCESS1_ID);
         batch1.setStatus(ProcessState.WARNING);
         ProcessInfo processInfo1 = new ProcessInfo();
+        processInfo1.setPlanned(new Date());
         processInfo1.setProcessId(PROCESS1_ID);
         processInfo1.setBatchId(PROCESS1_ID);
         processInfo1.setStatus(ProcessState.FINISHED);
@@ -131,7 +134,7 @@ public class TestProcessEndpoint extends JerseyTest {
         when(processServiceMock.countBatchHeaders(any())).thenReturn(2);
         when(processServiceMock.getBatches(any(), eq(0), eq(10))).thenReturn(batches);
 
-        Response response = target("process/batches").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Response response = target("process/batch").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
         JSONObject jsonObject = new JSONObject(json);
@@ -145,7 +148,7 @@ public class TestProcessEndpoint extends JerseyTest {
     public void testDeleteBatch() {
         when(processServiceMock.deleteBatch(eq(PROCESS1_ID))).thenReturn(3);
 
-        Response response = target("process/batches/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).delete();
+        Response response = target("process/batch/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).delete();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
         JSONObject jsonObject = new JSONObject(json);
@@ -159,7 +162,7 @@ public class TestProcessEndpoint extends JerseyTest {
     public void testKillBatch() {
         when(processServiceMock.killBatch(eq(PROCESS1_ID))).thenReturn(5);
 
-        Response response = target("process/batches/" + PROCESS1_ID + "/execution").request().accept(MediaType.APPLICATION_JSON_TYPE).delete();
+        Response response = target("process/batch/" + PROCESS1_ID + "/execution").request().accept(MediaType.APPLICATION_JSON_TYPE).delete();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
         JSONObject jsonObject = new JSONObject(json);
@@ -176,7 +179,7 @@ public class TestProcessEndpoint extends JerseyTest {
         owners.add("PePo");
         when(processServiceMock.getOwners()).thenReturn(owners);
 
-        Response response = target("process/owners").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Response response = target("process/owner").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
         JSONObject jsonObject = new JSONObject(json);

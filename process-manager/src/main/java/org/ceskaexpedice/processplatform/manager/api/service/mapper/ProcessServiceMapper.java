@@ -20,8 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.common.utils.DateUtils;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;
@@ -69,9 +69,9 @@ public final class ProcessServiceMapper {
         Batch batch = new Batch();
         batch.setMainProcessId(processEntity.getProcessId());
         batch.setStatus(ProcessState.load(processEntity.getStatus()));
-        batch.setPlanned(processEntity.getPlanned());
-        batch.setStarted(processEntity.getStarted());
-        batch.setFinished(processEntity.getFinished());
+        batch.setPlanned(DateUtils.convert(processEntity.getPlanned()));
+        batch.setStarted(DateUtils.convert(processEntity.getStarted()));
+        batch.setFinished(DateUtils.convert(processEntity.getFinished()));
         batch.setOwner(processEntity.getOwner());
         return batch;
     }
@@ -84,9 +84,9 @@ public final class ProcessServiceMapper {
         processInfo.setProfileId(processEntity.getProfileId());
         processInfo.setWorkerId(processEntity.getWorkerId());
         processInfo.setPid(processEntity.getPid());
-        processInfo.setPlanned(processEntity.getPlanned());
-        processInfo.setStarted(processEntity.getStarted());
-        processInfo.setFinished(processEntity.getFinished());
+        processInfo.setPlanned(DateUtils.convert(processEntity.getPlanned()));
+        processInfo.setStarted(DateUtils.convert(processEntity.getStarted()));
+        processInfo.setFinished(DateUtils.convert(processEntity.getFinished()));
         processInfo.setStatus(ProcessState.load(processEntity.getStatus()));
         processInfo.setPayload(processEntity.getPayload());
         processInfo.setBatchId(processEntity.getBatchId());

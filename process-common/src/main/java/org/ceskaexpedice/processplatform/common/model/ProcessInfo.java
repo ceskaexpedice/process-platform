@@ -16,7 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.common.model;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,9 +30,9 @@ public class ProcessInfo {
     private String profileId;
     private String workerId;
     private int pid;
-    private LocalDateTime planned;
-    private LocalDateTime started;
-    private LocalDateTime finished;
+    private Date planned;
+    private Date started;
+    private Date finished;
     private ProcessState status;
     private Map<String, String> payload = new HashMap<>();
     private String batchId;
@@ -97,27 +97,27 @@ public class ProcessInfo {
         this.workerId = workerId;
     }
 
-    public LocalDateTime getPlanned() {
+    public Date getPlanned() {
         return planned;
     }
 
-    public void setPlanned(LocalDateTime planned) {
+    public void setPlanned(Date planned) {
         this.planned = planned;
     }
 
-    public LocalDateTime getStarted() {
+    public Date getStarted() {
         return started;
     }
 
-    public void setStarted(LocalDateTime started) {
+    public void setStarted(Date started) {
         this.started = started;
     }
 
-    public LocalDateTime getFinished() {
+    public Date getFinished() {
         return finished;
     }
 
-    public void setFinished(LocalDateTime finished) {
+    public void setFinished(Date finished) {
         this.finished = finished;
     }
 

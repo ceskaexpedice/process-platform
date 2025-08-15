@@ -72,7 +72,7 @@ public class ProcessEndpoint {
     }
 
     @GET
-    @Path("batches")
+    @Path("batch")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBatches(
             @QueryParam("offset") String offsetStr,
@@ -102,7 +102,7 @@ public class ProcessEndpoint {
     }
 
     @DELETE
-    @Path("batches/{mainProcessId}")
+    @Path("batch/{mainProcessId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteBatch(@PathParam("mainProcessId") String mainProcessId) {
         int deleted = processService.deleteBatch(mainProcessId);
@@ -113,7 +113,7 @@ public class ProcessEndpoint {
     }
 
     @DELETE
-    @Path("batches/{mainProcessId}/execution")
+    @Path("batch/{mainProcessId}/execution")
     @Produces(MediaType.APPLICATION_JSON)
     public Response killBatch(@PathParam("mainProcessId") String mainProcessId) {
         int killed = processService.killBatch(mainProcessId);
@@ -124,7 +124,7 @@ public class ProcessEndpoint {
     }
 
     @GET
-    @Path("owners")
+    @Path("owner")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOwners() {
         List<String> owners = processService.getOwners();

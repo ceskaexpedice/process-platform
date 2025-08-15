@@ -77,14 +77,14 @@ public final class ProcessMapper {
             processEntity.setProfileId(rsProcess.getString("profile_id"));
             processEntity.setWorkerId(rsProcess.getString("worker_id"));
             processEntity.setPid(rsProcess.getInt("pid"));
-            if(rsProcess.getTimestamp("started") != null){
+            if(rsProcess.getTimestamp("planned") != null){
                 processEntity.setPlanned(rsProcess.getTimestamp("planned").toLocalDateTime());
             }
             if(rsProcess.getTimestamp("started") != null){
-                processEntity.setPlanned(rsProcess.getTimestamp("started").toLocalDateTime());
+                processEntity.setStarted(rsProcess.getTimestamp("started").toLocalDateTime());
             }
             if(rsProcess.getTimestamp("finished") != null){
-                processEntity.setPlanned(rsProcess.getTimestamp("finished").toLocalDateTime());
+                processEntity.setFinished(rsProcess.getTimestamp("finished").toLocalDateTime());
             }
             processEntity.setStatus(rsProcess.getInt("status"));
             String json = rsProcess.getString("payload");
