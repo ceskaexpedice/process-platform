@@ -14,6 +14,11 @@
  */
 package org.ceskaexpedice.processplatform.manager.db;
 
+import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
+import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
@@ -21,8 +26,11 @@ import org.junit.jupiter.api.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.PROFILE1_ID;
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.createTables;
 
 /**
@@ -58,12 +66,32 @@ public class TestDbUtils_integration {
         }
     }
 
+    // helper class for locale env prep
     @Disabled
     @Test
-    public void testCreateEmptyDb() {
+    public void testCreateEmptyDb_helper() {
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
         DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
         createTables(dbConnectionProvider);
+    }
+
+    // helper class for locale env prep
+    @Disabled
+    @Test
+    public void testScheduleMainProcess_helper() {
+        ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
+        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
+        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
+        NodeService nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
+        ProcessService processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertNotNull(processInfo);
     }
 
     private static void dropTables(Connection connection) {

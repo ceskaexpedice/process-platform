@@ -67,9 +67,9 @@ public class ManagerStartupListener implements ServletContextListener {
 
     private void initDb(DbConnectionProvider dbProvider) {
         makeSureTableExists(dbProvider, NODE_TABLE);
-        makeSureTableExists(dbProvider, PROCESS_TABLE);
         makeSureTableExists(dbProvider, PLUGIN_TABLE);
         makeSureTableExists(dbProvider, PROFILE_TABLE);
+        makeSureTableExists(dbProvider, PROCESS_TABLE);
     }
 
     private static void initServices(ManagerConfiguration config, DbConnectionProvider dbProvider) {

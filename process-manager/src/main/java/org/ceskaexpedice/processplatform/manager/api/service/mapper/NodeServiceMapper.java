@@ -33,8 +33,8 @@ public final class NodeServiceMapper {
     public static Node mapNode(NodeEntity nodeEntity) {
         if(nodeEntity == null) return null;
         Node node = new Node();
-        node.setNodeId(node.getNodeId());
-        node.setDescription(node.getDescription());
+        node.setNodeId(nodeEntity.getNodeId());
+        node.setDescription(nodeEntity.getDescription());
         node.setType(NodeType.valueOf(nodeEntity.getType()));
         node.setUrl(nodeEntity.getUrl());
         node.setTags(nodeEntity.getTags());
