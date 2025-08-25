@@ -1,0 +1,1410 @@
+openapi: 3.0.2
+info:
+  title: Administrační API v systému Kramerius
+  description: |
+    Popis je platný k verzi 7.0.38 a vyšší. Kramerius obsahuje REST API, které umožňuje všechny operace nad systémem.   Standardně je dostupné na nainstalovaném serveru pod kontextem: `~/search/api/admin/v7.0*`.  
+    Primárně určeno pro administraci  
+
+  version: "7.0"
+
+servers:
+  - url: /process-manager/api
+
+tags:
+  - name: ForWorker
+    description: >
+      Výpis, plánování, stopování, atd..
+
+  - name: Nodes
+    description: >
+      Výpis, plánování, stopování, atd..
+
+  - name: Plugins
+    description: >
+      Výpis, plánování, stopování, atd..
+
+  - name: Profiles
+    description: >
+      Výpis, plánování, stopování, atd..
+
+  - name: Processes
+    description: >
+      Výpis, plánování, stopování, atd..
+
+paths:
+  /worker/register_node:
+    post:
+      tags:
+        - ForWorker
+      summary: Register node
+      description: Naplánuje nový proces, který může být různých typů, jako například indexace, import, import NDK, atd.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+
+            examples:
+
+              importfoxml:
+                summary: Plánování procesu import/FOXML
+                description: |
+                  Příklad naplánování procesu importu FOXML. 
+                  Popis parametrů:
+                  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.  
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"import","params":{"inputDataDir":"/d28b2a1a-508e-419e-9d3b-12ed4560138e","startIndexer":true,"license":"dnnto","collections":"uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02", "pathtype":"relative"}}
+              importndk:
+                summary: Plánování procesu import/NDK-METS
+                description: |
+                  Příklad naplánování procesu importu NDK-METS
+                  Popis parametrů:
+
+                  - **policy**: Příznak viditelnosti, ponecháno z důvodu zpětné kompatibility. Pro viditelnost využívejte licenci public nebo onsite  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **useIIPServer**: Use IIP server.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"convert_and_import","params":{"policy":"PRIVATE","inputDataDir":"/1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","startIndexer":true,"useIIPServer":true,"license":"dnnto","collections":"uuid:28b00683-977d-4743-ad4b-ff8135f5e263", "pathtype":"relative"}}
+              index_object:
+                summary: Plánování indexace objektu
+                description: |
+                  Příklad naplánování procesu indexace objektu
+                  Popis parametrů:
+
+                  - **type**: Typ indexace. Možné hodnoty jsou TREE_AND_FOSTER_TREES nebo OBJECT 
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **ignoreInconsistentObjects**: Příznak určuje zda má indexer pokračovat i v případě nalezení nekonzistence .
+                
+
+                value: {"defid":"new_indexer_index_object","params":{"type":"TREE_AND_FOSTER_TREES","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922","ignoreInconsistentObjects":false}}
+
+
+              add_license:
+                summary: Plánování procesu přidání licence
+                description: |
+                  Příklad přidání licence
+                  Popis parametrů:
+                  
+                  - **license**: Přiřazovaná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+
+                value: {"defid":"add_license","params":{"license":"orphan","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+              remove_license:
+                summary: Plánování procesu odebírání licence
+                description: |
+                  
+                  Příklad odebírání licence
+                  Popis parametrů:
+                  
+                  - **license**: Odebíraná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                
+
+                value: {"defid":"remove_license","params":{"license":"dnnto","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+
+              backup_collection:
+                summary: Vytvoření zálohy sbírky/sbírek
+                description: |
+                  Vytvoří zálohu sbírky/sbírek
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"backup-collections","params":{"pidlist":["uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02"],"backupname":"Test"}}
+
+
+              restore_collection:
+                summary: Obnovení sbírek ze zálohy
+                description: |
+                  Obnovení sbírek ze zálohy
+                  Popis parametrů:
+                  
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"restore-collections","params":{"backupname":"Test.zip"}}
+
+
+              flag_to_license:
+                summary: Změna příznaku na licence (public a onsite)
+                description: Příklad změny poříznaku
+
+                value: {"defid":"flag_to_license","params":{}}
+
+
+              sdnnt_sync:
+                summary: Plánování procesu synchronizace se SDNNT
+                description: Příklad synchronizace se SDNNT
+
+
+                value: {"defid":"sdnnt-sync","params":{}}
+
+              delete:
+                summary: Plánování procesu mazání
+                description: |
+                  Příklad smazání objektu
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  
+                  - **ignoreIncosistencies**: Ignorovat nekozistence
+
+                value: {"defid":"delete_tree","params":{"pid":"uuid:1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","ignoreIncosistencies":true}}
+
+      responses:
+        '200':
+          description: Proces byl úspěšně naplánován
+          content:
+            application/json:
+              example: {
+                "name": "Import FOXML z /d28b2a1a-508e-419e-9d3b-12ed4560138e ",
+                "id": "import",
+                "state": "PLANNED",
+                "planned": "+56753-06-10T20:40:06",
+                "uuid": "103cb713-b778-4370-8d58-f13bf4b276ec"
+              }
+        '400':
+          description: Špatný požadavek - chybí definice procesu nebo `defid`
+          content:
+            application/json:
+              example:
+                error: "missing process definition"
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+          content:
+            application/json:
+              example:
+                error: "user 'username' is not allowed to manage processes"
+
+  /worker/register_plugin:
+    post:
+      tags:
+        - ForWorker
+      summary: Register plugin
+      description: Naplánuje nový proces, který může být různých typů, jako například indexace, import, import NDK, atd.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+
+            examples:
+
+              importfoxml:
+                summary: Plánování procesu import/FOXML
+                description: |
+                  Příklad naplánování procesu importu FOXML. 
+                  Popis parametrů:
+                  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.  
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"import","params":{"inputDataDir":"/d28b2a1a-508e-419e-9d3b-12ed4560138e","startIndexer":true,"license":"dnnto","collections":"uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02", "pathtype":"relative"}}
+              importndk:
+                summary: Plánování procesu import/NDK-METS
+                description: |
+                  Příklad naplánování procesu importu NDK-METS
+                  Popis parametrů:
+
+                  - **policy**: Příznak viditelnosti, ponecháno z důvodu zpětné kompatibility. Pro viditelnost využívejte licenci public nebo onsite  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **useIIPServer**: Use IIP server.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"convert_and_import","params":{"policy":"PRIVATE","inputDataDir":"/1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","startIndexer":true,"useIIPServer":true,"license":"dnnto","collections":"uuid:28b00683-977d-4743-ad4b-ff8135f5e263", "pathtype":"relative"}}
+              index_object:
+                summary: Plánování indexace objektu
+                description: |
+                  Příklad naplánování procesu indexace objektu
+                  Popis parametrů:
+
+                  - **type**: Typ indexace. Možné hodnoty jsou TREE_AND_FOSTER_TREES nebo OBJECT 
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **ignoreInconsistentObjects**: Příznak určuje zda má indexer pokračovat i v případě nalezení nekonzistence .
+                
+
+                value: {"defid":"new_indexer_index_object","params":{"type":"TREE_AND_FOSTER_TREES","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922","ignoreInconsistentObjects":false}}
+
+
+              add_license:
+                summary: Plánování procesu přidání licence
+                description: |
+                  Příklad přidání licence
+                  Popis parametrů:
+                  
+                  - **license**: Přiřazovaná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+
+                value: {"defid":"add_license","params":{"license":"orphan","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+              remove_license:
+                summary: Plánování procesu odebírání licence
+                description: |
+                  
+                  Příklad odebírání licence
+                  Popis parametrů:
+                  
+                  - **license**: Odebíraná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                
+
+                value: {"defid":"remove_license","params":{"license":"dnnto","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+
+              backup_collection:
+                summary: Vytvoření zálohy sbírky/sbírek
+                description: |
+                  Vytvoří zálohu sbírky/sbírek
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"backup-collections","params":{"pidlist":["uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02"],"backupname":"Test"}}
+
+
+              restore_collection:
+                summary: Obnovení sbírek ze zálohy
+                description: |
+                  Obnovení sbírek ze zálohy
+                  Popis parametrů:
+                  
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"restore-collections","params":{"backupname":"Test.zip"}}
+
+
+              flag_to_license:
+                summary: Změna příznaku na licence (public a onsite)
+                description: Příklad změny poříznaku
+
+                value: {"defid":"flag_to_license","params":{}}
+
+
+              sdnnt_sync:
+                summary: Plánování procesu synchronizace se SDNNT
+                description: Příklad synchronizace se SDNNT
+
+
+                value: {"defid":"sdnnt-sync","params":{}}
+
+              delete:
+                summary: Plánování procesu mazání
+                description: |
+                  Příklad smazání objektu
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  
+                  - **ignoreIncosistencies**: Ignorovat nekozistence
+
+                value: {"defid":"delete_tree","params":{"pid":"uuid:1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","ignoreIncosistencies":true}}
+
+      responses:
+        '200':
+          description: Proces byl úspěšně naplánován
+          content:
+            application/json:
+              example: {
+                "name": "Import FOXML z /d28b2a1a-508e-419e-9d3b-12ed4560138e ",
+                "id": "import",
+                "state": "PLANNED",
+                "planned": "+56753-06-10T20:40:06",
+                "uuid": "103cb713-b778-4370-8d58-f13bf4b276ec"
+              }
+        '400':
+          description: Špatný požadavek - chybí definice procesu nebo `defid`
+          content:
+            application/json:
+              example:
+                error: "missing process definition"
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+          content:
+            application/json:
+              example:
+                error: "user 'username' is not allowed to manage processes"
+
+  /worker/next_process/{workerId}:
+    get:
+      tags:
+        - ForWorker
+      summary: Vrací detail node dle databázového id
+      description: Vrací detail procesu/dávky dle databázového id
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: Databázová id node
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: JSON reprezentace node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "nodeId": "curatorWorker",
+                  "description": "Worker [curatorWorker]",
+                  "type": "WORKER",
+                  "url": "http://localhost:8089/process-worker/api/",
+                  "tags": [
+                    "testPlugin2",
+                    "testPlugin1-small",
+                    "testPlugin1-big"
+                  ]
+                }
+        '400':
+          description: Nevalidní id procesu, process_id musí být číslo
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+        '404':
+          description: Proces se zadaným id neexistuje
+
+  /worker/schedule_sub_process:
+    post:
+      tags:
+        - ForWorker
+      summary: Register plugin
+      description: Naplánuje nový proces, který může být různých typů, jako například indexace, import, import NDK, atd.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+
+            examples:
+
+              importfoxml:
+                summary: Plánování procesu import/FOXML
+                description: |
+                  Příklad naplánování procesu importu FOXML. 
+                  Popis parametrů:
+                  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.  
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"import","params":{"inputDataDir":"/d28b2a1a-508e-419e-9d3b-12ed4560138e","startIndexer":true,"license":"dnnto","collections":"uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02", "pathtype":"relative"}}
+              importndk:
+                summary: Plánování procesu import/NDK-METS
+                description: |
+                  Příklad naplánování procesu importu NDK-METS
+                  Popis parametrů:
+
+                  - **policy**: Příznak viditelnosti, ponecháno z důvodu zpětné kompatibility. Pro viditelnost využívejte licenci public nebo onsite  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **useIIPServer**: Use IIP server.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: {"defid":"convert_and_import","params":{"policy":"PRIVATE","inputDataDir":"/1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","startIndexer":true,"useIIPServer":true,"license":"dnnto","collections":"uuid:28b00683-977d-4743-ad4b-ff8135f5e263", "pathtype":"relative"}}
+              index_object:
+                summary: Plánování indexace objektu
+                description: |
+                  Příklad naplánování procesu indexace objektu
+                  Popis parametrů:
+
+                  - **type**: Typ indexace. Možné hodnoty jsou TREE_AND_FOSTER_TREES nebo OBJECT 
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **ignoreInconsistentObjects**: Příznak určuje zda má indexer pokračovat i v případě nalezení nekonzistence .
+                
+
+                value: {"defid":"new_indexer_index_object","params":{"type":"TREE_AND_FOSTER_TREES","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922","ignoreInconsistentObjects":false}}
+
+
+              add_license:
+                summary: Plánování procesu přidání licence
+                description: |
+                  Příklad přidání licence
+                  Popis parametrů:
+                  
+                  - **license**: Přiřazovaná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+
+                value: {"defid":"add_license","params":{"license":"orphan","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+              remove_license:
+                summary: Plánování procesu odebírání licence
+                description: |
+                  
+                  Příklad odebírání licence
+                  Popis parametrů:
+                  
+                  - **license**: Odebíraná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                
+
+                value: {"defid":"remove_license","params":{"license":"dnnto","pid":"uuid:b35833b3-7f7f-4cac-a434-484b6e096922"}}
+
+
+              backup_collection:
+                summary: Vytvoření zálohy sbírky/sbírek
+                description: |
+                  Vytvoří zálohu sbírky/sbírek
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"backup-collections","params":{"pidlist":["uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02"],"backupname":"Test"}}
+
+
+              restore_collection:
+                summary: Obnovení sbírek ze zálohy
+                description: |
+                  Obnovení sbírek ze zálohy
+                  Popis parametrů:
+                  
+                  - **backupname**: Jméno zálohy
+                
+
+                value: {"defid":"restore-collections","params":{"backupname":"Test.zip"}}
+
+
+              flag_to_license:
+                summary: Změna příznaku na licence (public a onsite)
+                description: Příklad změny poříznaku
+
+                value: {"defid":"flag_to_license","params":{}}
+
+
+              sdnnt_sync:
+                summary: Plánování procesu synchronizace se SDNNT
+                description: Příklad synchronizace se SDNNT
+
+
+                value: {"defid":"sdnnt-sync","params":{}}
+
+              delete:
+                summary: Plánování procesu mazání
+                description: |
+                  Příklad smazání objektu
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  
+                  - **ignoreIncosistencies**: Ignorovat nekozistence
+
+                value: {"defid":"delete_tree","params":{"pid":"uuid:1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","ignoreIncosistencies":true}}
+
+      responses:
+        '200':
+          description: Proces byl úspěšně naplánován
+          content:
+            application/json:
+              example: {
+                "name": "Import FOXML z /d28b2a1a-508e-419e-9d3b-12ed4560138e ",
+                "id": "import",
+                "state": "PLANNED",
+                "planned": "+56753-06-10T20:40:06",
+                "uuid": "103cb713-b778-4370-8d58-f13bf4b276ec"
+              }
+        '400':
+          description: Špatný požadavek - chybí definice procesu nebo `defid`
+          content:
+            application/json:
+              example:
+                error: "missing process definition"
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+          content:
+            application/json:
+              example:
+                error: "user 'username' is not allowed to manage processes"
+
+  /worker/pid/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Nastaveni read only flag
+      description: Nastaveni read only flag pro jadro Krameria
+      operationId: updateWorkMode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                readOnly:
+                  type: boolean
+                  description: Indicates if the system should be in read-only mode.
+                reason:
+                  type: string
+                  description: Důvod nastavení read only režimu
+                  enum:
+                    - maintenance
+                    - distributedLocksException
+                    - noReason
+              required:
+                - readOnly
+                - reason
+      responses:
+        '200':
+          description: Successfully updated work mode
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /worker/state/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Nastaveni read only flag
+      description: Nastaveni read only flag pro jadro Krameria
+      operationId: updateWorkMode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                readOnly:
+                  type: boolean
+                  description: Indicates if the system should be in read-only mode.
+                reason:
+                  type: string
+                  description: Důvod nastavení read only režimu
+                  enum:
+                    - maintenance
+                    - distributedLocksException
+                    - noReason
+              required:
+                - readOnly
+                - reason
+      responses:
+        '200':
+          description: Successfully updated work mode
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /worker/description/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Nastaveni read only flag
+      description: Nastaveni read only flag pro jadro Krameria
+      operationId: updateWorkMode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                readOnly:
+                  type: boolean
+                  description: Indicates if the system should be in read-only mode.
+                reason:
+                  type: string
+                  description: Důvod nastavení read only režimu
+                  enum:
+                    - maintenance
+                    - distributedLocksException
+                    - noReason
+              required:
+                - readOnly
+                - reason
+      responses:
+        '200':
+          description: Successfully updated work mode
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /node:
+    get:
+      tags:
+        - Nodes
+      summary: Vrací seznam všech nodes
+      description: Vrací seznam všech nodes.
+      responses:
+        '200':
+          description: Úspěšně získané nodes
+          content:
+            application/json:
+              example: [ {
+                "nodeId": "curatorWorker",
+                "description": "Worker [curatorWorker]",
+                "type": "WORKER",
+                "url": "http://localhost:8089/process-worker/api/",
+                "tags": [
+                  "testPlugin2",
+                  "testPlugin1-small",
+                  "testPlugin1-big"
+                ] }
+              ]
+
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /node/{nodeId}:
+    get:
+      tags:
+        - Nodes
+      summary: Vrací detail node dle databázového id
+      description: Vrací detail procesu/dávky dle databázového id
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: Databázová id node
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: JSON reprezentace node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "nodeId": "curatorWorker",
+                  "description": "Worker [curatorWorker]",
+                  "type": "WORKER",
+                  "url": "http://localhost:8089/process-worker/api/",
+                  "tags": [
+                    "testPlugin2",
+                    "testPlugin1-small",
+                    "testPlugin1-big"
+                  ]
+                }
+        '400':
+          description: Nevalidní id procesu, process_id musí být číslo
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+        '404':
+          description: Proces se zadaným id neexistuje
+
+  /plugin:
+    get:
+      tags:
+        - Plugins
+      summary: Vrací seznam všech plugins
+      description: Vrací seznam všech nodes.
+      responses:
+        '200':
+          description: Úspěšně získané nodes
+          content:
+            application/json:
+              example: [
+                {
+                  "pluginId": "testPlugin1",
+                  "description": "Testing plugin 1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payloadFieldSpecMap": {
+                    "name": {
+                      "type": "STRING",
+                      "required": true
+                    },
+                    "surname": {
+                      "type": "STRING",
+                      "required": true
+                    }
+                  },
+                  "scheduledProfiles": [
+                    "testPlugin2"
+                  ],
+                  "profiles": []
+                },
+                {
+                  "pluginId": "testPlugin2",
+                  "description": "Testing plugin 2",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin2.TestPlugin2",
+                  "payloadFieldSpecMap": {
+
+                  },
+                  "scheduledProfiles": [],
+                  "profiles": []
+                }
+              ]
+
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /plugin/{pluginId}:
+    get:
+      tags:
+        - Plugins
+      summary: Vrací detail plugin dle databázového id
+      description: Vrací detail procesu/dávky dle databázového id
+      parameters:
+        - name: pluginId
+          in: path
+          required: true
+          description: Databázová id node
+          schema:
+            type: string
+          example: testPlugin1
+      responses:
+        '200':
+          description: JSON reprezentace node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "pluginId": "testPlugin1",
+                  "description": "Testing plugin 1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payloadFieldSpecMap": {
+                    "name": {
+                      "type": "STRING",
+                      "required": true
+                    },
+                    "surname": {
+                      "type": "STRING",
+                      "required": true
+                    }
+                  },
+                  "scheduledProfiles": [
+                    "testPlugin2"
+                  ],
+                  "profiles": [
+                    {
+                      "profileId": "testPlugin1-big",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx32g"
+                      ]
+                    },
+                    {
+                      "profileId": "testPlugin1-small",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx4g"
+                      ]
+                    }
+                  ]
+                }
+        '400':
+          description: Nevalidní id procesu, process_id musí být číslo
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+        '404':
+          description: Proces se zadaným id neexistuje
+
+  /profile:
+    get:
+      tags:
+        - Profiles
+      summary: Vrací seznam všech profiles
+      description: Vrací seznam všech nodes.
+      responses:
+        '200':
+          description: Úspěšně získané nodes
+          content:
+            application/json:
+              example: [
+                {
+                  "profileId": "testPlugin1-big",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx32g"
+                  ]
+                },
+                {
+                  "profileId": "testPlugin1-small",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx4g"
+                  ]
+                },
+                {
+                  "profileId": "testPlugin2",
+                  "description": null,
+                  "pluginId": "testPlugin2",
+                  "jvmArgs": []
+                }
+              ]
+
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /profile/{profileId}:
+    get:
+      tags:
+        - Profiles
+      summary: Vrací detail profile dle databázového id
+      description: Vrací detail procesu/dávky dle databázového id
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          description: Databázová id node
+          schema:
+            type: string
+          example: testPlugin1-big
+      responses:
+        '200':
+          description: JSON reprezentace node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "profileId": "testPlugin1-big",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx32g"
+                  ]
+                }
+        '400':
+          description: Nevalidní id procesu, process_id musí být číslo
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+        '404':
+          description: Proces se zadaným id neexistuje
+    put:
+      tags:
+        - Profiles
+      summary: Nastaveni read only flag
+      description: Nastaveni read only flag pro jadro Krameria
+      operationId: updateWorkMode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                readOnly:
+                  type: boolean
+                  description: Indicates if the system should be in read-only mode.
+                reason:
+                  type: string
+                  description: Důvod nastavení read only režimu
+                  enum:
+                    - maintenance
+                    - distributedLocksException
+                    - noReason
+              required:
+                - readOnly
+                - reason
+      responses:
+        '200':
+          description: Successfully updated work mode
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /process:
+    post:
+      tags:
+        - Processes
+      summary: Naplánování procesu
+      description: Naplánuje nový proces, který může být různých typů, jako například indexace, import, import NDK, atd.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+
+            examples:
+              
+              importfoxml:
+                summary: Plánování procesu import/FOXML
+                description: |
+                  Příklad naplánování procesu importu FOXML. 
+                  Popis parametrů:
+                  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.  
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: { "defid": "import","params": { "inputDataDir": "/d28b2a1a-508e-419e-9d3b-12ed4560138e","startIndexer": true,"license": "dnnto","collections": "uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02", "pathtype": "relative" } }
+              importndk:
+                summary: Plánování procesu import/NDK-METS
+                description: |
+                  Příklad naplánování procesu importu NDK-METS
+                  Popis parametrů:
+
+                  - **policy**: Příznak viditelnosti, ponecháno z důvodu zpětné kompatibility. Pro viditelnost využívejte licenci public nebo onsite  
+                  - **inputDataDir**: Cesta k adresáři s daty pro import.
+                  - **startIndexer**: Boolean hodnota určující, zda začít indexaci.
+                  - **useIIPServer**: Use IIP server.
+                  - **license**: Typ licence pro import.
+                  - **collections**: UUID kolekcí, do kterých budou data importována.
+                  - **pathtype**: Typ cesty, možné hodnoty **absolute** nebo **relative**
+
+                value: { "defid": "convert_and_import","params": { "policy": "PRIVATE","inputDataDir": "/1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","startIndexer": true,"useIIPServer": true,"license": "dnnto","collections": "uuid:28b00683-977d-4743-ad4b-ff8135f5e263", "pathtype": "relative" } }
+              index_object:
+                summary: Plánování indexace objektu
+                description: |
+                  Příklad naplánování procesu indexace objektu
+                  Popis parametrů:
+
+                  - **type**: Typ indexace. Možné hodnoty jsou TREE_AND_FOSTER_TREES nebo OBJECT 
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **ignoreInconsistentObjects**: Příznak určuje zda má indexer pokračovat i v případě nalezení nekonzistence .
+                
+                
+                value: { "defid": "new_indexer_index_object","params": { "type": "TREE_AND_FOSTER_TREES","pid": "uuid:b35833b3-7f7f-4cac-a434-484b6e096922","ignoreInconsistentObjects": false } }
+
+
+              add_license:
+                summary: Plánování procesu přidání licence
+                description: |
+                  Příklad přidání licence
+                  Popis parametrů:
+                  
+                  - **license**: Přiřazovaná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+
+                value: { "defid": "add_license","params": { "license": "orphan","pid": "uuid:b35833b3-7f7f-4cac-a434-484b6e096922" } }
+              
+              remove_license:
+                summary: Plánování procesu odebírání licence
+                description: |
+                  
+                  Příklad odebírání licence
+                  Popis parametrů:
+                  
+                  - **license**: Odebíraná licence
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                
+                
+                value: { "defid": "remove_license","params": { "license": "dnnto","pid": "uuid:b35833b3-7f7f-4cac-a434-484b6e096922" } }
+
+              
+              backup_collection:
+                summary: Vytvoření zálohy sbírky/sbírek
+                description: |
+                  Vytvoří zálohu sbírky/sbírek
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  - **backupname**: Jméno zálohy
+                
+                
+                value: { "defid": "backup-collections","params": { "pidlist": [ "uuid:bcc986fc-7ec8-47eb-b585-121e48f7bd02" ],"backupname": "Test" } }
+              
+              
+              restore_collection:
+                summary: Obnovení sbírek ze zálohy
+                description: |
+                  Obnovení sbírek ze zálohy
+                  Popis parametrů:
+                  
+                  - **backupname**: Jméno zálohy
+                
+                
+                value: { "defid": "restore-collections","params": { "backupname": "Test.zip" } }
+
+              
+              flag_to_license:
+                summary: Změna příznaku na licence (public a onsite)
+                description: Příklad změny poříznaku
+
+                value: { "defid": "flag_to_license","params": { } }
+
+
+              sdnnt_sync:
+                summary: Plánování procesu synchronizace se SDNNT
+                description: Příklad synchronizace se SDNNT
+
+
+                value: { "defid": "sdnnt-sync","params": { } }
+
+              delete:
+                summary: Plánování procesu mazání
+                description: |
+                  Příklad smazání objektu
+                  Popis parametrů:
+                  
+                  - **pid**: Pid identifkikátor objektu
+                  - **pidlist**: V případě, že chceme více objektů, je možno využít pole pidů
+                  
+                  - **ignoreIncosistencies**: Ignorovat nekozistence
+
+                value: { "defid": "delete_tree","params": { "pid": "uuid:1c8fc53b-9c82-4bc7-8e1f-038d92749b1f","ignoreIncosistencies": true } }
+
+      responses:
+        '200':
+          description: Proces byl úspěšně naplánován
+          content:
+            application/json:
+              example: {
+                "name": "Import FOXML z /d28b2a1a-508e-419e-9d3b-12ed4560138e ",
+                "id": "import",
+                "state": "PLANNED",
+                "planned": "+56753-06-10T20:40:06",
+                "uuid": "103cb713-b778-4370-8d58-f13bf4b276ec"
+              }
+        '400':
+          description: Špatný požadavek - chybí definice procesu nebo `defid`
+          content:
+            application/json:
+              example:
+                error: "missing process definition"
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+          content:
+            application/json:
+              example:
+                error: "user 'username' is not allowed to manage processes"
+
+  /process/{processId}:
+    get:
+      tags:
+        - Processes
+      summary: Vrací detail procesu/dávky dle databázového id
+      description: Vrací detail procesu/dávky dle databázového id
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Databázová id procesu
+          schema:
+            type: string
+          example: 576
+      responses:
+        '200':
+          description: JSON reprezentace procesu/dávky
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "process": {
+                    "defid": "import",
+                    "name": "Import FOXML z ./import/d28b2a1a-508e-419e-9d3b-12ed4560138e ",
+                    "started": "2024-10-13T07:46:51.141",
+                    "finished": "2024-10-13T07:46:54.077",
+                    "id": "576",
+                    "state": "FAILED",
+                    "planned": "2024-10-13T07:46:50.406",
+                    "uuid": "103cb713-b778-4370-8d58-f13bf4b276ec"
+                  },
+                  "batch": {
+                    "owner_name": "krameriusadmin",
+                    "owner_id": "krameriusadmin",
+                    "started": "2024-10-13T07:46:51.141",
+                    "finished": "2024-10-13T07:46:54.077",
+                    "id": "576",
+                    "state": "FAILED",
+                    "planned": "2024-10-13T07:46:50.406",
+                    "token": "13d099c7-e95c-4834-ad6e-d8f40017d0b9"
+                  }
+                }
+        '400':
+          description: Nevalidní id procesu, process_id musí být číslo
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+        '404':
+          description: Proces se zadaným id neexistuje
+
+  /process/batch:
+    get:
+      tags:
+        - Processes
+      summary: Vrací všechny dávky procesů
+      description: Vrací všechny dávky procesů a umožňuje filtrování a paginaci
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: Počáteční bod výpisu/paginace. Standardně 0.
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          description: Maximální počet vrácených položek. Standardně 50.
+          schema:
+            type: integer
+            default: 50
+        - name: owner
+          in: query
+          required: false
+          description: Filtrování dle vlastníka
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          description: Filtrování dle počátečního data. (ISO 8601 formát).
+          schema:
+            type: string
+            format: date-time
+        - name: until
+          in: query
+          required: false
+          description: Filtrování dle koncového data. (ISO 8601 formát).
+          schema:
+            type: string
+            format: date-time
+        - name: state
+          in: query
+          required: false
+          description: Filtrování dle stavu.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Výpis všech dávek asociovaných s procesem
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {
+                "batches": [
+                  {
+                    "processes": [
+                      {
+                        "defid": "import",
+                        "name": "Import FOXML z /k4_ae9265da-e51b-4521-80ca-532ffde5277a ",
+                        "started": "2024-10-16T07:11:29.899",
+                        "finished": "2024-10-16T07:11:35.15",
+                        "id": "587",
+                        "state": "FINISHED",
+                        "planned": "2024-10-16T07:11:29.815",
+                        "uuid": "6f10ffa5-8cab-476e-a1d4-97781945fec8"
+                      },
+                      {
+                        "defid": "new_indexer_index_object",
+                        "name": "Indexace Orlické hory a Podorlicko: přírodou, dějinami, současností : sborník vlastivědných prací ([uuid:263c8c1c-8873-47d4-8586-3a0a3c9dc1db], typ TREE_AND_FOSTER_TREES)",
+                        "started": "2024-10-16T07:11:35.991",
+                        "finished": "2024-10-16T07:11:40.491",
+                        "id": "588",
+                        "state": "FINISHED",
+                        "planned": "2024-10-16T07:11:35.057",
+                        "uuid": "b33e5ee5-d243-4cf7-b471-eae052bbcc6f"
+                      }
+                    ],
+                    "batch": {
+                      "owner_name": "krameriusadmin",
+                      "owner_id": "krameriusadmin",
+                      "started": "2024-10-16T07:11:29.899",
+                      "finished": "2024-10-16T07:11:40.491",
+                      "id": "587",
+                      "state": "FINISHED",
+                      "planned": "2024-10-16T07:11:29.815",
+                      "token": "f4910a6d-ca34-468c-a400-c67a8fe501e8"
+                    }
+                  } ] }
+        '400':
+          description: Nevalidní query parametr (offset, limit, from, until)
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /process/batch/{mainProcessId}:
+    delete:
+      tags:
+        - Processes
+      summary: Smaže konkrétní procesu
+      description: Smaže konkrétní proces
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          description: ID prvního procesu v dávce.
+          schema:
+            type: integer
+          example: 576
+      responses:
+        '200':
+          description: Proces úspěšně smazán
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Neplatné ID procesu nebo dávka nelze smazat.
+
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /process/batch/{mainProcessId}/execution:
+    delete:
+      tags:
+        - Processes
+      summary: Ukončí běžící proces
+      description: Ukončí běžící proces
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          description: ID procesu
+          schema:
+            type: integer
+          example: 576
+      responses:
+        '200':
+          description: Proces úspěšně ukončen.
+        '400':
+          description: Neplatné ID.
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+  /process/owner:
+    get:
+      tags:
+        - Processes
+      summary: Vrací seznam všech vlastníků procesů
+      description: Vrací seznam všech vlastníků procesů.
+      responses:
+        '200':
+          description: Úspěšně získané licence
+          content:
+            application/json:
+              example: {
+                "owners": [
+                  {
+                    "name": "krameriusadmin",
+                    "id": "krameriusadmin"
+                  }
+                ]
+              }
+
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+
+  /process/{processId}/log/out:
+    get:
+      tags:
+        - Processes
+      summary: Vrací standardní výstup z procesu
+      description: Vrací standardní výstup z procesu
+      parameters:
+        - name: process_uuid
+          in: path
+          required: true
+          description: UUID procesu
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: Jméno souboru pro download. Standardně "out.txt".
+          schema:
+            type: string
+            default: "out.txt"
+      responses:
+        '200':
+          description: Proces nalezen a logy poskytnuty ve formě streamu
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: User is not authorized to access these logs.
+        '404':
+          description: Process logs not found for the given UUID.
+
+  
+  /process/{processId}/log/err:
+    get:
+      tags:
+        - Processes
+      summary: Vrací chybový výstup procesu
+      description: Vrací chybový výstup procesu
+      parameters:
+        - name: process_uuid
+          in: path
+          required: true
+          description: uuid procesu
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: Jméno výstupního souboru. Standardně "err.txt".
+          schema:
+            type: string
+            default: "err.txt"
+      responses:
+        '200':
+          description: Error logs file found and returned as a binary stream.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Uživatel nemá oprávnění k požadované akci
+
+        '404':
+          description: Error logs not found for the given UUID.
+
+
+
