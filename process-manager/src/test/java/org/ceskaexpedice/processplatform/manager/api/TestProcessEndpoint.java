@@ -39,9 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.ceskaexpedice.testutils.ManagerTestsUtils.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,6 +71,11 @@ public class TestProcessEndpoint extends JerseyTest {
         when(processServiceMock.scheduleMainProcess(any())).thenReturn(PROCESS1_ID);
         ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess();
         scheduleMainProcess.setProfileId(PROFILE1_ID);
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        scheduleMainProcess.setPayload(payload);
+        scheduleMainProcess.setOwnerId("PePo");
         String json = mapper.writeValueAsString(scheduleMainProcess);
 
         Response response = target("process/").request(MediaType.APPLICATION_JSON).post((Entity.entity(

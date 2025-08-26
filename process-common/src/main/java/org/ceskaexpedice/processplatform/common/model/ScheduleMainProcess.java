@@ -36,4 +36,8 @@ public class ScheduleMainProcess extends ScheduleProcess{
     public String getOwnerId() {
         return ownerId;
     }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
 }
