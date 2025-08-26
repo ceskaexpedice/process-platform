@@ -58,10 +58,6 @@ dependencies {
 }
 
 war {
-    webXml = file('web/WEB-INF/web.xml')
-}
-
-war {
     archiveFileName = 'process-manager.war'
 }
 
