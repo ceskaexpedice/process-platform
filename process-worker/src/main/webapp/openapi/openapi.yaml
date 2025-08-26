@@ -1,0 +1,125 @@
+openapi: 3.0.2
+info:
+  title: Process Platform Worker API
+  description: |
+    API for Process Platform manager nodes
+
+  version: "1.0"
+
+servers:
+  - url: /process-worker/api
+
+tags:
+  - name: ForManager
+    description: >
+      Registering nodes and plugins, providing planned processes, maintaining processes states, scheduling sub processes
+
+paths:
+  /manager/{processId}/log/out:
+    get:
+      tags:
+        - ForManager
+      summary: Returns logs from the process standard output
+      description: Returns logs from the process standard output
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Process id
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "out.txt".
+          schema:
+            type: string
+            default: "out.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Process logs not found for the given processId.
+
+  /manager/{processId}/log/err:
+    get:
+      tags:
+        - ForManager
+      summary: Returns logs from the process error output
+      description: Returns logs from the process error output (delegates to a worker)
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: uuid procesu
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "err.txt".
+          schema:
+            type: string
+            default: "err.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Error logs not found for the given process id.
+
+  /manager/batch/{mainProcessId}:
+    delete:
+      tags:
+        - ForManager
+      summary: Deletes a batch
+      description: Deletes a batch. All processes in the batch must "deletable" - e.g. not running
+      parameters:
+        - name: mainProcessId
+          in: path
+          required: true
+          description: Main process id
+          example: ed25ce29-2149-439d-85c4-cc5e516e3036
+      responses:
+        '200':
+          description: Batch deleted
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Bad Request
+
+  /manager/batch/{mainProcessId}/execution:
+    delete:
+      tags:
+        - ForManager
+      summary: Kills running batch processes
+      description: Kills running batch processes
+      parameters:
+        - name: mainProcessId
+          in: path
+          required: true
+          description: Main process Id
+          example: 576
+      responses:
+        '200':
+          description: Processes killed
+        '404':
+          description: Bad Request
+
+
+
