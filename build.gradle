@@ -2,22 +2,10 @@ plugins {
     id 'java'
 }
 
-/*
-allprojects {
-    group = 'cz.kramerius.processplatform'
-    version = '1.0.0'
-}*/
-
 subprojects {
     apply plugin: 'java'
 
     repositories {
         mavenCentral()
     }
-/*
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    }*/
 }

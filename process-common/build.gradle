@@ -29,11 +29,6 @@ repositories {
 }
 
 dependencies {
-    // jackson dependency
-    //implementation 'com.fasterxml.jackson.core:jackson-annotations:2.8.1'
-    //implementation 'com.fasterxml.jackson.core:jackson-core:2.8.1'
-    //implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
-
     implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')

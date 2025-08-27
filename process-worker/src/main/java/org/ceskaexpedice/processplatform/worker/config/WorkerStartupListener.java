@@ -35,7 +35,6 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  * @author ppodsednik
  */
 // TODO implement properly build plugins process via Gradle
-// TODO check gradle files and sort out dependencies - also consider common dependencies
 public class WorkerStartupListener implements ServletContextListener {
     private static Logger LOGGER = Logger.getLogger(WorkerStartupListener.class.getName());
     private static ServletContext ctx;
