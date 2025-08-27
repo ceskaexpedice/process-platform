@@ -34,7 +34,6 @@ import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguratio
  * WorkerStartupListener
  * @author ppodsednik
  */
-// TODO add openapi swagger
 // TODO implement properly build plugins process via Gradle
 // TODO check gradle files and sort out dependencies - also consider common dependencies
 public class WorkerStartupListener implements ServletContextListener {

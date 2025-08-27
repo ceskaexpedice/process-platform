@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   title: Process Platform Manager API
   description: |
-    API for applications utilizing their processes via Process Platform and for Process Platform worker nodes
+    API for applications using Process Platform for running its processes; part of the API is dedicated to Process Platform worker nodes
 
   version: "1.0"
 
@@ -12,11 +12,11 @@ servers:
 tags:
   - name: ForWorker
     description: >
-      Registering nodes and plugins, providing planned processes, maintaining processes states, scheduling sub processes
+      Registering nodes and plugins, providing processes eligible for running, maintaining processes states, scheduling sub processes, ...
 
   - name: Nodes
     description: >
-      Providing information about registered worker nodes
+      Providing information about already registered worker nodes
 
   - name: Plugins
     description: >
@@ -24,11 +24,11 @@ tags:
 
   - name: Profiles
     description: >
-      Providing information about registered profiles, updating individual profiles
+      Providing information about already registered profiles, updating individual profiles
 
   - name: Processes
     description: >
-      Scheduling main processes, handling batches (groups of processes), providing logs for individual processes
+      Scheduling main processes, handling batches (groups of processes), providing logs for individual processes, ...
 
 paths:
   /worker/register_node:
@@ -132,8 +132,8 @@ paths:
     get:
       tags:
         - ForWorker
-      summary: Returns first process suitable for the specified worker
-      description: Returns first process suitable for the specified worker. The process state is updated
+      summary: Returns first process eligible for the specified worker
+      description: Returns first process eligible for the specified worker. The process state is updated
       parameters:
         - name: workerId
           in: path
@@ -166,14 +166,14 @@ paths:
                   "ownerId": "PePo"
                 }
         '404':
-          description: No process found for specified worker
+          description: No process found for the worker
 
   /worker/schedule_sub_process:
     post:
       tags:
         - ForWorker
       summary: Schedules new sub process
-      description: Schedules new sub process
+      description: Schedules new sub process in the batch
       requestBody:
         description: JSON with sub process information.
         required: true
@@ -341,7 +341,7 @@ paths:
       tags:
         - Plugins
       summary: Provides list of all plugins
-      description: Provides list of all plugins
+      description: Provides list of all plugins (profiles not included)
       responses:
         '200':
           description: Plugins list
@@ -384,7 +384,7 @@ paths:
       tags:
         - Plugins
       summary: Returns the specified plugin
-      description: Returns the specified plugin
+      description: Returns the specified plugin with attached profiles
       parameters:
         - name: pluginId
           in: path
@@ -515,7 +515,7 @@ paths:
       tags:
         - Profiles
       summary: Updates the profile
-      description: Updates the profile
+      description: Updates the profile (just JVM args updated)
       parameters:
         - in: path
           name: profileId
@@ -593,7 +593,7 @@ paths:
           example: ed25ce29-2149-439d-85c4-cc5e516e3036
       responses:
         '200':
-          description: JSON reprezentace procesu/dávky
+          description: JSON representation of the process
           content:
             application/json:
               schema:
@@ -622,8 +622,8 @@ paths:
     get:
       tags:
         - Processes
-      summary: Returns batches
-      description: Returns batches allowing filtering and pagination
+      summary: Returns batches (groups od processes)
+      description: Returns batches (groups of processes) allowing filtering and pagination
       parameters:
         - name: offset
           in: query
@@ -667,7 +667,7 @@ paths:
             type: string
       responses:
         '200':
-          description: List of all batches
+          description: List of batches
           content:
             application/json:
               schema:
@@ -748,14 +748,14 @@ paths:
                 "limit": 50
               }
         '400':
-          description: Bad request
+          description: Bad request - wrong parameters
 
   /process/batch/{mainProcessId}:
     delete:
       tags:
         - Processes
-      summary: Deletes a batch
-      description: Deletes a batch. All processes in the batch must "deletable" - e.g. not running
+      summary: Deletes a batch for given main process id
+      description: Deletes a batch for a given process id. All processes in the batch must "deletable" - e.g. not running
       parameters:
         - name: mainProcessId
           in: path
@@ -769,8 +769,8 @@ paths:
             application/json:
               schema:
                 type: string
-        '404':
-          description: Bad Request
+        '400':
+          description: Bad Request - invalid state
 
   /process/batch/{mainProcessId}/execution:
     delete:
@@ -788,7 +788,7 @@ paths:
         '200':
           description: Processes killed
         '404':
-          description: Bad Request
+          description: Bad Request - invalid state
 
   /process/owner:
     get:
@@ -813,8 +813,8 @@ paths:
     get:
       tags:
         - Processes
-      summary: Returns logs from the process standard output
-      description: Returns logs from the process standard output (delegates to a worker)
+      summary: Returns process standard output logs
+      description: Returns process standard output logs (delegates to a worker)
       parameters:
         - name: processId
           in: path
@@ -846,8 +846,8 @@ paths:
     get:
       tags:
         - Processes
-      summary: Returns logs from the process error output
-      description: Returns logs from the process error output (delegates to a worker)
+      summary: Returns process error output logs
+      description: Returns process error output logs (delegates to a worker)
       parameters:
         - name: processId
           in: path
