@@ -8,6 +8,7 @@ import org.gradle.api.GradleException
 class ProcessWorkerExtension {
     String workerName
     Project warProject
+	String warArtifact
     List<Project> plugins = []
 }
 
@@ -20,22 +21,46 @@ class ProcessWorkerPlugin implements Plugin<Project> {
                 throw new IllegalArgumentException("processWorker.workerName must be set")
             }
 
-            if (!ext.warProject) {
-                throw new IllegalArgumentException("processWorker.warProject must be set")
-            }
+	
+			// Rozhodovací logika
+			if (ext.warProject && ext.warArtifact) {
+				throw new IllegalArgumentException("processWorker.warProject and processWorker.warArtifact cannot be set at the same time. Please use only one.")
+			}
+
+
+			def warDependency
+			if (ext.warProject) {
+				// Použití závislosti na projektu
+				warDependency = ext.warProject
+			} else if (ext.warArtifact) {
+				// Použití závislosti na artefaktu z repozitáře
+				warDependency = ext.warArtifact
+			} else {
+				// Žádná z vlastností není nastavena
+				throw new IllegalArgumentException("Either processWorker.warProject or processWorker.warArtifact must be set")
+			}
 
             def outputDir = new File(project.buildDir, "worker")
             def webappsDir = new File(outputDir, "webapps")
             def pluginsDir = new File(outputDir, "lib/plugins")
+
+			def warConfig = project.configurations.create("workerWar")
+			project.dependencies.add(warConfig.name, warDependency)
+
 
             // Build task
             def buildWorkerTask = project.tasks.register("buildWorker") {
                 group = "build"
                 description = "Assembles worker with WAR and selected plugins"
 
-                // Depends on WAR build
-                dependsOn ext.warProject.tasks.named("war")
+				if (ext.warProject) {
+					// Pokud je nastaven Project, závislost je na úloze 'war' tohoto projektu
+					dependsOn ext.warProject.tasks.named("war")
+				}
 
+				inputs.files(warConfig)
+
+    
                 // Depends on each plugin's buildProcessPlugin
                 ext.plugins.each { pluginProject ->
                     def pluginTask = pluginProject.tasks.findByName("buildProcessPlugin")
