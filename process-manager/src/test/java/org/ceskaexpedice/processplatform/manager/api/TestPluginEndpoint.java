@@ -14,10 +14,12 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.Assertions;
@@ -28,13 +30,13 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.logging.Logger;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.PLUGIN1_ID;
+import static org.ceskaexpedice.testutils.ManagerTestsUtils.PLUGIN2_ID;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 /**
  * TestPluginEndpoint
@@ -45,77 +47,47 @@ public class TestPluginEndpoint extends JerseyTest {
 
     @Mock
     private PluginService pluginServiceMock;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected Application configure() {
         MockitoAnnotations.openMocks(this);
-
-        /*
-        ManagerConfiguration managerConfiguration = new ManagerConfiguration(new Properties());
-        managerConfiguration.set(ManagerConfiguration.JDBC_URL_KEY, "jdbc:postgresql://localhost:15432/kramerius");
-        managerConfiguration.set(ManagerConfiguration.JDBC_USER_NAME_KEY, "fedoraAdmin");
-        managerConfiguration.set(ManagerConfiguration.JDBC_USER_PASSWORD_KEY, "fedoraAdmin");
-        DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
-        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
-
-         */
-
-
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new PluginEndpoint(pluginServiceMock));
         resourceConfig.register(GlobalExceptionMapper.class);
-        resourceConfig.register(new LoggingFeature(
-                Logger.getLogger("HTTPLogger"),
-                LoggingFeature.Verbosity.PAYLOAD_ANY
-        ));
         return resourceConfig;
     }
 
     @Test
-    public void testGetPlugin() {
-        PluginInfo pluginInfo = new PluginInfo("testPlugin1", null, null, null, null, null);
-        //when(pluginServiceMock.getPlugin(eq("testPlugin1"))).thenReturn(pluginInfo);
-        when(pluginServiceMock.getPlugin(anyString())).thenAnswer(invocation -> {
-            String pluginId = invocation.getArgument(0);
-            if ("testPluginError".equals(pluginId)) {
-                throw new BusinessLogicException("Plugin 'testPluginError' caused an error");
-            } else if ("testPlugin1".equals(pluginId)) {
-                return pluginInfo;
-            }
-            return null; // Or throw for unknown IDs
-        });
+    public void testGetPlugin() throws JsonProcessingException {
+        PluginInfo retVal = new PluginInfo(PLUGIN1_ID, null, null, null, null, null);
+        when(pluginServiceMock.getPlugin(eq(PLUGIN1_ID), eq(true), eq(true))).thenReturn(retVal);
 
-        Response response = target("plugin/testPluginError").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-
-        Assertions.assertEquals(400, response.getStatus());
-        /*
-        assertThrows(BusinessLogicException.class, () -> {
-            pluginServiceMock.getPlugin("testPluginError");
-        });*/
-
-        String entity = response.readEntity(String.class);
-        verify(pluginServiceMock, times(1)).getPlugin(eq("testPluginError"));
-        System.out.println(entity);
-    }
-/*
-    @Test
-    public void testGetProcessByProcessId() {
-        Response response = target("processes/by_process_id/pid")
-                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
-        //Assertions.assertEquals(200, response.getStatus());
-        String entity = response.readEntity(String.class);
-        System.out.println(entity);
-    }
-
-    @Test
-    public void testScheduleProcess() {
-        Response response = target("processes").request(MediaType.APPLICATION_JSON).post((Entity.entity(
-                "{\"uf\": 99}", MediaType.APPLICATION_JSON_TYPE)));
+        Response response = target("plugin/" + PLUGIN1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
-        String responseBody = response.readEntity(String.class);
-        System.out.println(responseBody);
-    }
-    */
+        String json = response.readEntity(String.class);
+        PluginInfo pluginInfo = mapper.readValue(json,PluginInfo.class);
+        Assertions.assertEquals(PLUGIN1_ID, pluginInfo.getPluginId());
 
+        response = target("plugin/" + PLUGIN2_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(404, response.getStatus());
+
+        verify(pluginServiceMock, times(2)).getPlugin(any(), eq(true), eq(true));
+    }
+
+    @Test
+    public void testGetPlugins() throws JsonProcessingException {
+        List<PluginInfo> retVal = new ArrayList<>();
+        retVal.add(new PluginInfo(PLUGIN1_ID, null, null, null, null, null));
+        retVal.add(new PluginInfo(PLUGIN2_ID, null, null, null, null, null));
+        when(pluginServiceMock.getPlugins()).thenReturn(retVal);
+
+        Response response = target("plugin/").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        List<PluginInfo> pluginInfos = mapper.readValue(json, new TypeReference<>() {
+        });
+        Assertions.assertEquals(2, pluginInfos.size());
+    }
 
 }

@@ -25,10 +25,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ReflectionUtils
+ * @author ppodsednik
+ */
 public final class ReflectionUtils {
 
     private ReflectionUtils() {
@@ -47,7 +52,6 @@ public final class ReflectionUtils {
     public static Object[] map(Method processMethod, String[] defaultParams, Map<String, String> processParametersProperties) {
         Annotation[][] annots = processMethod.getParameterAnnotations();
         Class<?>[] types = processMethod.getParameterTypes();
-        //if (defaultParams.length < types.length) throw new IllegalArgumentException("defaultParams.length is small array. It must have at least "+types.length+" items");
         List<Object> params = new ArrayList<Object>();
         for (int i = 0; i < types.length; i++) {
             Annotation[] ann = annots[i];
@@ -135,9 +139,26 @@ public final class ReflectionUtils {
         return nameAnnot;
     }
 
-    private static Object instantiate(String val, Class<?> class1) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
-        Constructor<?> constructor = class1.getConstructor(new Class[]{String.class});
-        return constructor.newInstance(val);
+    private static Object instantiate(String paramValue, Class<?> paramType) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+        Object value;
+        if (paramType.equals(java.util.Date.class)) {
+            value = java.sql.Timestamp.valueOf(paramValue);
+        } else if (paramType.equals(java.time.LocalDateTime.class)) {
+            value = java.time.LocalDateTime.parse(
+                    paramValue,
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            );
+        } else if (paramType.equals(java.time.LocalDate.class)) {
+            value = java.time.LocalDate.parse(
+                    paramValue,
+                    DateTimeFormatter.ISO_LOCAL_DATE
+            );
+        } else {
+            // Fallback for other parameter types
+            Constructor<?> ctor = paramType.getConstructor(String.class);
+            value = ctor.newInstance(paramValue);
+        }
+        return value;
     }
 
 }

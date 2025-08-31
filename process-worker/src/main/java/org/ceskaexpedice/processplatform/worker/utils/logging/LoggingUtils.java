@@ -16,10 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.utils.logging;
 
-import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * LoggingUtils
+ * @author ppodsednik
+ */
 public final class LoggingUtils {
     private static final String LOGGING_FILE_PROPERTY = "java.util.logging.config.file";
     private static final String LOGGING_CLASS_PROPERTY = "java.util.logging.config.class";

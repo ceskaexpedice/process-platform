@@ -17,29 +17,28 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
-import org.ceskaexpedice.processplatform.manager.db.*;
+import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.PluginMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
-import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
-import java.sql.*;
-import java.util.*;
-import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
-public class PluginDao {
-
-    private static final Logger LOGGER = Logger.getLogger(PluginDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
-    private static final ObjectMapper mapper = new ObjectMapper();
+/**
+ * PluginDao
+ * @author ppodsednik
+ */
+public class PluginDao extends AbstractDao{
 
     public PluginDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider,managerConfiguration);
     }
 
     public PluginEntity getPlugin(String pluginId) {
@@ -78,16 +77,7 @@ public class PluginDao {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_plugin (plugin_id, description, main_class, payload_field_spec_map, scheduled_profiles) VALUES (?, ?, ?, ?::jsonb, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, plugin.getPluginId());
-                stmt.setString(2, plugin.getDescription());
-                stmt.setString(3, plugin.getMainClass());
-
-                String json = mapper.writeValueAsString(plugin.getPayloadFieldSpecMap());
-                stmt.setString(4, json);
-
-                Array scheduledProfilesArray = connection.createArrayOf("text", plugin.getScheduledProfiles().toArray());
-                stmt.setArray(5, scheduledProfilesArray);
-
+                PluginMapper.mapPlugin(stmt, plugin, connection);
                 stmt.executeUpdate();
             } catch (JsonProcessingException e) {
                 throw new ApplicationException(e.toString(), e);
@@ -95,20 +85,6 @@ public class PluginDao {
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-    }
-
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

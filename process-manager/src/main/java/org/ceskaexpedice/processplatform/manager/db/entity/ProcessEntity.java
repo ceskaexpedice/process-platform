@@ -16,18 +16,26 @@
  */
 package org.ceskaexpedice.processplatform.manager.db.entity;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * Process
+ * ProcessEntity
  * @author ppodsednik
  */
 public class ProcessEntity {
     private String processId;
+    private String description;
     private String profileId;
+    private String workerId;
+    private int pid;
+    private LocalDateTime planned;
+    private LocalDateTime started;
+    private LocalDateTime finished;
+    private int status;
     private Map<String, String> payload;
     private String batchId;
-    private String ownerId;
+    private String owner;
 
     public ProcessEntity() {
     }
@@ -44,8 +52,8 @@ public class ProcessEntity {
         return batchId;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getOwner() {
+        return owner;
     }
 
     public void setProcessId(String processId) {
@@ -60,8 +68,8 @@ public class ProcessEntity {
         this.batchId = batchId;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public String getProfileId() {
@@ -72,4 +80,59 @@ public class ProcessEntity {
         this.profileId = profileId;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getWorkerId() {
+        return workerId;
+    }
+
+    public void setWorkerId(String workerId) {
+        this.workerId = workerId;
+    }
+
+    public LocalDateTime getPlanned() {
+        return planned;
+    }
+
+    public void setPlanned(LocalDateTime planned) {
+        this.planned = planned;
+    }
+
+    public LocalDateTime getStarted() {
+        return started;
+    }
+
+    public void setStarted(LocalDateTime started) {
+        this.started = started;
+    }
+
+    public LocalDateTime getFinished() {
+        return finished;
+    }
+
+    public void setFinished(LocalDateTime finished) {
+        this.finished = finished;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getPid() {
+        return pid;
+    }
+
+    public void setPid(int pid) {
+        this.pid = pid;
+    }
 }

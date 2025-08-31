@@ -1,0 +1,123 @@
+openapi: 3.0.2
+info:
+  title: Process Platform Worker API
+  description: |
+    API for Process Platform manager nodes
+
+  version: "1.0"
+
+servers:
+  - url: /process-worker/api
+
+tags:
+  - name: ForManager
+    description: >
+      Fetching logs, deleting process working directories, killing running processes
+
+paths:
+  /manager/{processId}/log/out:
+    get:
+      tags:
+        - ForManager
+      summary: Returns process standard output logs
+      description: Returns process standard output logs
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Process id
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "out.txt".
+          schema:
+            type: string
+            default: "out.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Process logs not found for the given processId.
+
+  /manager/{processId}/log/err:
+    get:
+      tags:
+        - ForManager
+      summary: Returns process error output logs
+      description: Returns process error output logs
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: uuid procesu
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "err.txt".
+          schema:
+            type: string
+            default: "err.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Error logs not found for the given process id.
+
+  /manager/{processId}/directory:
+    delete:
+      tags:
+        - ForManager
+      summary: Deletes process working directory
+      description: Deletes process working directory
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Process id
+          example: ed25ce29-2149-439d-85c4-cc5e516e3036
+      responses:
+        '200':
+          description: Directory deleted or does not exist
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /manager/{pid}/kill:
+    delete:
+      tags:
+        - ForManager
+      summary: Kills running process
+      description: Kills running process
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: PID of the running process
+          example: 576
+      responses:
+        '200':
+          description: Process killed
+        '404':
+          description: Process does not exist
+
+
+

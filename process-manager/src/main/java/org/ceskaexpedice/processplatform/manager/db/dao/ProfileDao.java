@@ -17,25 +17,26 @@
 package org.ceskaexpedice.processplatform.manager.db.dao;
 
 import org.ceskaexpedice.processplatform.common.DataAccessException;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.mapper.ProfileMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
 import java.sql.*;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class ProfileDao {
+/**
+ * ProfileDao
+ * @author petrp
+ */
+public class ProfileDao extends AbstractDao{
 
     private static final Logger LOGGER = Logger.getLogger(ProfileDao.class.getName());
-    private final DbConnectionProvider dbConnectionProvider;
-    private final ManagerConfiguration managerConfiguration;
 
     public ProfileDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        this.dbConnectionProvider = dbConnectionProvider;
-        this.managerConfiguration = managerConfiguration;
+        super(dbConnectionProvider, managerConfiguration);
     }
 
     public PluginProfileEntity getProfile(String profileId) {
@@ -43,7 +44,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return false;
                 }
@@ -59,7 +60,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }
@@ -75,7 +76,7 @@ public class ProfileDao {
             List<PluginProfileEntity> profiles = new JDBCQueryTemplate<PluginProfileEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<PluginProfileEntity> returnsList) throws SQLException {
-                    PluginProfileEntity pluginProfile = PluginMapper.mapPluginProfile(rs);
+                    PluginProfileEntity pluginProfile = ProfileMapper.mapPluginProfile(rs);
                     returnsList.add(pluginProfile);
                     return true;
                 }
@@ -90,14 +91,8 @@ public class ProfileDao {
         try (Connection connection = getConnection()) {
             String sql = "INSERT INTO pcp_profile (profile_id, plugin_id, jvm_args) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                ProfileMapper.mapPluginProfile(stmt, profile, connection);
                 stmt.setString(1, profile.getProfileId());
-                stmt.setString(2, profile.getPluginId());
-                if (profile.getJvmArgs() != null) {
-                    Array jvmArgsArray = connection.createArrayOf("text", profile.getJvmArgs().toArray());
-                    stmt.setArray(3, jvmArgsArray);
-                } else {
-                    stmt.setNull(3, Types.ARRAY);
-                }
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
@@ -106,58 +101,28 @@ public class ProfileDao {
 
     }
 
-    public void updateProfile(PluginProfileEntity profile) {
+    public void updateJvmArgs(String profileId, List<String> jvmArgs) {
         try (Connection connection = getConnection()) {
             String sql = "UPDATE pcp_profile SET jvm_args = ? WHERE profile_id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-                if (profile.getJvmArgs() != null) {
-                    Array jvmArgsArray = connection.createArrayOf("text", profile.getJvmArgs().toArray());
+                if (jvmArgs != null) {
+                    Array jvmArgsArray = connection.createArrayOf("text", jvmArgs.toArray());
                     stmt.setArray(1, jvmArgsArray);
                 } else {
                     stmt.setNull(1, Types.ARRAY);
                 }
 
-                stmt.setString(2, profile.getProfileId()); // WHERE clause
+                stmt.setString(2, profileId);
 
                 int updated = stmt.executeUpdate();
                 if (updated == 0) {
-                    throw new DataAccessException("No profile found with ID: " + profile.getProfileId());
+                    throw new DataAccessException("No profile found with ID: " + profileId);
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-    }
-
-    public void deleteProfile(String profileId) {
-        try (Connection connection = getConnection()) {
-            String sql = "DELETE FROM pcp_profile WHERE profile_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, profileId);
-
-                int deleted = stmt.executeUpdate();
-                if (deleted == 0) {
-                    throw new DataAccessException("No profile found to delete with ID: " + profileId);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.toString(), e);
-        }
-    }
-
-    private Connection getConnection() {
-        Connection connection = dbConnectionProvider.get();
-        if (connection == null) {
-            //throw new NotReadyException("connection not ready");
-        }
-        try {
-//            connection.setTransactionIsolation(KConfiguration.getInstance().getConfiguration().getInt("jdbcProcessTransactionIsolationLevel", Connection.TRANSACTION_READ_COMMITTED));
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            //throw new NotReadyException("connection not ready - " + e);
-        }
-        return connection;
     }
 
 }

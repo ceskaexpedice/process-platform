@@ -16,75 +16,97 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.DataAccessException;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration.*;
 
 public class ManagerStartupListener implements ServletContextListener {
 
-    public static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
+    private static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
+    private static ServletContext ctx;
+    private DbConnectionProvider dbProvider;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        this.ctx = sce.getServletContext();
         Properties props = new Properties();
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream("manager.properties")) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in != null) {
+                LOGGER.info("Load config file [" + CONFIG_FILE + "]");
                 props.load(in);
             }
         } catch (IOException e) {
-            throw new ApplicationException("Cannot load manager.properties", e);
+            LOGGER.warning("Cannot load properties file:" + e);
         }
         ManagerConfiguration config = new ManagerConfiguration(props);
-        DbConnectionProvider dbProvider = new DbConnectionProvider(config);
+        dbProvider = new DbConnectionProvider(config);
+
+        initServices(config, dbProvider);
+        initDb(dbProvider);
+    }
+
+    private void initDb(DbConnectionProvider dbProvider) {
+        makeSureTableExists(dbProvider, NODE_TABLE);
+        makeSureTableExists(dbProvider, PLUGIN_TABLE);
+        makeSureTableExists(dbProvider, PROFILE_TABLE);
+        makeSureTableExists(dbProvider, PROCESS_TABLE);
+    }
+
+    private static void initServices(ManagerConfiguration config, DbConnectionProvider dbProvider) {
+        NodeService nodeService = new NodeService(config, dbProvider);
         PluginService pluginService = new PluginService(config, dbProvider);
-        ProcessService processService = new ProcessService(config, dbProvider);
+        ProfileService profileService = new ProfileService(config, dbProvider);
+        ProcessService processService = new ProcessService(config, dbProvider, pluginService, nodeService);
 
-        ServletContext ctx = sce.getServletContext();
-        ctx.setAttribute("pluginService", pluginService);
-        ctx.setAttribute("processService", processService);
-
-        makeSureTableExists(dbProvider, "pcp_profile");
-        makeSureTableExists(dbProvider, "pcp_process");
-        makeSureTableExists(dbProvider, "pcp_plugin");
+        ctx.setAttribute(NodeService.class.getSimpleName(), nodeService);
+        ctx.setAttribute(PluginService.class.getSimpleName(), pluginService);
+        ctx.setAttribute(ProfileService.class.getSimpleName(), profileService);
+        ctx.setAttribute(ProcessService.class.getSimpleName(), processService);
     }
 
     private void makeSureTableExists(DbConnectionProvider dbProvider, String tableName) {
         try {
             Connection connection = dbProvider.get();
-            boolean pcpProfile = DbUtils.tableExists(connection, tableName);
-            if (!pcpProfile) {
+            boolean tableExists = DbUtils.tableExists(connection, tableName);
+            if (!tableExists) {
+                LOGGER.info("Creating table [" + tableName + "]");
                 JDBCUpdateTemplate updateTemplate = new JDBCUpdateTemplate(connection, true);
                 InputStream is = getClass().getClassLoader().getResourceAsStream(String.format("%s.sql", tableName));
                 String sql = IOUtils.toString(is, "UTF-8");
                 updateTemplate.executeUpdate(sql);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new ApplicationException(e.getMessage(), e);
         }
+    }
+
+    static ServletContext getServletContext() {
+        return ctx;
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // TODO dbProvider.close();
+        dbProvider.close();
     }
 }

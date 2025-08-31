@@ -16,32 +16,36 @@
  */
 package org.ceskaexpedice.processplatform.manager.config;
 
-import javax.servlet.ServletContext;
-import org.ceskaexpedice.processplatform.manager.api.ManagerAgentEndpoint;
-import org.ceskaexpedice.processplatform.manager.api.PluginEndpoint;
-import org.ceskaexpedice.processplatform.manager.api.ProcessEndpoint;
+import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
+import org.ceskaexpedice.processplatform.manager.api.*;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Context;
+import javax.servlet.ServletContext;
 
 /**
  * ManagerApplication
  * @author ppodsednik
  */
-@ApplicationPath("/api")
 public class ManagerApplication extends ResourceConfig {
 
-    public ManagerApplication(@Context ServletContext context) {
-        PluginService pluginService = (PluginService) context.getAttribute("pluginService");
-        ProcessService processService = (ProcessService) context.getAttribute("processService");
+    public ManagerApplication() {
+        ServletContext ctx = ManagerStartupListener.getServletContext();
 
+        NodeService nodeService = (NodeService) ctx.getAttribute(NodeService.class.getSimpleName());
+        ProcessService processService = (ProcessService) ctx.getAttribute(ProcessService.class.getSimpleName());
+        PluginService pluginService = (PluginService) ctx.getAttribute(PluginService.class.getSimpleName());
+        ProfileService profileService = (ProfileService) ctx.getAttribute(ProfileService.class.getSimpleName());
+
+        register(new NodeEndpoint(nodeService));
+        register(new ProcessEndpoint(processService, nodeService));
         register(new PluginEndpoint(pluginService));
-        register(new ProcessEndpoint(processService));
-        register(new ManagerAgentEndpoint(pluginService, processService));
-        // TODO register(GlobalExceptionMapper.class);
+        register(new ProfileEndpoint(profileService));
+        register(new ForWorkerEndpoint(pluginService, processService, nodeService));
+        register(GlobalExceptionMapper.class);
     }
 
 }

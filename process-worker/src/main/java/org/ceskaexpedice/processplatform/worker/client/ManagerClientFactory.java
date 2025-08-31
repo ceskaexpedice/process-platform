@@ -19,13 +19,16 @@ package org.ceskaexpedice.processplatform.worker.client;
 
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
+/**
+ * ManagerClientFactory
+ * @author ppodsednik
+ */
 public final class ManagerClientFactory {
 
     private ManagerClientFactory() {
     }
 
     public static ManagerClient createManagerClient(WorkerConfiguration configuration) {
-        // TODO do something more fancy here
         ManagerClient managerClient = new ManagerClient(configuration);
         return managerClient;
     }

@@ -17,15 +17,19 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.Node;
+import org.ceskaexpedice.processplatform.common.model.NodeType;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClientFactory;
-import org.ceskaexpedice.processplatform.worker.config.EffectiveWorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.plugin.loader.PluginsLoader;
-import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -46,26 +50,45 @@ public class WorkerMain {
         LOGGER.info("Initializing...");
         this.workerConfiguration = workerConfiguration;
         managerClient = ManagerClientFactory.createManagerClient(workerConfiguration);
-        registerPlugins();
+        List<PluginInfo> pluginsList = scanPlugins();
+        if (pluginsList.isEmpty()) {
+            throw new ApplicationException("No plugins found");
+        }
+        registerNode(pluginsList);
+        registerPlugins(pluginsList);
         this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
         workerLoop.start();
         LOGGER.info("Initialized");
     }
 
     private List<PluginInfo> scanPlugins() {
-        File pluginsDir = new EffectiveWorkerConfiguration(workerConfiguration).getPluginDirectory();
-        LOGGER.info(String.format("Plugin folder is %s", pluginsDir));
+        File pluginsDir = workerConfiguration.getPluginDirectory();
+        LOGGER.info(String.format("Plugin folder is [%s]", pluginsDir));
         List<PluginInfo> pluginsList = PluginsLoader.load(pluginsDir);
         return pluginsList;
     }
 
-    private void registerPlugins() {
-        List<PluginInfo> pluginsList = scanPlugins();
-        if(pluginsList.isEmpty()){
-            throw new ApplicationException("No plugins found");
-        }
+    private void registerNode(List<PluginInfo> pluginsList) {
+        LOGGER.info(String.format("Register node [%s]", workerConfiguration.getWorkerId()));
+        Set<String> tags = new HashSet<>();
         for (PluginInfo pluginInfo : pluginsList) {
-            LOGGER.info("Discovered plugin: " + pluginInfo.getPluginId());
+            for (PluginProfile pluginProfile: pluginInfo.getProfiles()){
+                tags.add(pluginProfile.getProfileId());
+            }
+        }
+        Node node = new Node();
+        node.setNodeId(workerConfiguration.getWorkerId());
+        node.setDescription(String.format("Worker [%s]", workerConfiguration.getWorkerId()));
+        node.setType(NodeType.WORKER);
+        node.setUrl(workerConfiguration.getWorkerBaseUrl());
+        node.setTags(tags);
+
+        managerClient.registerNode(node);
+    }
+
+    private void registerPlugins(List<PluginInfo> pluginsList) {
+        for (PluginInfo pluginInfo : pluginsList) {
+            LOGGER.info("Register plugin: " + pluginInfo.getPluginId());
             managerClient.registerPlugin(pluginInfo);
         }
     }

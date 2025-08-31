@@ -17,18 +17,22 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
-import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
-import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
+import org.ceskaexpedice.processplatform.common.ErrorCode;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.PluginServiceMapper;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProfileServiceMapper;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.dao.PluginDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -48,16 +52,26 @@ public class PluginService {
         this.profileDao = new ProfileDao(dbConnectionProvider, managerConfiguration);
     }
 
-    // ------ plugins ----------
-
-    public PluginInfo getPlugin(String pluginId) {
-        // TODO get all scheduled processes hierarchically
+    public PluginInfo getPlugin(String pluginId, boolean includeProfiles, boolean scheduledProfilesRecursive) {
         PluginEntity pluginEntity = pluginDao.getPlugin(pluginId);
         PluginInfo pluginInfo = PluginServiceMapper.mapPlugin(pluginEntity);
-        if(pluginInfo == null) return null;
-
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
+        if (pluginInfo == null) {
+            return null;
+        }
+        if (!includeProfiles) {
+            return pluginInfo;
+        }
+        List<PluginProfile> profiles = ProfileServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
         pluginInfo.setProfiles(profiles);
+        if (!scheduledProfilesRecursive) {
+            return pluginInfo;
+        }
+
+        // get all scheduled profiles recursive
+        Set<String> visitedPlugins = new HashSet<>();
+        Set<String> resultProfiles = new LinkedHashSet<>();
+        collectScheduledProfilesRecursive(pluginEntity, visitedPlugins, resultProfiles);
+        pluginInfo.setScheduledProfiles(resultProfiles);
         return pluginInfo;
     }
 
@@ -67,67 +81,87 @@ public class PluginService {
     }
 
     public void validatePayload(String pluginId, Map<String, String> payload) {
-        // TODO validate input
-        PluginInfo plugin = getPlugin(pluginId);
-        for (String name : plugin.getPayloadFieldSpecMap().keySet()) {
-            PayloadFieldSpec payloadFieldSpec = plugin.getPayloadFieldSpecMap().get(name);
-            if (payloadFieldSpec.isRequired()) {
-                if (!payload.containsKey(name)) {
-                    throw new BusinessLogicException("Payload field " + name + " is missing");
+        PluginInfo plugin = getPlugin(pluginId, false, false);
+        if(plugin == null || plugin.getPayloadFieldSpecMap() == null) {
+            return;
+        }
+        for (Map.Entry<String, PayloadFieldSpec> entry : plugin.getPayloadFieldSpecMap().entrySet()) {
+            String name = entry.getKey();
+            PayloadFieldSpec payloadFieldSpec = entry.getValue();
+
+            String payloadValue = payload.get(name);
+
+            // Check required
+            if (payloadFieldSpec.isRequired() && (payloadValue == null || payloadValue.isEmpty())) {
+                throw new BusinessLogicException("Payload field '" + name + "' is missing", ErrorCode.INVALID_INPUT);
+            }
+
+            // Skip type check if value is null or empty (but not required)
+            if (payloadValue == null || payloadValue.isEmpty()) {
+                continue;
+            }
+
+            // Type validation
+            try {
+                switch (payloadFieldSpec.getType()) {
+                    case STRING:
+                        // No specific check for strings
+                        break;
+                    case BOOLEAN:
+                        if (!payloadValue.equalsIgnoreCase("true") && !payloadValue.equalsIgnoreCase("false")) {
+                            throw new BusinessLogicException("Payload field '" + name + "' must be a boolean (true/false)", ErrorCode.INVALID_INPUT);
+                        }
+                        break;
+                    case NUMBER:
+                        Double.parseDouble(payloadValue); // Will throw if invalid
+                        break;
+                    case DATE:
+                        // Customize the expected format as needed
+                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                        LocalDate.parse(payloadValue, formatter);
+                        break;
+                    default:
+                        throw new BusinessLogicException("Unknown payload field type for field '" + name + "'", ErrorCode.INVALID_INPUT);
                 }
+            } catch (Exception e) {
+                throw new BusinessLogicException("Invalid value for field '" + name + "' of type " + payloadFieldSpec.getType() + ": " + payloadValue, ErrorCode.INVALID_INPUT);
             }
         }
     }
 
     public void registerPlugin(PluginInfo pluginInfo) {
-        // TODO log messages
-        PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId());
+        LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));
+        PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId(), false, false);
         if (pluginExisting != null) {
-            // already registered
-            for (PluginProfile profile : pluginInfo.getProfiles()) {
-                PluginProfileEntity profileExisting = profileDao.getProfile(profile.getProfileId());
-                if (profileExisting == null) {
-                    // let's register new profile for the existing plugin
-                    PluginProfileEntity newProfile = PluginServiceMapper.mapProfile(profile);
-                    profileDao.createProfile(newProfile);
-                }
-            }
-        } else {
-            pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
-            for (PluginProfile profile : pluginInfo.getProfiles()) {
-                profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
-            }
+            LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] already registered");
+            return;
+        }
+        pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
+        for (PluginProfile profile : pluginInfo.getProfiles()) {
+            profileDao.createProfile(ProfileServiceMapper.mapProfile(profile));
         }
     }
 
-    // ------ profiles ----------
-
-    public PluginProfile getProfile(String profileId) {
-        PluginProfile profile = PluginServiceMapper.mapProfile(profileDao.getProfile(profileId));
-        return profile;
+    private void collectScheduledProfilesRecursive(PluginEntity pluginEntity, Set<String> visitedPlugins, Set<String> resultProfiles) {
+        if (pluginEntity == null) {
+            return;
+        }
+        // avoid loops
+        if (!visitedPlugins.add(pluginEntity.getPluginId())) {
+            return;
+        }
+        Set<String> scheduledProfiles = pluginEntity.getScheduledProfiles();
+        if (scheduledProfiles == null) {
+            return;
+        }
+        for (String profileId : scheduledProfiles) {
+            resultProfiles.add(profileId);
+            PluginProfileEntity profileEntity = profileDao.getProfile(profileId);
+            if (profileEntity != null) {
+                PluginEntity nextPlugin = pluginDao.getPlugin(profileEntity.getPluginId());
+                collectScheduledProfilesRecursive(nextPlugin, visitedPlugins, resultProfiles);
+            }
+        }
     }
-
-    public List<PluginProfile> getProfiles() {
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles());
-        return profiles;
-    }
-
-    public List<PluginProfile> getProfiles(String pluginId) {
-        List<PluginProfile> profiles = PluginServiceMapper.mapProfiles(profileDao.getProfiles(pluginId));
-        return profiles;
-    }
-
-    public void createProfile(PluginProfile profile) {
-        profileDao.createProfile(PluginServiceMapper.mapProfile(profile));
-    }
-
-    public void updateProfile(PluginProfile profile) {
-        profileDao.updateProfile(PluginServiceMapper.mapProfile(profile));
-    }
-
-    public void deleteProfile(String profileId) {
-        profileDao.deleteProfile(profileId);
-    }
-
 
 }

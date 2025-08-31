@@ -1,0 +1,879 @@
+openapi: 3.0.2
+info:
+  title: Process Platform Manager API
+  description: |
+    API for applications using Process Platform for running its processes; part of the API is dedicated to Process Platform worker nodes
+
+  version: "1.0"
+
+servers:
+  - url: /process-manager/api
+
+tags:
+  - name: ForWorker
+    description: >
+      Registering nodes and plugins, providing processes eligible for running, maintaining processes states, scheduling sub processes, ...
+
+  - name: Nodes
+    description: >
+      Providing information about already registered worker nodes
+
+  - name: Plugins
+    description: >
+      Providing information about registered plugins
+
+  - name: Profiles
+    description: >
+      Providing information about already registered profiles, updating individual profiles
+
+  - name: Processes
+    description: >
+      Scheduling main processes, handling batches (groups of processes), providing logs for individual processes, ...
+
+paths:
+  /worker/register_node:
+    post:
+      tags:
+        - ForWorker
+      summary: Registers new node
+      description: Registers a new node if not present
+      requestBody:
+        description: JSON with node information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+            example: {
+              "nodeId": "curatorWorker",
+              "description": "Worker [curatorWorker]",
+              "type": "WORKER",
+              "url": "http://localhost:8089/process-worker/api/",
+              "tags": [
+                "testPlugin2",
+                "testPlugin1-small",
+                "testPlugin1-big"
+              ]
+            }
+      responses:
+        '200':
+          description: Node registered or registration skipped if the node already exists
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {"message": "Node [curatorWorker] registered"}
+        '400':
+          description: Bad Request
+
+  /worker/register_plugin:
+    post:
+      tags:
+        - ForWorker
+      summary: Registers new plugin
+      description: Registers a new plugin if not present
+      requestBody:
+        description: JSON with plugin information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              example: {
+                  "pluginId": "testPlugin1",
+                  "description": "Testing plugin 1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payloadFieldSpecMap": {
+                    "name": {
+                      "type": "STRING",
+                      "required": true
+                    },
+                    "surname": {
+                      "type": "STRING",
+                      "required": true
+                    }
+                  },
+                  "scheduledProfiles": [
+                    "testPlugin2"
+                  ],
+                  "profiles": [
+                    {
+                      "profileId": "testPlugin1-big",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx32g"
+                      ]
+                    },
+                    {
+                      "profileId": "testPlugin1-small",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx4g"
+                      ]
+                    }
+                  ]
+                }
+      responses:
+        '200':
+          description: Plugin registered or registration skipped if the plugin already exists
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {"message": "Plugin [testPlugin1] registered"}
+        '400':
+          description: Bad Request
+
+  /worker/next_process/{workerId}:
+    get:
+      tags:
+        - ForWorker
+      summary: Returns first process eligible for the specified worker
+      description: Returns first process eligible for the specified worker. The process state is updated
+      parameters:
+        - name: workerId
+          in: path
+          required: true
+          description: Registered worker id
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: JSON representation of the process
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "processId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                  "profileId": "testPlugin1-big",
+                  "pluginId": "testPlugin1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payload": {
+                    "name": "Pe",
+                    "surname": "Po"
+                  },
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx32g"
+                  ],
+                  "batchId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                  "ownerId": "PePo"
+                }
+        '404':
+          description: No process found for the worker
+
+  /worker/schedule_sub_process:
+    post:
+      tags:
+        - ForWorker
+      summary: Schedules new sub process
+      description: Schedules new sub process in the batch
+      requestBody:
+        description: JSON with sub process information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+            example: {
+              "profileId" : "testPlugin2",
+              "payload" : {
+                "surname" : "Po",
+                "name" : "Pe"
+              },
+              "batchId" : "6853579d-15c1-4fb9-ad11-3e107141aedb"
+            }
+      responses:
+        '200':
+          description: New sub process scheduled
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {"processId": "ed25ce29-2149-439d-85c4-cc5e516e3036"}
+        '400':
+          description: Bad Request
+
+  /worker/pid/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Sets the process PID
+      description: Sets the process PID
+      parameters:
+        - in: path
+          name: processId
+          description: Process id
+          schema:
+            type: string
+          required: true
+
+        - in: query
+          name: pid
+          description: PID number
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successfully updated pid
+        '404':
+          description: Process not found
+
+  /worker/state/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Sets the process state
+      description: Sets the process state
+      parameters:
+        - in: path
+          name: processId
+          description: Process id
+          schema:
+            type: string
+          required: true
+
+        - in: query
+          name: state
+          description: Process state
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successfully updated state
+        '404':
+          description: Process not found
+
+  /worker/description/{processId}:
+    put:
+      tags:
+        - ForWorker
+      summary: Sets the process description
+      description: Sets the process description
+      parameters:
+        - in: path
+          name: processId
+          description: Process id
+          schema:
+            type: string
+          required: true
+
+        - in: query
+          name: description
+          description: Process description
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successfully updated description
+        '404':
+          description: Process not found
+
+  /node:
+    get:
+      tags:
+        - Nodes
+      summary: Provides list of all nodes
+      description: Provides list of all nodes
+      responses:
+        '200':
+          description: Nodes list
+          content:
+            application/json:
+              example: [ {
+                "nodeId": "curatorWorker",
+                "description": "Worker [curatorWorker]",
+                "type": "WORKER",
+                "url": "http://localhost:8089/process-worker/api/",
+                "tags": [
+                  "testPlugin2",
+                  "testPlugin1-small",
+                  "testPlugin1-big"
+                ] }
+              ]
+
+  /node/{nodeId}:
+    get:
+      tags:
+        - Nodes
+      summary: Returns the specified node
+      description: Returns the specified node
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: Node id
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: JSON representation of the node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "nodeId": "curatorWorker",
+                  "description": "Worker [curatorWorker]",
+                  "type": "WORKER",
+                  "url": "http://localhost:8089/process-worker/api/",
+                  "tags": [
+                    "testPlugin2",
+                    "testPlugin1-small",
+                    "testPlugin1-big"
+                  ]
+                }
+        '404':
+          description: The specified node des not exist
+
+  /plugin:
+    get:
+      tags:
+        - Plugins
+      summary: Provides list of all plugins
+      description: Provides list of all plugins (profiles not included)
+      responses:
+        '200':
+          description: Plugins list
+          content:
+            application/json:
+              example: [
+                {
+                  "pluginId": "testPlugin1",
+                  "description": "Testing plugin 1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payloadFieldSpecMap": {
+                    "name": {
+                      "type": "STRING",
+                      "required": true
+                    },
+                    "surname": {
+                      "type": "STRING",
+                      "required": true
+                    }
+                  },
+                  "scheduledProfiles": [
+                    "testPlugin2"
+                  ],
+                  "profiles": []
+                },
+                {
+                  "pluginId": "testPlugin2",
+                  "description": "Testing plugin 2",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin2.TestPlugin2",
+                  "payloadFieldSpecMap": {
+
+                  },
+                  "scheduledProfiles": [],
+                  "profiles": []
+                }
+              ]
+
+  /plugin/{pluginId}:
+    get:
+      tags:
+        - Plugins
+      summary: Returns the specified plugin
+      description: Returns the specified plugin with attached profiles
+      parameters:
+        - name: pluginId
+          in: path
+          required: true
+          description: Plugin id
+          schema:
+            type: string
+          example: testPlugin1
+      responses:
+        '200':
+          description: JSON representation  of the plugin
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "pluginId": "testPlugin1",
+                  "description": "Testing plugin 1",
+                  "mainClass": "org.ceskaexpedice.processplatform.testplugin1.TestPlugin1",
+                  "payloadFieldSpecMap": {
+                    "name": {
+                      "type": "STRING",
+                      "required": true
+                    },
+                    "surname": {
+                      "type": "STRING",
+                      "required": true
+                    }
+                  },
+                  "scheduledProfiles": [
+                    "testPlugin2"
+                  ],
+                  "profiles": [
+                    {
+                      "profileId": "testPlugin1-big",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx32g"
+                      ]
+                    },
+                    {
+                      "profileId": "testPlugin1-small",
+                      "description": null,
+                      "pluginId": "testPlugin1",
+                      "jvmArgs": [
+                        "-Xms1g",
+                        "-Xmx4g"
+                      ]
+                    }
+                  ]
+                }
+        '404':
+          description: Plugin does not exist
+
+  /profile:
+    get:
+      tags:
+        - Profiles
+      summary: Provides list of all profiles
+      description: Provides list of all profiles
+      responses:
+        '200':
+          description: Profiles list
+          content:
+            application/json:
+              example: [
+                {
+                  "profileId": "testPlugin1-big",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx32g"
+                  ]
+                },
+                {
+                  "profileId": "testPlugin1-small",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx4g"
+                  ]
+                },
+                {
+                  "profileId": "testPlugin2",
+                  "description": null,
+                  "pluginId": "testPlugin2",
+                  "jvmArgs": []
+                }
+              ]
+
+  /profile/{profileId}:
+    get:
+      tags:
+        - Profiles
+      summary: Returns the specified profile
+      description: Returns the specified profile
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          description: Profile id
+          schema:
+            type: string
+          example: testPlugin1-big
+      responses:
+        '200':
+          description: JSON representation of the profile
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "profileId": "testPlugin1-big",
+                  "description": null,
+                  "pluginId": "testPlugin1",
+                  "jvmArgs": [
+                    "-Xms1g",
+                    "-Xmx32g"
+                  ]
+                }
+        '404':
+          description: Profile does not exist
+    put:
+      tags:
+        - Profiles
+      summary: Updates the profile
+      description: Updates the profile (just JVM args updated)
+      parameters:
+        - in: path
+          name: profileId
+          description: Profile id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: JSON representation of the profile
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+            example: {
+              "profileId": "testPlugin1-big",
+              "description": null,
+              "pluginId": "testPlugin1",
+              "jvmArgs": [
+                "-Xms1g",
+                "-Xmx32g"
+              ]
+            }
+      responses:
+        '200':
+          description: Successfully updated profile
+        '400':
+          description: Bad Request
+
+  /process:
+    post:
+      tags:
+        - Processes
+      summary: Schedules new main process
+      description: Schedules new main process
+      requestBody:
+        description: JSON with process information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+            example: {
+              "profileId" : "testPlugin1-big",
+              "payload" : {
+                "surname" : "Po",
+                "name" : "Pe"
+              },
+              "ownerId" : "PePo"
+            }
+      responses:
+        '200':
+          description: New main process scheduled
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {"processId": "ed25ce29-2149-439d-85c4-cc5e516e3036"}
+        '400':
+          description: Bad Request
+
+  /process/{processId}:
+    get:
+      tags:
+        - Processes
+      summary: Returns the process specified
+      description: Returns the process specified
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Process id
+          schema:
+            type: string
+          example: ed25ce29-2149-439d-85c4-cc5e516e3036
+      responses:
+        '200':
+          description: JSON representation of the process
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "processId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                  "description": "Main process for the profile testPlugin1-big",
+                  "profileId": "testPlugin1-big",
+                  "workerId": "curatorWorker",
+                  "pid": 9889,
+                  "planned": 1756198668715,
+                  "started": 1756202186751,
+                  "finished": null,
+                  "status": "RUNNING",
+                  "payload": {
+                    "name": "Pe",
+                    "surname": "Po"
+                  },
+                  "batchId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                  "owner": "PePo"
+                }
+        '404':
+          description: Process not found
+
+  /process/batch:
+    get:
+      tags:
+        - Processes
+      summary: Returns batches (groups od processes)
+      description: Returns batches (groups of processes) allowing filtering and pagination
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          description: From where to start
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          description: How many rows to give back
+          schema:
+            type: integer
+            default: 50
+        - name: owner
+          in: query
+          required: false
+          description: Filter by owner
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          description: Filter by date from. (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          description: Filter by date to. (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: state
+          in: query
+          required: false
+          description: Filter by state
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of batches
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {
+                "batches": [
+                  {
+                    "owner": "PePo",
+                    "processes": [
+                      {
+                        "owner": "PePo",
+                        "workerId": "curatorWorker",
+                        "processId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                        "payload": {
+                          "surname": "Po",
+                          "name": "Pe"
+                        },
+                        "profileId": "testPlugin1-big",
+                        "description": "Main process for the profile testPlugin1-big",
+                        "pid": 9889,
+                        "started": 1756202186751,
+                        "finished": null,
+                        "planned": 1756198668715,
+                        "batchId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                        "status": "RUNNING"
+                      }
+                    ],
+                    "mainProcessId": "ed25ce29-2149-439d-85c4-cc5e516e3036",
+                    "started": 1756202186751,
+                    "finished": null,
+                    "planned": 1756198668715,
+                    "status": "RUNNING"
+                  },
+                  {
+                    "owner": "PePo",
+                    "processes": [
+                      {
+                        "owner": "PePo",
+                        "workerId": "curatorWorker",
+                        "processId": "6853579d-15c1-4fb9-ad11-3e107141aedb",
+                        "payload": {
+                          "surname": "Po",
+                          "name": "Pe"
+                        },
+                        "profileId": "testPlugin1-big",
+                        "description": "NewProcessName-PePo",
+                        "pid": 27204,
+                        "started": 1755262856918,
+                        "finished": 1755262857087,
+                        "planned": 1755262848459,
+                        "batchId": "6853579d-15c1-4fb9-ad11-3e107141aedb",
+                        "status": "FINISHED"
+                      },
+                      {
+                        "owner": "PePo",
+                        "workerId": "curatorWorker",
+                        "processId": "114a8406-1788-4cc5-bb04-89ca1a8ba9fe",
+                        "payload": {},
+                        "profileId": "testPlugin2",
+                        "description": "Sub process for the profile testPlugin2",
+                        "pid": 10900,
+                        "started": 1755262858373,
+                        "finished": 1755262858428,
+                        "planned": 1755262857057,
+                        "batchId": "6853579d-15c1-4fb9-ad11-3e107141aedb",
+                        "status": "FINISHED"
+                      }
+                    ],
+                    "mainProcessId": "6853579d-15c1-4fb9-ad11-3e107141aedb",
+                    "started": 1755262856918,
+                    "finished": 1755262857087,
+                    "planned": 1755262848459,
+                    "status": "FINISHED"
+                  }
+                ],
+                "totalSize": 2,
+                "offset": 0,
+                "limit": 50
+              }
+        '400':
+          description: Bad request - wrong parameters
+
+  /process/batch/{mainProcessId}:
+    delete:
+      tags:
+        - Processes
+      summary: Deletes a batch for given main process id
+      description: Deletes a batch for a given process id. All processes in the batch must "deletable" - e.g. not running
+      parameters:
+        - name: mainProcessId
+          in: path
+          required: true
+          description: Main process id
+          example: ed25ce29-2149-439d-85c4-cc5e516e3036
+      responses:
+        '200':
+          description: Batch deleted
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - invalid state
+
+  /process/batch/{mainProcessId}/execution:
+    delete:
+      tags:
+        - Processes
+      summary: Kills running batch processes
+      description: Kills running batch processes
+      parameters:
+        - name: mainProcessId
+          in: path
+          required: true
+          description: Main process Id
+          example: 576
+      responses:
+        '200':
+          description: Processes killed
+        '404':
+          description: Bad Request - invalid state
+
+  /process/owner:
+    get:
+      tags:
+        - Processes
+      summary: Returns all processes owners
+      description: Returns all processes owners
+      responses:
+        '200':
+          description: Owners
+          content:
+            application/json:
+              example: {
+                "owners": [
+                  {
+                    "owner": "PePo"
+                  }
+                ]
+              }
+
+  /process/{processId}/log/out:
+    get:
+      tags:
+        - Processes
+      summary: Returns process standard output logs
+      description: Returns process standard output logs (delegates to a worker)
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: Process id
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "out.txt".
+          schema:
+            type: string
+            default: "out.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Process logs not found for the given processId.
+
+  /process/{processId}/log/err:
+    get:
+      tags:
+        - Processes
+      summary: Returns process error output logs
+      description: Returns process error output logs (delegates to a worker)
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: uuid procesu
+          schema:
+            type: string
+            format: uuid
+          example: 103cb713-b778-4370-8d58-f13bf4b276ec
+        - name: fileName
+          in: query
+          required: false
+          description: File name. Default "err.txt".
+          schema:
+            type: string
+            default: "err.txt"
+      responses:
+        '200':
+          description: Log provided
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Error logs not found for the given process id.
+
+
+

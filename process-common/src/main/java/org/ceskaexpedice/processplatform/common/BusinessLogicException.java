@@ -16,14 +16,19 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
+/**
+ * BusinessLogicException
+ * @author ppodsednik
+ */
 public class BusinessLogicException extends RuntimeException {
+    private final ErrorCode errorCode;
 
-    public BusinessLogicException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public BusinessLogicException(String message) {
+    public BusinessLogicException(String message, ErrorCode errorCode) {
         super(message);
+        this.errorCode = errorCode;
     }
 
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

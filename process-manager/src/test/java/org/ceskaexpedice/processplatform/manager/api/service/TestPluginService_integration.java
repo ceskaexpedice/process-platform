@@ -15,14 +15,17 @@
 package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldType;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
-import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -54,60 +57,119 @@ public class TestPluginService_integration {
         loadTestData(dbConnectionProvider);
     }
 
-    // ------ plugins ----------
+    @Test
+    public void testGetPlugin_noProfiles_noScheduledProfilesRecursive() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID, false, false);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(0, pluginInfo.getProfiles().size());
+        Assertions.assertEquals(2, pluginInfo.getPayloadFieldSpecMap().size());
+        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
+
+        pluginInfo = pluginService.getPlugin(PLUGIN2_ID, false, false);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(0, pluginInfo.getProfiles().size());
+        Assertions.assertNull(pluginInfo.getPayloadFieldSpecMap());
+        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
+
+        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists", false, false);
+        Assertions.assertNull(pluginInfo);
+    }
 
     @Test
-    public void testGetPlugin() {
-        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID);
+    public void testGetPlugin_withProfiles_noScheduledProfilesRecursive() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID, true, false);
         Assertions.assertNotNull(pluginInfo);
         Assertions.assertEquals(2, pluginInfo.getProfiles().size());
         Assertions.assertEquals(2, pluginInfo.getPayloadFieldSpecMap().size());
-        // TODO Assertions.assertEquals(2, pluginInfo.getScheduledProfiles().size());
+        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
 
-        pluginInfo = pluginService.getPlugin(PLUGIN2_ID);
+        pluginInfo = pluginService.getPlugin(PLUGIN2_ID, true, false);
         Assertions.assertNotNull(pluginInfo);
         Assertions.assertEquals(1, pluginInfo.getProfiles().size());
         Assertions.assertNull(pluginInfo.getPayloadFieldSpecMap());
         Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
 
-        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists");
+        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists", true, false);
+        Assertions.assertNull(pluginInfo);
+    }
+
+    @Test
+    public void testGetPlugin_withProfiles_withScheduledProfilesRecursive() {
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN1_ID, true, true);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(2, pluginInfo.getProfiles().size());
+        Assertions.assertEquals(2, pluginInfo.getPayloadFieldSpecMap().size());
+        Assertions.assertEquals(2, pluginInfo.getScheduledProfiles().size());
+
+        pluginInfo = pluginService.getPlugin(PLUGIN2_ID, true, true);
+        Assertions.assertNotNull(pluginInfo);
+        Assertions.assertEquals(1, pluginInfo.getProfiles().size());
+        Assertions.assertNull(pluginInfo.getPayloadFieldSpecMap());
+        Assertions.assertEquals(1, pluginInfo.getScheduledProfiles().size());
+
+        pluginInfo = pluginService.getPlugin(PLUGIN1_ID + "notExists", true, true);
         Assertions.assertNull(pluginInfo);
     }
 
     @Test
     public void testGetPlugins() {
         List<PluginInfo> plugins = pluginService.getPlugins();
-        Assertions.assertEquals(2, plugins.size());
+        Assertions.assertEquals(3, plugins.size());
     }
 
     @Test
     public void testValidatePayload() {
+        // check required
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
         pluginService.validatePayload(PLUGIN1_ID, payload);
-
         payload.remove("surname");
         assertThrows(BusinessLogicException.class, () -> {
             pluginService.validatePayload(PLUGIN1_ID, payload);
         });
-        // TODO test more
+
+        // check boolean
+        payload.clear();
+        payload.put("booleanField", "true");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("booleanField", "notBoolean");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
+
+        // check number
+        payload.clear();
+        payload.put("numberField", "123");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("numberField", "12notNumber");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
+
+        // check date
+        payload.clear();
+        payload.put("dateField", "1960-11-12");
+        pluginService.validatePayload(PLUGIN3_ID, payload);
+        payload.put("dateField", "1960-99-12");
+        assertThrows(BusinessLogicException.class, () -> {
+            pluginService.validatePayload(PLUGIN3_ID, payload);
+        });
 
     }
 
     @Test
     public void testRegisterPlugin() {
-        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID);
+        PluginInfo pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID, false, false);
         Assertions.assertNull(pluginInfo);
 
-        // TODO more tests
         Map<String, PayloadFieldSpec> payloadFieldSpecMap = new HashMap<>();
-        payloadFieldSpecMap.put("name", new PayloadFieldSpec("string", true));
+        payloadFieldSpecMap.put("name", new PayloadFieldSpec(PayloadFieldType.STRING, true));
         Set<String> scheduledProfiles = new HashSet<>();
-        scheduledProfiles.add(NEW_PROFILE_ID);
+        scheduledProfiles.add(PROFILE_NEW_ID);
 
-        List<PluginProfile> profiles  = new ArrayList<>();
-        PluginProfile pluginProfile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN_NEW_ID, new ArrayList<>());
+        List<PluginProfile> profiles = new ArrayList<>();
+        PluginProfile pluginProfile = new PluginProfile(PROFILE_NEW_ID, "Test", PLUGIN_NEW_ID, new ArrayList<>());
         profiles.add(pluginProfile);
 
         PluginInfo pluginInfoNew = new PluginInfo(PLUGIN_NEW_ID, "Test plugin New", "com.mainClass",
@@ -115,61 +177,9 @@ public class TestPluginService_integration {
 
         pluginService.registerPlugin(pluginInfoNew);
 
-        pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID);
+        pluginInfo = pluginService.getPlugin(PLUGIN_NEW_ID, true, false);
         Assertions.assertNotNull(pluginInfo);
         Assertions.assertEquals(1, pluginInfo.getProfiles().size());
-    }
-
-    // ------ profiles ----------
-
-    @Test
-    public void testGetProfile() {
-        PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertNotNull(profile);
-        profile = pluginService.getProfile(PROFILE1_ID + "notExists");
-        Assertions.assertNull(profile);
-    }
-
-    @Test
-    public void testGetProfiles() {
-        List<PluginProfile> profiles = pluginService.getProfiles();
-        Assertions.assertEquals(3, profiles.size());
-    }
-
-    @Test
-    public void testGetPluginProfiles() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-    }
-
-    @Test
-    public void testCreateProfile() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-        PluginProfile profile = new PluginProfile(NEW_PROFILE_ID, "Test", PLUGIN1_ID, List.of("-Xmx32g"));
-        pluginService.createProfile(profile);
-        profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(3, profiles.size());
-    }
-
-    @Test
-    public void testUpdateProfile() {
-        PluginProfile profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertEquals(2, profile.getJvmArgs().size());
-        List<String> args = List.of("-Xmx32g", "a", "b", "c");
-        profile.setJvmArgs(args);
-        pluginService.updateProfile(profile);
-        profile = pluginService.getProfile(PROFILE1_ID);
-        Assertions.assertEquals(4, profile.getJvmArgs().size());
-    }
-
-    @Test
-    public void testDeleteProfile() {
-        List<PluginProfile> profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(2, profiles.size());
-        pluginService.deleteProfile(PROFILE1_ID);
-        profiles = pluginService.getProfiles(PLUGIN1_ID);
-        Assertions.assertEquals(1, profiles.size());
     }
 
 }

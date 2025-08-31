@@ -22,6 +22,10 @@ import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utils
+ * @author ppodsednik
+ */
 public final class Utils {
 
     private Utils() {}

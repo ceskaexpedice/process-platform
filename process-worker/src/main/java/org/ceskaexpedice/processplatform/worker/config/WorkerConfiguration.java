@@ -30,17 +30,17 @@ import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJs
  * @author ppodsednik
  */
 public class WorkerConfiguration {
+    public static final String CONFIG_FILE = "worker.properties";
     public static final String WORKING_DIR = System.getProperty("user.home") + File.separator + ".processplatform";
-    public static final String DEFAULT_WORKER_WORKDIR = WORKING_DIR + File.separator + "worker";
-    public static final String WORKER_CONFIG_BASE64_KEY = "workerConfigBase64";
+    public static final String WORKER_CONFIG_BASE_64 = "workerConfigBase64";
+    private static final String TOMCAT_HOME = System.getProperty("catalina.home");
 
-    public static final String WORKER_LOOP_SLEEP_SEC_KEY = "workerLoopSleepSec";
-
-    public static final String PLUGIN_PATH_KEY = "pluginPath";
-    public static final String STARTER_CLASSPATH_KEY = "starterClasspath";
-    public static final String MANAGER_BASE_URL_KEY = "managerBaseUrl";
-    public static final String WORKER_TAGS_KEY = "workerTags";
-    public static final String WORKER_ID_KEY = "workerId";
+    private static final String WORKER_LOOP_SLEEP_SEC_KEY = "WORKER_LOOP_SLEEP_SECS";
+    private static final String PLUGIN_PATH_KEY = "PLUGIN_PATH";
+    private static final String STARTER_CLASSPATH_KEY = "STARTER_CLASSPATH";
+    private static final String MANAGER_BASE_URL_KEY = "MANAGER_BASE_URL";
+    private static final String WORKER_BASE_URL_KEY = "WORKER_BASE_URL";
+    private static final String WORKER_ID_KEY = "WORKER_ID";
 
     private final Properties props = new Properties();
 
@@ -99,8 +99,78 @@ public class WorkerConfiguration {
         return props.getProperty(key, defaultValue);
     }
 
-    public static WorkerConfiguration getWorkerConfig() {
-        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE64_KEY);
+    // ---------- effective configuration
+
+    public int getWorkerLoopSleepSecs() {
+        String sleepSecKey = get(WORKER_LOOP_SLEEP_SEC_KEY);
+        if (sleepSecKey != null) {
+            return Integer.parseInt(sleepSecKey);
+        }else {
+            return 10;
+        }
+    }
+
+    public void setWorkerLoopSleepSecs(int  sleepSec) {
+        set(WORKER_LOOP_SLEEP_SEC_KEY, String.valueOf(sleepSec));
+    }
+
+    public File getPluginDirectory() {
+        return new File(getPluginPath());
+    }
+
+    public void setPluginDirectory(String pluginDirectory) {
+        set(PLUGIN_PATH_KEY, pluginDirectory);
+    }
+
+    private String getPluginPath() {
+        String defaultVal = TOMCAT_HOME != null
+                ? TOMCAT_HOME + File.separator + "lib" + File.separator + "plugins"
+                : "lib" + File.separator + "plugins";
+        String configured = get(WorkerConfiguration.PLUGIN_PATH_KEY);
+        if (configured != null && new File(configured).exists()) {
+            return configured;
+        }
+        return defaultVal;
+    }
+
+    public String getManagerBaseUrl() {
+        String managerUrl = get(WorkerConfiguration.MANAGER_BASE_URL_KEY);
+        if (managerUrl != null && !managerUrl.isEmpty()) {
+            return managerUrl.endsWith("/") ? managerUrl : managerUrl + "/";
+        }
+        return "http://localhost:8080/";
+    }
+
+    public void setManagerBaseUrl(String  managerBaseUrl) {
+        set(MANAGER_BASE_URL_KEY, managerBaseUrl);
+    }
+
+    public String getStarterClasspath() {
+        return get(STARTER_CLASSPATH_KEY);
+    }
+
+    public void setStarterClasspath(String  starterClasspath) {
+        set(STARTER_CLASSPATH_KEY, String.valueOf(starterClasspath));
+    }
+
+    public String getWorkerBaseUrl() {
+        return get(WORKER_BASE_URL_KEY);
+    }
+
+    public void setWorkerBaseUrl(String workerBaseUrl) {
+        set(WORKER_BASE_URL_KEY, workerBaseUrl);
+    }
+
+    public String getWorkerId() {
+        return get(WORKER_ID_KEY);
+    }
+
+    public void setWorkerId(String workerId) {
+        set(WORKER_ID_KEY, workerId);
+    }
+
+    public static WorkerConfiguration decodeWorkerConfig() {
+        String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE_64);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
         Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
         WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);

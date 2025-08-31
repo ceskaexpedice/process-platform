@@ -14,9 +14,8 @@
  */
 package org.ceskaexpedice.processplatform.manager.api.service;
 
-import org.ceskaexpedice.processplatform.common.entity.ScheduleMainProcess;
-import org.ceskaexpedice.processplatform.common.entity.ScheduledProcess;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
@@ -38,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestProcessService_integration {
     private static Properties testsProperties;
     private static ProcessService processService;
+    private static NodeService nodeService;
     private static DbConnectionProvider dbConnectionProvider;
 
     @BeforeAll
@@ -45,7 +45,9 @@ public class TestProcessService_integration {
         testsProperties = IntegrationTestsUtils.loadProperties();
         ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
         dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
-        processService = new ProcessService(managerConfiguration, dbConnectionProvider);
+        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
+        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService);
+        nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
     }
 
     @BeforeEach
@@ -56,27 +58,360 @@ public class TestProcessService_integration {
     }
 
     @Test
-    public void testScheduleProcess() {
+    public void testScheduleMainProcess() {
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
         ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        processService.scheduleProcess(scheduleMainProcess);
-        // TODO
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertNotNull(processInfo);
+    }
+
+    @Test
+    public void testScheduleMainProcess_payloadError() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("surname", "Po");
+        assertThrows(BusinessLogicException.class, () -> {
+            ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+            processService.scheduleMainProcess(scheduleMainProcess);
+        });
+    }
+
+    @Test
+    public void testScheduleSubProcess() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String mainProcessId = processService.scheduleMainProcess(scheduleMainProcess);
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(PROFILE2_ID, payload);
+        scheduleSubProcess.setBatchId(mainProcessId);
+        String subProcessId = processService.scheduleSubProcess(scheduleSubProcess);
+        ProcessInfo processInfo = processService.getProcess(subProcessId);
+        Assertions.assertNotNull(processInfo);
+    }
+
+    @Test
+    public void testScheduleSubProcess_batchError() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        assertThrows(BusinessLogicException.class, () -> {
+            ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(PROFILE2_ID, payload);
+            scheduleSubProcess.setBatchId("wrongBatchId");
+            String subProcessId = processService.scheduleSubProcess(scheduleSubProcess);
+            ProcessInfo processInfo = processService.getProcess(subProcessId);
+            Assertions.assertNotNull(processInfo);
+        });
     }
 
     @Test
     public void testGetNextScheduledProcess() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
         payload.put("surname", "Po");
         ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        processService.scheduleProcess(scheduleMainProcess);
-        List<String> tags = new ArrayList<>();
-        tags.add(PROFILE1_ID);
-        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(tags);
+        processService.scheduleMainProcess(scheduleMainProcess);
+        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(NODE_WORKER1_ID);
         Assertions.assertNotNull(nextScheduledProcess);
-        // TODO more asserts
+        Assertions.assertEquals(2, nextScheduledProcess.getJvmArgs().size());
+        ProcessInfo processInfo = processService.getProcess(nextScheduledProcess.getProcessId());
+        Assertions.assertEquals(NODE_WORKER1_ID, processInfo.getWorkerId());
+        Assertions.assertEquals(ProcessState.NOT_RUNNING, processInfo.getStatus());
+    }
+
+    @Test
+    public void testGetBatches() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        // schedule main process + subprocess; set state Finished and Warning
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.WARNING);
+        // schedule another main process - default state is Planned
+        ScheduleMainProcess scheduleMainProcess2 = new ScheduleMainProcess(PROFILE1_ID, payload, "Fiki");
+        processService.scheduleMainProcess(scheduleMainProcess2);
+
+        int countBatchHeaders = processService.countBatchHeaders(null);
+        Assertions.assertEquals(2, countBatchHeaders);
+        List<Batch> batches = processService.getBatches(null,0, 50);
+        Assertions.assertEquals(2, batches.size());
+        Assertions.assertEquals("Fiki", batches.get(0).getOwner());
+        Assertions.assertEquals(1, batches.get(0).getProcesses().size());
+        Assertions.assertEquals("PePo", batches.get(1).getOwner());
+        Assertions.assertEquals(2, batches.get(1).getProcesses().size());
+        batches = processService.getBatches(null,0, 1);
+        Assertions.assertEquals(1, batches.size());
+
+        BatchFilter batchFilter = new BatchFilter();
+        batchFilter.setProcessState(ProcessState.WARNING);
+        countBatchHeaders = processService.countBatchHeaders(batchFilter);
+        Assertions.assertEquals(1, countBatchHeaders);
+        batches = processService.getBatches(batchFilter,0, 50);
+        Assertions.assertEquals(1, batches.size());
+        Assertions.assertEquals(2, batches.get(0).getProcesses().size());
+        int counter = 0;
+        for (ProcessInfo processInfo : batches.get(0).getProcesses()) {
+            if(processInfo.getProcessId().equals(processInfo.getBatchId())){
+                Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+                ++counter;
+            }else{
+                Assertions.assertEquals(ProcessState.WARNING, processInfo.getStatus());
+                ++counter;
+            }
+        }
+        Assertions.assertEquals(2, counter);
+    }
+
+    @Test
+    public void testGetBatch() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        // schedule main process + subprocess; set state Finished and Warning
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.WARNING);
+
+        Batch batch = processService.getBatch(processId1);
+        Assertions.assertEquals(ProcessState.WARNING, batch.getStatus());
+        Assertions.assertEquals(2, batch.getProcesses().size());
+        int counter = 0;
+        for (ProcessInfo processInfo : batch.getProcesses()) {
+            if(processInfo.getProcessId().equals(processInfo.getBatchId())){
+                Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+                ++counter;
+            }else{
+                Assertions.assertEquals(ProcessState.WARNING, processInfo.getStatus());
+                ++counter;
+            }
+        }
+        Assertions.assertEquals(2, counter);
+    }
+
+    @Test
+    public void testDeleteBatchInDb() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        // schedule main process + subprocess; set state Finished and Finished
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.FINISHED);
+
+        int deleted = processService.deleteBatchInDb(processId1);
+        Assertions.assertEquals(2, deleted);
+    }
+
+    @Test
+    public void testDeleteBatch_wrongState() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        // schedule main process + subprocess; set state Finished and Planned
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.RUNNING);
+
+        assertThrows(BusinessLogicException.class, () -> {
+            processService.deleteBatch(processId1);
+        });
+    }
+
+    @Test
+    public void testKillBatch() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.RUNNING);
+
+        int killed = processService.killBatch(processId1);
+        Assertions.assertEquals(0, killed);
+    }
+
+    @Test
+    public void testKillBatch_wrongState() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
+        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
+        scheduleSubProcess11.setBatchId(processId1);
+        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
+        processService.updateState(processId1, ProcessState.FINISHED);
+        processService.updateState(subProcessId11, ProcessState.FINISHED);
+
+        assertThrows(BusinessLogicException.class, () -> {
+            processService.killBatch(processId1);
+        });
+    }
+
+    @Test
+    public void testGetNextScheduledProcess_none() {
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add("anotherOne");
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(NODE_WORKER1_ID);
+        Assertions.assertNull(nextScheduledProcess);
+    }
+
+    @Test
+    public void testGetOwners() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PaSt");
+        processService.scheduleMainProcess(scheduleMainProcess);
+
+        List<String> owners = processService.getOwners();
+        Assertions.assertEquals(2, owners.size());
+        Assertions.assertEquals("PaSt", owners.get(0));
+        Assertions.assertEquals("PePo", owners.get(1));
+    }
+
+    @Test
+    public void testUpdate_state() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(ProcessState.PLANNED, processInfo.getStatus());
+
+        processService.updateState(processId, ProcessState.FINISHED);
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(ProcessState.FINISHED, processInfo.getStatus());
+    }
+
+    @Test
+    public void testUpdate_pid() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(0, processInfo.getPid());
+
+        processService.updatePid(processId, 123);
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals(123, processInfo.getPid());
+
+        assertThrows(BusinessLogicException.class, () -> {
+            processService.updatePid("processIdNotExistent", 123);
+        });
+
+    }
+
+    @Test
+    public void testUpdate_description() {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String processId = processService.scheduleMainProcess(scheduleMainProcess);
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Assertions.assertTrue(processInfo.getDescription().contains("Main process"));
+
+        processService.updateDescription(processId, "NewDescription");
+        processInfo = processService.getProcess(processId);
+        Assertions.assertEquals("NewDescription", processInfo.getDescription());
     }
 
 }

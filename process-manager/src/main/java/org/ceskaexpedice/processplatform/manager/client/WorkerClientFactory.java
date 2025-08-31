@@ -18,17 +18,33 @@
 package org.ceskaexpedice.processplatform.manager.client;
 
 
-import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
+
+/**
+ * WorkerClientFactory
+ * @author petrp
+ */
 public final class WorkerClientFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(WorkerClientFactory.class.getName());
+    private static final AtomicReference<WorkerClient> INSTANCE = new AtomicReference<>();
 
     private WorkerClientFactory() {
     }
 
-    public static WorkerClient createWorkerClient(ManagerConfiguration configuration) {
-        // TODO do something more fancy here
-        WorkerClient workerClient = new WorkerClient(configuration);
-        return workerClient;
+    public static WorkerClient createWorkerClient(ProcessService processService, NodeService nodeService) {
+        return INSTANCE.updateAndGet(existingInstance -> {
+            if (existingInstance == null) {
+                LOGGER.info("Creating new WorkerClient");
+                WorkerClient workerClient = new WorkerClient(processService, nodeService);
+                return workerClient;
+            }
+            return existingInstance;
+        });
     }
 
 }

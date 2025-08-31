@@ -18,17 +18,19 @@
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
-import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
+/**
+ * PluginContextFactory
+ * @author ppodsednik
+ */
 public final class PluginContextFactory {
 
     private PluginContextFactory() {
     }
 
     public static PluginContext createPluginContext(WorkerConfiguration configuration, ProcessConfiguration processConfiguration) {
-        // TODO do something more fancy here
         PluginStarter pluginStarter = new PluginStarter(configuration, processConfiguration);
         return pluginStarter;
     }

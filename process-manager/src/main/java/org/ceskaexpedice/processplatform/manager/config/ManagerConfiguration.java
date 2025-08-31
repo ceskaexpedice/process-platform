@@ -19,7 +19,6 @@ package org.ceskaexpedice.processplatform.manager.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 
 /**
@@ -27,11 +26,16 @@ import java.util.stream.Collectors;
  * @author ppodsednik
  */
 public class ManagerConfiguration {
-    private static final String WORKER_URL_KEY_PREFIX = "worker.";
-    private static final String WORKER_URL_KEY_SUFFIX = ".url";
-    public static final String JDBC_URL_KEY = "jdbcUrl";
-    public static final String JDBC_USER_NAME_KEY = "jdbcUsername";
-    public static final String JDBC_USER_PASSWORD_KEY = "jdbcPassword";
+    public static final String CONFIG_FILE = "manager.properties";
+
+    public static final String NODE_TABLE = "pcp_node";
+    public static final String PLUGIN_TABLE = "pcp_plugin";
+    public static final String PROFILE_TABLE = "pcp_profile";
+    public static final String PROCESS_TABLE = "pcp_process";
+
+    private static final String JDBC_URL_KEY = "JDBC_URL";
+    private static final String JDBC_USER_NAME_KEY = "JDBC_USERNAME";
+    private static final String JDBC_USER_PASSWORD_KEY = "JDBC_PASSWORD";
 
     private final Properties props = new Properties();
 
@@ -90,33 +94,19 @@ public class ManagerConfiguration {
         return props.getProperty(key, defaultValue);
     }
 
-    public String getWorkerUrl(String workerId) {
-        return getWorkerUrlMap().get(workerId);
+    // --- effective -------------------------------
+
+    public String getJdbcUrl() {
+        return get(JDBC_URL_KEY);
     }
 
-    /**
-     * Returns a mapping of workerId to base URL
-     */
-    private Map<String, String> getWorkerUrlMap() {
-        return props.entrySet().stream()
-                .filter(entry -> {
-                    String key = entry.getKey().toString();
-                    return key.startsWith(WORKER_URL_KEY_PREFIX) && key.endsWith(WORKER_URL_KEY_SUFFIX);
-                })
-                .collect(Collectors.toMap(
-                        entry -> extractWorkerId(entry.getKey().toString()),
-                        entry -> entry.getValue().toString()
-                ));
+    public String getJdbcUsername() {
+        return get(JDBC_USER_NAME_KEY);
     }
 
-    /**
-     * Extracts workerId from key like "worker.worker-1.url"
-     * Example:
-     * worker.worker-1.url = http://localhost:8081
-     * worker.worker-2.url = http://10.0.0.5:8081
-     */
-    private String extractWorkerId(String key) {
-        return key.substring(WORKER_URL_KEY_PREFIX.length(), key.length() - WORKER_URL_KEY_SUFFIX.length());
+    public String getJdbcPassword() {
+        return get(JDBC_USER_PASSWORD_KEY);
     }
+
 
 }

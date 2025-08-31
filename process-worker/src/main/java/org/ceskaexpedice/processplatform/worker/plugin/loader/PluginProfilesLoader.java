@@ -18,13 +18,14 @@ package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -33,35 +34,23 @@ import java.util.jar.JarFile;
  * @author ppodsednik
  */
 final class PluginProfilesLoader {
+    private static final String PROFILES_FILE_Name = "profile.json";
 
     private PluginProfilesLoader() {
     }
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    static List<PluginProfile> loadProfiles(File pluginJar, File externalProfilesDir, String pluginId) {
-        List<PluginProfile> internalProfiles = loadInternalProfiles(pluginJar, pluginId);
-        List<PluginProfile> externalProfiles = loadExternalProfiles(externalProfilesDir, pluginId);
-
-        // Merge: external overrides internal by 'profileId'
-        Map<String, PluginProfile> merged = new LinkedHashMap<>();
-        for (PluginProfile p : internalProfiles) {
-            p.setPluginId(pluginId);
-            merged.put(p.getProfileId(), p);
-        }
-        for (PluginProfile p : externalProfiles) {
-            p.setPluginId(pluginId);
-            merged.put(p.getProfileId(), p);
-        }
-
-        return new ArrayList<>(merged.values());
+    static List<PluginProfile> loadProfiles(File pluginJar) {
+        List<PluginProfile> internalProfiles = loadInternalProfiles(pluginJar);
+        return internalProfiles;
     }
 
-    private static List<PluginProfile> loadInternalProfiles(File jarFile, String pluginId) {
+    private static List<PluginProfile> loadInternalProfiles(File jarFile) {
         try {
             try (JarFile jar = new JarFile(jarFile)) {
-                JarEntry entry = jar.getJarEntry(pluginId + ".json");
-                if (entry == null) return Collections.emptyList();
+                JarEntry entry = jar.getJarEntry(PROFILES_FILE_Name);
+                if (entry == null) return new ArrayList<>();
                 try (InputStream in = jar.getInputStream(entry)) {
                     List<PluginProfile> profiles = Arrays.asList(mapper.readValue(in, PluginProfile[].class));
                     return profiles;
@@ -72,16 +61,4 @@ final class PluginProfilesLoader {
         }
     }
 
-    private static List<PluginProfile> loadExternalProfiles(File pluginDir, String pluginId) {
-        try {
-            File json = new File(pluginDir, pluginId + ".json");
-            if (!json.exists()) return Collections.emptyList();
-            try (InputStream in = new FileInputStream(json)) {
-                List<PluginProfile> profiles = Arrays.asList(mapper.readValue(in, PluginProfile[].class));
-                return profiles;
-            }
-        } catch (IOException e) {
-            throw new ApplicationException(e.toString(), e);
-        }
-    }
 }

@@ -16,11 +16,11 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.loader;
 
-import org.ceskaexpedice.processplatform.common.ApplicationException;
-import org.ceskaexpedice.processplatform.common.entity.PayloadFieldSpec;
 import org.ceskaexpedice.processplatform.api.PluginSpi;
-import org.ceskaexpedice.processplatform.common.entity.PluginInfo;
-import org.ceskaexpedice.processplatform.common.entity.PluginProfile;
+import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
+import org.ceskaexpedice.processplatform.common.model.PluginInfo;
+import org.ceskaexpedice.processplatform.common.model.PluginProfile;
 
 import java.io.File;
 import java.net.*;
@@ -28,7 +28,7 @@ import java.security.CodeSource;
 import java.util.*;
 
 /**
- * PluginScanner
+ * PluginsLoader
  * @author ppodsednik
  */
 public final class PluginsLoader {
@@ -38,7 +38,7 @@ public final class PluginsLoader {
     public static URLClassLoader createPluginClassLoader(File pluginDir) {
         File[] jars = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jars == null || jars.length == 0) {
-            throw new ApplicationException("No JAR files found in: " + pluginDir.getAbsolutePath());
+            throw new IllegalStateException("No JAR files found in: " + pluginDir.getAbsolutePath());
         }
         URL[] urls = new URL[jars.length];
         for (int i = 0; i < jars.length; i++) {
@@ -70,7 +70,7 @@ public final class PluginsLoader {
             ServiceLoader<PluginSpi> loader = ServiceLoader.load(PluginSpi.class, pluginClassLoader);
             for (PluginSpi plugin : loader) {
                 File pluginJar = getPluginJar(plugin);
-                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar, pluginDir);
+                PluginInfo pluginInfo = resolvePlugin(plugin, pluginJar);
                 result.add(pluginInfo);
             }
         }
@@ -94,14 +94,17 @@ public final class PluginsLoader {
         return pluginJar;
     }
 
-    private static PluginInfo resolvePlugin(PluginSpi plugin, File pluginJar, File pluginDir) {
+    private static PluginInfo resolvePlugin(PluginSpi plugin, File pluginJar) {
         String pluginId = plugin.getPluginId();
         String description = plugin.getDescription();
         String mainClass = plugin.getMainClass();
         Set<String> scheduledProfiles = plugin.getScheduledProfiles();
         Map<String, PayloadFieldSpec> payloadSpec = plugin.getPayloadSpec();
 
-        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar, pluginDir, pluginId);
+        List<PluginProfile> profiles = PluginProfilesLoader.loadProfiles(pluginJar);
+        for(PluginProfile profile : profiles){
+            profile.setPluginId(pluginId);
+        }
         if(profiles.isEmpty()){
             PluginProfile defaultProfile = new PluginProfile(pluginId, pluginId, pluginId, new ArrayList<>());
             profiles.add(defaultProfile);

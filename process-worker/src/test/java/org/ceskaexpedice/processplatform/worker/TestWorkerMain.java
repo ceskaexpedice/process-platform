@@ -14,7 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker;
 
-import org.ceskaexpedice.processplatform.worker.client.ManagerAgentTestEndpoint;
+import org.ceskaexpedice.processplatform.worker.client.ForWorkerTestEndpoint;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.utils.Utils;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -28,9 +28,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
-import static org.ceskaexpedice.processplatform.worker.Constants.MANAGER_BASE_URI;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.PLUGIN_PATH_KEY;
-import static org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration.WORKER_LOOP_SLEEP_SEC_KEY;
+import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.MANAGER_BASE_URI;
 
 /**
  * TestWorkerMain
@@ -46,21 +44,19 @@ public class TestWorkerMain {
     public void setUp() throws Exception {
         URL resource = getClass().getClassLoader().getResource("plugins");
         workerConfiguration = new WorkerConfiguration(new Properties());
-        workerConfiguration.set(PLUGIN_PATH_KEY, resource.getFile());
+        workerConfiguration.setPluginDirectory(resource.getFile());
         String starterClasspath = System.getProperty("java.class.path");
-        workerConfiguration.set(WorkerConfiguration.STARTER_CLASSPATH_KEY, starterClasspath);
-        workerConfiguration.set(WorkerConfiguration.MANAGER_BASE_URL_KEY, MANAGER_BASE_URI);
-        String TAGS = Constants.PLUGIN1_PROFILE_BIG + "," + Constants.PLUGIN1_PROFILE_SMALL;
-        workerConfiguration.set(WorkerConfiguration.WORKER_TAGS_KEY, TAGS);
-        workerConfiguration.set(WORKER_LOOP_SLEEP_SEC_KEY,"10");
+        workerConfiguration.setStarterClasspath(starterClasspath);
+        workerConfiguration.setManagerBaseUrl(MANAGER_BASE_URI);
+        workerConfiguration.setWorkerId("testWorker");
 
-        final ResourceConfig rc = new ResourceConfig(ManagerAgentTestEndpoint.class);
+        final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
         server.start();
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         server.shutdownNow();
     }
 
