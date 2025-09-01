@@ -13,6 +13,29 @@ class ProcessPlugin implements Plugin<Project> {
         def ext = project.extensions.create("processPlugin", ProcessPluginExtension)
 
         project.afterEvaluate {
+		
+	        def generateProfileTask = project.tasks.register("generateProcessPluginProfile") {
+                group = "build"
+                description = "Generates profile.json for process plugin"
+
+                def outputDir = new File(project.buildDir, "generated/resources")
+                def jsonFile = new File(outputDir, "profile.json")
+
+                outputs.file(jsonFile)
+
+                doLast {
+                    outputDir.mkdirs()
+                    jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(ext.profiles))
+                    println "Generated profile.json at ${jsonFile}"
+                }
+            }
+
+            project.sourceSets.main.resources.srcDir("${project.buildDir}/generated/resources")
+            project.tasks.named("processResources").configure {
+                dependsOn(generateProfileTask)
+            }
+
+		
             project.tasks.register("buildProcessPlugin") {
                 group = "build"
                 description = "Builds plugin JAR and distribution"
@@ -42,10 +65,11 @@ class ProcessPlugin implements Plugin<Project> {
 
 
                     // write JSON
+					/*
                     def jsonFile = new File(distDir, "${ext.pluginName}.json")
                     jsonFile.text = groovy.json.JsonOutput.prettyPrint(
                         groovy.json.JsonOutput.toJson(ext.profiles)
-                    )
+                    )*/
 
                     println "Built process plugin: ${distDir}"
                 }
