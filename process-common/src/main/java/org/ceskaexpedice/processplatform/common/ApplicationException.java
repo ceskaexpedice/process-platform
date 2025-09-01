@@ -17,7 +17,7 @@
 package org.ceskaexpedice.processplatform.common;
 
 /**
- * TechnicalException
+ * ApplicationException class
  * @author ppodsednik
  */
 public class ApplicationException extends RuntimeException {
