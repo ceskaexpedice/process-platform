@@ -35,11 +35,11 @@ Worker
 }
 }
 ```
-
+```
 /worker
 |
 | > plugins/import/ a.jar., b.jar, c.jar
-
+```
 ```gradle
 processes/ build.gradle
 apply 'application'
