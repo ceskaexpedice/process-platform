@@ -9,6 +9,7 @@ class ProcessWorkerExtension {
     Project warProject
 	String warArtifact
     List<Project> plugins = []
+	String warName = "worker.war"
 }
 
 class ProcessWorkerPlugin implements Plugin<Project> {
@@ -83,11 +84,13 @@ class ProcessWorkerPlugin implements Plugin<Project> {
 					}
 					
 					
-                    def warTarget = new File(webappsDir, "process-worker.war")
+                    //def warTarget = new File(webappsDir, "process-worker.war")
+					def warTarget = new File(webappsDir, ext.warName)
                     warTarget.parentFile.mkdirs()
                     project.copy {
                         from warFile
                         into webappsDir
+						rename { fileName -> ext.warName }
                     }
                     println "Copied WAR to ${warTarget}"
 
