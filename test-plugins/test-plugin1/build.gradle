@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.ceskaexpedice:process-api:1.0-SNAPSHOT'
+    implementation project(':process-api')
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

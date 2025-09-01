@@ -23,7 +23,7 @@ public class TestPlugin1 {
         // we can use the context too...
         PluginContext pluginContext = PluginContextHolder.getContext();
         pluginContext.updateProcessName("NewProcessName-" + fullName);
-        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess("testPlugin2", new HashMap<>());
+        org.ceskaexpedice.processplatform.common.model.ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess("testPlugin2", new HashMap<>());
         pluginContext.scheduleSubProcess(scheduleSubProcess);
     }
 
