@@ -24,9 +24,17 @@ class ProcessPlugin implements Plugin<Project> {
                 outputs.file(jsonFile)
 
                 doLast {
-                    outputDir.mkdirs()
-                    jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(ext.profiles))
-                    println "Generated profile.json at ${jsonFile}"
+                    //outputDir.mkdirs()
+					//jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(ext.profiles))
+                    //println "Generated profile.json at ${jsonFile}"
+					
+					outputDir.mkdirs()
+					def jsonContent = groovy.json.JsonOutput.prettyPrint(
+						groovy.json.JsonOutput.toJson(ext.profiles)
+					)
+					jsonFile.text = jsonContent
+					println "Generated profile.json at ${jsonFile}"
+					
                 }
             }
 
