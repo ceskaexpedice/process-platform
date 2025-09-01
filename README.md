@@ -1,5 +1,9 @@
+
+![Build](https://img.shields.io/github/actions/workflow/status/ceskaexpedice/process-platform/gradle-push.yml?branch=main)
+
 # process-platform
 
+```
 Worker Startup
 │
 ├── Discover plugins via SPI
@@ -22,6 +26,8 @@ Worker
 │   ├── jvmParams
 │   └── user payload (e.g., input path)
 └── Worker starts PluginStarter with proper config
+```
+```json
 {
 "type": "import-cgi",
 "mainClass": "org.example.Import",
@@ -31,11 +37,13 @@ Worker
 "addCollection": { "type": "boolean", "required": false }
 }
 }
-
+```
+```
 /worker
 |
 | > plugins/import/ a.jar., b.jar, c.jar
-
+```
+```gradle
 processes/ build.gradle
 apply 'application'
 
@@ -174,6 +182,7 @@ manager bude mit prehled o vsem..  Takze bude schopen ridit workery, poda vsechn
 worker - nekde zmizel- musim import preplanovat...
 
 
+```
 
 worker bude - nemusel mit pristup do db
 to api bude primarne urceno pro manager..,
