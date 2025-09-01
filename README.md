@@ -1,3 +1,6 @@
+
+![Build](https://img.shields.io/github/actions/workflow/status/ceskaexpedice/process-platform/gradle-push.yml?branch=main)
+
 # process-platform
 
 ```
