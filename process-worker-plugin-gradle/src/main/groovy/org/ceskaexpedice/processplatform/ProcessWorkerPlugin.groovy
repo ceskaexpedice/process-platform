@@ -73,7 +73,16 @@ class ProcessWorkerPlugin implements Plugin<Project> {
                     println "Assembling worker '${ext.workerName}'..."
 
                     // Copy WAR
-                    def warFile = ext.warProject.tasks.named("war").get().archiveFile.get().asFile
+                    //def warFile = ext.warProject.tasks.named("war").get().archiveFile.get().asFile
+
+					File warFile
+					if (ext.warProject) {
+						warFile = ext.warProject.tasks.named("war").get().archiveFile.get().asFile
+					} else {
+						warFile = warConfig.singleFile
+					}
+					
+					
                     def warTarget = new File(webappsDir, "process-worker.war")
                     warTarget.parentFile.mkdirs()
                     project.copy {

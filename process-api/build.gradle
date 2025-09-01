@@ -4,12 +4,13 @@ plugins {
 }
 
 publishing {
-
+	
+	/*
     publications {
         myLibrary(MavenPublication) {
             from components.java
         }
-    }
+    }*/
 
     repositories {
         maven {
