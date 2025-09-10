@@ -137,7 +137,7 @@ public enum ProcessState {
     }
 
     public static boolean isBatchStateDeletable(ProcessState batchState) {
-        return expect(batchState, ProcessState.PLANNED, ProcessState.FAILED, ProcessState.KILLED);
+        return expect(batchState, ProcessState.FINISHED, ProcessState.FAILED, ProcessState.KILLED);
     }
 
     public static boolean completedState(ProcessState realProcessState) {
