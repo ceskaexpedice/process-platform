@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker.api;
 
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.ws.rs.*;
@@ -25,6 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * ForManagerEndpoint
@@ -45,7 +48,19 @@ public class ForManagerEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogsOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        InputStream logStream = forManagerService.getProcessLog(processId, false);
+        return getProcessLogHelper(processId, fileName, false);
+    }
+
+    @GET
+    @Path("{processId}/log/err")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getProcessLogErr(@PathParam("processId") String processId,
+                                     @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
+        return getProcessLogHelper(processId, fileName, true);
+    }
+
+    public Response getProcessLogHelper(String processId, String fileName, boolean err) {
+        InputStream logStream = forManagerService.getProcessLog(processId, err);
         return Response.ok((StreamingOutput) output -> {
                     try (logStream) {
                         logStream.transferTo(output);
@@ -55,17 +70,34 @@ public class ForManagerEndpoint {
     }
 
     @GET
-    @Path("{processId}/log/err")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogErr(@PathParam("processId") String processId,
-                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        InputStream logStream = forManagerService.getProcessLog(processId, true);
-        return Response.ok((StreamingOutput) output -> {
-                    try (logStream) {
-                        logStream.transferTo(output);
-                    }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
-                .build();
+    @Path("{processId}/log/out/lines")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getProcessLogOutLines(@PathParam("processId") String processId,
+                                          @QueryParam("offset") String offsetStr,
+                                          @QueryParam("limit") String limitStr) {
+        return getProcessLogLinesHelper(processId, offsetStr, limitStr, false);
+    }
+
+    @GET
+    @Path("{processId}/log/err/lines")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getProcessLogErrLines(@PathParam("processId") String processId,
+                                          @QueryParam("offset") String offsetStr,
+                                          @QueryParam("limit") String limitStr) {
+        return getProcessLogLinesHelper(processId, offsetStr, limitStr, true);
+    }
+
+    private Response getProcessLogLinesHelper(String processId, String offsetStr,String limitStr, boolean err) {
+        JSONObject result = new JSONObject();
+        result.put("totalSize", forManagerService.getProcessLogSize(processId, err));
+        JSONArray linesJson = new JSONArray();
+        List<String> lines = forManagerService.getProcessLogLines(processId, err,
+                forManagerService.getLogOffset(offsetStr), forManagerService.getLogLimit(limitStr));
+        for (String line : lines) {
+            linesJson.put(line);
+        }
+        result.put("lines", linesJson);
+        return APIRestUtilities.jsonPayload(result.toString());
     }
 
     @DELETE
@@ -81,9 +113,9 @@ public class ForManagerEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response killProcessJvm(@PathParam("pid") String pid) {
         boolean killed = forManagerService.killProcessJvm(pid);
-        if(!killed){
+        if (!killed) {
             return APIRestUtilities.notFound("Process JVM not found [%s]", pid);
-        }else{
+        } else {
             return APIRestUtilities.ok("Process JVM Killed [%s]", pid);
         }
     }

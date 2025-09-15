@@ -17,15 +17,17 @@
 package org.ceskaexpedice.processplatform.worker.api.service;
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.BusinessLogicException;
+import org.ceskaexpedice.processplatform.common.ErrorCode;
+import org.ceskaexpedice.processplatform.common.utils.StringUtils;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandler;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandlerFactory;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
@@ -35,6 +37,8 @@ import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.*;
  * @author ppodsednik
  */
 public class ForManagerService {
+    private static final Integer GET_LOGS_DEFAULT_OFFSET = 0;
+    private static final Integer GET_LOGS_DEFAULT_LIMIT = 10;
     private final WorkerConfiguration workerConfiguration;
 
     public ForManagerService(WorkerConfiguration workerConfiguration) {
@@ -51,15 +55,61 @@ public class ForManagerService {
         }
     }
 
-    public void deleteWorkingDir(String processId){
+    public long getProcessLogSize(String processId, boolean err) {
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
+        File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
+        ProcessLogsHelper processLogsHelper = new ProcessLogsHelper(standardStreamFile);
+        long logFileSize = processLogsHelper.getLogFileSize();
+        return logFileSize;
+    }
+
+    public List<String> getProcessLogLines(String processId, boolean err, int offset, int limit) {
+        File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
+        File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
+        ProcessLogsHelper processLogsHelper = new ProcessLogsHelper(standardStreamFile);
+        List<String> lines = processLogsHelper.getLogFileData(offset, limit);
+        return lines;
+    }
+
+    public static int getLogLimit(String limitStr) {
+        int limit = GET_LOGS_DEFAULT_LIMIT;
+        if (StringUtils.isAnyString(limitStr)) {
+            try {
+                limit = Integer.valueOf(limitStr);
+                if (limit < 1) {
+                    throw new BusinessLogicException(String.format("limit must be a positive number, '%s' is not", limitStr), ErrorCode.INVALID_INPUT);
+                }
+            } catch (NumberFormatException e) {
+                throw new BusinessLogicException(String.format("limit must be a number, '%s' is not", limitStr), ErrorCode.INVALID_INPUT);
+            }
+        }
+        return limit;
+    }
+
+    public int getLogOffset(String offsetStr) {
+        int offset = GET_LOGS_DEFAULT_OFFSET;
+        if (StringUtils.isAnyString(offsetStr)) {
+            try {
+                offset = Integer.valueOf(offsetStr);
+                if (offset < 0) {
+                    throw new BusinessLogicException(String.format("offset must be zero or a positive number, '%s' is not", offsetStr), ErrorCode.INVALID_INPUT);
+                }
+            } catch (NumberFormatException e) {
+                throw new BusinessLogicException(String.format("offset must be a number, '%s' is not", offsetStr), ErrorCode.INVALID_INPUT);
+            }
+        }
+        return offset;
+    }
+
+    public void deleteWorkingDir(String processId) {
         File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
         ProcessDirUtils.deleteRecursively(processWorkingDir);
     }
 
-    public boolean killProcessJvm(String pid){
+    public boolean killProcessJvm(String pid) {
         OSHandler osHandler = OSHandlerFactory.createOSHandler(pid);
         boolean processAlive = osHandler.isProcessAlive();
-        if(!processAlive){
+        if (!processAlive) {
             return false;
         }
         osHandler.killProcess();
