@@ -28,7 +28,7 @@ public class ProcessLogsHelper {
 
             return errorProcessRAFile.length();
         } catch (IOException ex) {
-            LOGGER.log(Level.FINE, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return 0;
         } finally {
             try {
@@ -52,16 +52,16 @@ public class ProcessLogsHelper {
             raf = new RandomAccessFile(logFile, "r");
             return readFromRAF(raf, offset, limit);
         } catch (FileNotFoundException e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            LOGGER.log(Level.WARNING, e.getMessage(), e);
             return "";
         } catch (IOException e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            LOGGER.log(Level.WARNING, e.getMessage(), e);
             return "";
         } finally {
             try {
                 if (raf != null) raf.close();
             } catch (IOException e) {
-                LOGGER.log(Level.FINE, e.getMessage(), e);
+                LOGGER.log(Level.WARNING, e.getMessage(), e);
             }
         }
     }

@@ -63,7 +63,7 @@ public class ForManagerService {
         return logFileSize;
     }
 
-    public List<String> getProcessLogLines(String processId, boolean err, int offset, int limit) {
+    public List<String> getProcessLogLines(String processId, boolean err, long offset, long limit) {
         File processWorkingDir = prepareProcessWorkingDirectory(workerConfiguration.getWorkerId(), processId);
         File standardStreamFile = err ? errorOutFile(processWorkingDir) : standardOutFile(processWorkingDir);
         ProcessLogsHelper processLogsHelper = new ProcessLogsHelper(standardStreamFile);
@@ -71,7 +71,7 @@ public class ForManagerService {
         return lines;
     }
 
-    public static int getLogLimit(String limitStr) {
+    public long getLogLimit(String limitStr) {
         int limit = GET_LOGS_DEFAULT_LIMIT;
         if (StringUtils.isAnyString(limitStr)) {
             try {
@@ -86,7 +86,7 @@ public class ForManagerService {
         return limit;
     }
 
-    public int getLogOffset(String offsetStr) {
+    public long getLogOffset(String offsetStr) {
         int offset = GET_LOGS_DEFAULT_OFFSET;
         if (StringUtils.isAnyString(offsetStr)) {
             try {

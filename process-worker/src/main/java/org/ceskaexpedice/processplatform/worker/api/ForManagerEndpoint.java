@@ -59,19 +59,8 @@ public class ForManagerEndpoint {
         return getProcessLogHelper(processId, fileName, true);
     }
 
-    public Response getProcessLogHelper(String processId, String fileName, boolean err) {
-        InputStream logStream = forManagerService.getProcessLog(processId, err);
-        return Response.ok((StreamingOutput) output -> {
-                    try (logStream) {
-                        logStream.transferTo(output);
-                    }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
-                .build();
-    }
-
     @GET
     @Path("{processId}/log/out/lines")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getProcessLogOutLines(@PathParam("processId") String processId,
                                           @QueryParam("offset") String offsetStr,
                                           @QueryParam("limit") String limitStr) {
@@ -80,24 +69,10 @@ public class ForManagerEndpoint {
 
     @GET
     @Path("{processId}/log/err/lines")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getProcessLogErrLines(@PathParam("processId") String processId,
                                           @QueryParam("offset") String offsetStr,
                                           @QueryParam("limit") String limitStr) {
         return getProcessLogLinesHelper(processId, offsetStr, limitStr, true);
-    }
-
-    private Response getProcessLogLinesHelper(String processId, String offsetStr,String limitStr, boolean err) {
-        JSONObject result = new JSONObject();
-        result.put("totalSize", forManagerService.getProcessLogSize(processId, err));
-        JSONArray linesJson = new JSONArray();
-        List<String> lines = forManagerService.getProcessLogLines(processId, err,
-                forManagerService.getLogOffset(offsetStr), forManagerService.getLogLimit(limitStr));
-        for (String line : lines) {
-            linesJson.put(line);
-        }
-        result.put("lines", linesJson);
-        return APIRestUtilities.jsonPayload(result.toString());
     }
 
     @DELETE
@@ -119,5 +94,29 @@ public class ForManagerEndpoint {
             return APIRestUtilities.ok("Process JVM Killed [%s]", pid);
         }
     }
+
+    private Response getProcessLogHelper(String processId, String fileName, boolean err) {
+        InputStream logStream = forManagerService.getProcessLog(processId, err);
+        return Response.ok((StreamingOutput) output -> {
+                    try (logStream) {
+                        logStream.transferTo(output);
+                    }
+                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
+                .build();
+    }
+
+    private Response getProcessLogLinesHelper(String processId, String offsetStr,String limitStr, boolean err) {
+        JSONObject result = new JSONObject();
+        result.put("totalSize", forManagerService.getProcessLogSize(processId, err));
+        JSONArray linesJson = new JSONArray();
+        List<String> lines = forManagerService.getProcessLogLines(processId, err,
+                forManagerService.getLogOffset(offsetStr), forManagerService.getLogLimit(limitStr));
+        for (String line : lines) {
+            linesJson.put(line);
+        }
+        result.put("lines", linesJson);
+        return APIRestUtilities.jsonPayload(result.toString());
+    }
+
 
 }

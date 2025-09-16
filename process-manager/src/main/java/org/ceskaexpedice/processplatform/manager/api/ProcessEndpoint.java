@@ -139,13 +139,40 @@ public class ProcessEndpoint {
         return APIRestUtilities.jsonPayload(result.toString());
     }
 
-
     @GET
     @Path("{processId}/log/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProcessLogOut(@PathParam("processId") String processId,
                                       @DefaultValue("out.txt") @QueryParam("fileName") String fileName) {
-        InputStream logStream = processService.getProcessLog(processId, false);
+        return getProcessLogHelper(processId, fileName, false);
+    }
+
+    @GET
+    @Path("{processId}/log/err")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getProcessLogErr(@PathParam("processId") String processId,
+                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
+        return getProcessLogHelper(processId, fileName, true);
+    }
+
+    @GET
+    @Path("{processId}/log/out/lines")
+    public Response getProcessLogOutLines(@PathParam("processId") String processId,
+                                          @QueryParam("offset") String offsetStr,
+                                          @QueryParam("limit") String limitStr) {
+        return getProcessLogLinesHelper(processId, offsetStr, limitStr, false);
+    }
+
+    @GET
+    @Path("{processId}/log/err/lines")
+    public Response getProcessLogErrLines(@PathParam("processId") String processId,
+                                          @QueryParam("offset") String offsetStr,
+                                          @QueryParam("limit") String limitStr) {
+        return getProcessLogLinesHelper(processId, offsetStr, limitStr, true);
+    }
+
+    private Response getProcessLogHelper(String processId, String fileName, boolean err) {
+        InputStream logStream = processService.getProcessLog(processId, true);
         return Response.ok((StreamingOutput) output -> {
                     try (logStream) {
                         logStream.transferTo(output);
@@ -154,18 +181,9 @@ public class ProcessEndpoint {
                 .build();
     }
 
-    @GET
-    @Path("{processId}/log/err")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getProcessLogErr(@PathParam("processId") String processId,
-                                      @DefaultValue("err.txt") @QueryParam("fileName") String fileName) {
-        InputStream logStream = processService.getProcessLog(processId, true);
-        return Response.ok((StreamingOutput) output -> {
-                    try (logStream) {
-                        logStream.transferTo(output);
-                    }
-                }).header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
-                .build();
+    private Response getProcessLogLinesHelper(String processId, String offsetStr,String limitStr, boolean err) {
+        JSONObject result = processService.getProcessLogLines(processId, offsetStr, limitStr, err);
+        return APIRestUtilities.jsonPayload(result.toString());
     }
 
 }

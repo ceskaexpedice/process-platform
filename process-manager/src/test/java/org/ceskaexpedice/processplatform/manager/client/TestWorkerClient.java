@@ -22,6 +22,7 @@ import org.ceskaexpedice.testutils.ManagerTestsUtils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,6 +80,13 @@ public class TestWorkerClient {
         InputStream processLog = workerClient.getProcessLog(ManagerTestsUtils.PROCESS1_ID, false);
         String outLog = new String(processLog.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(outLog.contains(OUT_LOG_PART));
+    }
+
+    @Test
+    public void testGetProcessLogLines() {
+        WorkerClient workerClient = new WorkerClient(processServiceMock, nodeServiceMock);
+        JSONObject processLogLines = workerClient.getProcessLogLines(ManagerTestsUtils.PROCESS1_ID, "0", "50", false);
+        Assertions.assertEquals(2, processLogLines.getJSONArray("lines").length());
     }
 
     @Test

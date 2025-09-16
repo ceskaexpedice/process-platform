@@ -81,6 +81,72 @@ paths:
         '404':
           description: Error logs not found for the given process id.
 
+  /manager/{processId}/log/out/lines:
+    get:
+      tags:
+        - ForManager
+      summary: Získá standardní výstup ve formě řádklů
+      description: Získá standardní výstup ve formě řádků
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: UUID procesu, pro který se získávají logy.
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Počáteční index, od kterého se začnou načítat řádky logu.
+          schema:
+            type: integer
+          example: 0
+        - name: limit
+          in: query
+          description: Maximální počet řádků logu, které se mají vrátit.
+          schema:
+            type: integer
+          example: 100
+      responses:
+        '200':
+          description: Úspěšně načtené logy procesu.
+        '400':
+          description: Neplatný požadavek, např. neplatný offset nebo limit.
+        '404':
+          description: Proces s daným UUID nebyl nalezen.
+
+  /manager/{processId}/log/err/lines:
+    get:
+      tags:
+        - ForManager
+      summary: Získá err výstup ve formě řádklů
+      description: Získá err výstup ve formě řádků
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          description: UUID procesu, pro který se získávají logy.
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Počáteční index, od kterého se začnou načítat řádky logu.
+          schema:
+            type: integer
+          example: 0
+        - name: limit
+          in: query
+          description: Maximální počet řádků logu, které se mají vrátit.
+          schema:
+            type: integer
+          example: 100
+      responses:
+        '200':
+          description: Úspěšně načtené logy procesu.
+        '400':
+          description: Neplatný požadavek, např. neplatný offset nebo limit.
+        '404':
+          description: Proces s daným UUID nebyl nalezen.
+
   /manager/{processId}/directory:
     delete:
       tags:

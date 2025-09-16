@@ -25,6 +25,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -216,5 +217,31 @@ public class TestProcessEndpoint extends JerseyTest {
         String resultErrLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(resultErrLog.contains("test err content"));
     }
+
+    @Test
+    public void testGetOutLogLines() {
+        long logSize = 21;
+        List<String> lines = new ArrayList<>();
+        lines.add("first line");
+        lines.add("second line");
+        JSONObject result = new JSONObject();
+        result.put("totalSize", logSize);
+        JSONArray linesJson = new JSONArray();
+        for (String line : lines) {
+            linesJson.put(line);
+        }
+        result.put("lines", linesJson);
+
+        when(processServiceMock.getProcessLogLines(eq(PROCESS1_ID), eq("0"), eq("50"), eq(false))).thenReturn(result);
+
+        Response response = target("process/" + PROCESS1_ID + "/log/out/lines").queryParam("processId", PROCESS1_ID).
+                queryParam("offset", "0").queryParam("limit", "50")
+                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String responseSt = response.readEntity(String.class);
+        JSONObject responseJson = new JSONObject(responseSt);
+        Assertions.assertEquals(2, responseJson.getJSONArray("lines").length());
+    }
+
 
 }

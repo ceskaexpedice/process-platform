@@ -30,6 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PLUGIN1_PROCESS_ID;
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PROCESS_PID;
@@ -77,6 +79,46 @@ public class TestForManagerEndpoint extends JerseyTest {
         InputStream responseStream = response.readEntity(InputStream.class);
         String resultErrLog = new String(responseStream.readAllBytes(), StandardCharsets.UTF_8);
         Assertions.assertTrue(resultErrLog.contains("test err content"));
+    }
+
+    @Test
+    public void testGetOutLogLines() {
+        long logSize = 21;
+        List<String> lines = new ArrayList<>();
+        lines.add("first line");
+        lines.add("second line");
+
+        when(forManagerServiceMock.getProcessLogSize(eq(PLUGIN1_PROCESS_ID), eq(false))).thenReturn(logSize);
+        when(forManagerServiceMock.getLogOffset(any())).thenReturn(0L);
+        when(forManagerServiceMock.getLogLimit(any())).thenReturn(logSize);
+        when(forManagerServiceMock.getProcessLogLines(eq(PLUGIN1_PROCESS_ID), eq(false), eq(0L), eq(logSize))).thenReturn(lines);
+
+        Response response = target("manager/" + PLUGIN1_PROCESS_ID + "/log/out/lines")
+                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String responseSt = response.readEntity(String.class);
+        JSONObject responseJson = new JSONObject(responseSt);
+        Assertions.assertEquals(2, responseJson.getJSONArray("lines").length());
+    }
+
+    @Test
+    public void testGetErrLogLines() {
+        long logSize = 21;
+        List<String> lines = new ArrayList<>();
+        lines.add("first line");
+        lines.add("second line");
+
+        when(forManagerServiceMock.getProcessLogSize(eq(PLUGIN1_PROCESS_ID), eq(true))).thenReturn(logSize);
+        when(forManagerServiceMock.getLogOffset(any())).thenReturn(0L);
+        when(forManagerServiceMock.getLogLimit(any())).thenReturn(logSize);
+        when(forManagerServiceMock.getProcessLogLines(eq(PLUGIN1_PROCESS_ID), eq(true), eq(0L), eq(logSize))).thenReturn(lines);
+
+        Response response = target("manager/" + PLUGIN1_PROCESS_ID + "/log/err/lines")
+                .request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String responseSt = response.readEntity(String.class);
+        JSONObject responseJson = new JSONObject(responseSt);
+        Assertions.assertEquals(2, responseJson.getJSONArray("lines").length());
     }
 
     @Test

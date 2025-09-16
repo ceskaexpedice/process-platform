@@ -26,6 +26,8 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
@@ -36,6 +38,7 @@ import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.json.JSONObject;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -128,6 +131,30 @@ public class WorkerClient {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
+        }
+    }
+
+    public JSONObject getProcessLogLines(String processId, String offset, String limit, boolean err) {
+        String suffix = err ? "err" : "out";
+        int code = -1;
+        try {
+            URIBuilder uriBuilder = new URIBuilder(getWorkerBaseUrl(processId) + "manager/" + processId + "/log/" + suffix + "/lines");
+            if (offset != null) uriBuilder.addParameter("offset", offset);
+            if (limit != null) uriBuilder.addParameter("limit", limit);
+
+            HttpGet get = new HttpGet(uriBuilder.build());
+            try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
+                code = response.getCode();
+                HttpEntity entity = response.getEntity();
+                String body = entity != null ? EntityUtils.toString(entity) : "";
+                if (code == 200) {
+                    return new JSONObject(body);
+                } else {
+                    throw new RemoteNodeException("Failed to get process log lines", NodeType.WORKER, code);
+                }
+            }
+        } catch (Exception e) {
+            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, code, e);
         }
     }
 

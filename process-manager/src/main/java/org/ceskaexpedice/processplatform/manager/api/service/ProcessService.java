@@ -32,6 +32,7 @@ import org.ceskaexpedice.processplatform.manager.db.dao.ProfileDao;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginProfileEntity;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -254,6 +255,11 @@ public class ProcessService {
     public InputStream getProcessLog(String processId, boolean err) {
         InputStream logStream = workerClient.getProcessLog(processId, err);
         return logStream;
+    }
+
+    public JSONObject getProcessLogLines(String processId, String offset, String limit, boolean err) {
+        JSONObject processLogLines = workerClient.getProcessLogLines(processId, offset, limit, err);
+        return processLogLines;
     }
 
     public int getBatchOffset(String offsetStr) {

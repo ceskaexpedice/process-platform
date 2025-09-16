@@ -32,15 +32,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.*;
 import static org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils.prepareProcessWorkingDirectory;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TestForManagerService
@@ -71,7 +67,7 @@ public class TestForManagerService {
 
     @AfterEach
     public void tearDown() {
-        if(server != null){
+        if (server != null) {
             server.shutdownNow();
         }
     }
@@ -79,7 +75,7 @@ public class TestForManagerService {
     @Test
     public void testGetOutLog() throws IOException {
         InputStream is = null;
-        try{
+        try {
             final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
             server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
             server.start();
@@ -92,7 +88,7 @@ public class TestForManagerService {
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, true);
             String errLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             assertFalse(errLog.contains(ERR_LOG_PART));
-        }finally {
+        } finally {
             is.close();
         }
     }
@@ -100,7 +96,7 @@ public class TestForManagerService {
     @Test
     public void testGetErrLog() throws IOException {
         InputStream is = null;
-        try{
+        try {
             server = null;
             launchPlugin1();
 
@@ -111,9 +107,25 @@ public class TestForManagerService {
             is = forManagerService.getProcessLog(PLUGIN1_PROCESS_ID, false);
             String outLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             assertFalse(outLog.contains(OUT_LOG_PART));
-        }finally {
+        } finally {
             is.close();
         }
+    }
+
+    @Test
+    public void testGetLogLines() throws IOException {
+        final ResourceConfig rc = new ResourceConfig(ForWorkerTestEndpoint.class);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(MANAGER_BASE_URI), rc);
+        server.start();
+        launchPlugin1();
+
+        long logSize = forManagerService.getProcessLogSize(PLUGIN1_PROCESS_ID, false);
+        List<String> logLines = forManagerService.getProcessLogLines(PLUGIN1_PROCESS_ID, false, 0, logSize);
+        assertEquals(13, logLines.size());
+
+        logSize = forManagerService.getProcessLogSize(PLUGIN1_PROCESS_ID, true);
+        logLines = forManagerService.getProcessLogLines(PLUGIN1_PROCESS_ID, true, 0, logSize);
+        assertEquals(3, logLines.size());
     }
 
     @Test
@@ -150,9 +162,9 @@ public class TestForManagerService {
     }
 
     private void launchPlugin1() {
-        Map<String,String> payload = new HashMap<>();
-        payload.put("name","Petr");
-        payload.put("surname","Harasil");
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Petr");
+        payload.put("surname", "Harasil");
         ScheduledProcess scheduledProcess = new ScheduledProcess(
                 PLUGIN1_PROCESS_ID,
                 PLUGIN1_PROFILE_BIG,
