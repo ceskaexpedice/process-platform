@@ -172,7 +172,7 @@ public class ProcessEndpoint {
     }
 
     private Response getProcessLogHelper(String processId, String fileName, boolean err) {
-        InputStream logStream = processService.getProcessLog(processId, true);
+        InputStream logStream = processService.getProcessLog(processId, err);
         return Response.ok((StreamingOutput) output -> {
                     try (logStream) {
                         logStream.transferTo(output);
