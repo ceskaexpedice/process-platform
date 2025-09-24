@@ -40,6 +40,8 @@ import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 /**
@@ -167,18 +169,29 @@ public class ManagerClient {
     }
 
     public void updateProcessDescription(String processId, String description) {
-        String url = String.format("%sworker/description/%s?description=%s", workerConfiguration.getManagerBaseUrl(), processId, description);
-        LOGGER.info(String.format("Update process description at %s", url));
-        HttpPut httpPut = new HttpPut(url);
+        try {
+            String encodedDescription = URLEncoder.encode(description, StandardCharsets.UTF_8);
+            String url = String.format(
+                    "%sworker/description/%s?description=%s",
+                    workerConfiguration.getManagerBaseUrl(),
+                    processId,
+                    encodedDescription
+            );
 
-        int statusCode = -1;
-        try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
-            statusCode = response.getCode();
-            if (statusCode != 200) {
-                throw new RemoteNodeException("Failed to update name", NodeType.MANAGER, statusCode, null);
+            LOGGER.info(String.format("Update process description at %s", url));
+            HttpPut httpPut = new HttpPut(url);
+
+            int statusCode = -1;
+            try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
+                statusCode = response.getCode();
+                if (statusCode != 200) {
+                    throw new RemoteNodeException("Failed to update name", NodeType.MANAGER, statusCode, null);
+                }
+            } catch (IOException e) {
+                throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
             }
-        } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to encode URL", e);
         }
     }
 
