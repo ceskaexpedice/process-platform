@@ -31,12 +31,13 @@ public final class ProfileMapper {
 
     public static void mapPluginProfile(PreparedStatement stmt, PluginProfileEntity profile, Connection conn) throws SQLException {
         stmt.setString(1, profile.getProfileId());
-        stmt.setString(2, profile.getPluginId());
+        stmt.setString(2, profile.getDescription());
+        stmt.setString(3, profile.getPluginId());
         if (profile.getJvmArgs() != null) {
             Array jvmArgsArray = conn.createArrayOf("text", profile.getJvmArgs().toArray());
-            stmt.setArray(3, jvmArgsArray);
+            stmt.setArray(4, jvmArgsArray);
         } else {
-            stmt.setNull(3, Types.ARRAY);
+            stmt.setNull(4, Types.ARRAY);
         }
     }
 

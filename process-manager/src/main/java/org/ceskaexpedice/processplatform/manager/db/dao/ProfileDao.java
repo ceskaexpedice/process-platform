@@ -89,10 +89,9 @@ public class ProfileDao extends AbstractDao{
 
     public void createProfile(PluginProfileEntity profile) {
         try (Connection connection = getConnection()) {
-            String sql = "INSERT INTO pcp_profile (profile_id, plugin_id, jvm_args) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO pcp_profile (profile_id, description, plugin_id, jvm_args) VALUES (?, ?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 ProfileMapper.mapPluginProfile(stmt, profile, connection);
-                stmt.setString(1, profile.getProfileId());
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {
