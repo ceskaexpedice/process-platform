@@ -129,7 +129,7 @@ public class TestManagerClient {
     @Test
     public void testUpdateProcessDescription() {
         ManagerClient managerClient = new ManagerClient(workerConfiguration);
-        managerClient.updateProcessDescription(PLUGIN1_PROCESS_ID, "newName");
+        managerClient.updateProcessDescription(PLUGIN1_PROCESS_ID, "new Name");
     }
 
 }
