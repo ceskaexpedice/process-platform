@@ -8,11 +8,9 @@ publishing {
     publications {
         mavenWeb(MavenPublication) { 
 		   from components.web 
-		   pom {
-				withXml {
-					def node = asNode().appendNode('packaging', 'war')
-				}
-			}
+			pom {
+                packaging = 'war' 
+            }
 		}
 	}
 	repositories {
