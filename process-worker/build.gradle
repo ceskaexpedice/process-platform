@@ -3,10 +3,25 @@ plugins {
 	id 'maven-publish'
 }
 
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = "https://maven.pkg.github.com/ceskaexpedice/process-platform"
+			credentials {
+				username = System.getenv("GITHUB_ACTOR")
+				password = System.getenv("GITHUB_TOKEN")
+			}
+		}
+	}
+}
+
+
 repositories {
     mavenLocal()
     mavenCentral()
 }
+
 
 dependencies {
     implementation project(':process-api')
@@ -45,6 +60,8 @@ test {
 war {
     archiveFileName = 'process-worker.war'
 }
+
+
 
 /* TODO is for Kramerius build
 tasks.register<Copy>("bundleProcess") {
