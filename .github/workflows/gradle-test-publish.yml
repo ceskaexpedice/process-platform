@@ -1,4 +1,4 @@
-name: Release new version of Process platform
+name: Publishing test of Process platform
 
 on:
   workflow_dispatch:
