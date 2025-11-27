@@ -1,5 +1,6 @@
 plugins {
     id 'war'
+	id 'com.google.cloud.tools.jib' version '3.4.4' 
 }
 repositories {
     mavenLocal()
@@ -7,7 +8,8 @@ repositories {
 }
 
 dependencies {
-    implementation project(':process-common')
+	
+   implementation project(':process-common')
 
     providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
 
@@ -45,3 +47,27 @@ war {
 test {
     useJUnitPlatform()
 }
+
+jib {
+    from {
+        image = 'tomcat:9.0.87-jdk21-temurin-jammy'
+		platforms {
+            platform {
+                architecture = 'amd64'
+                os = 'linux'
+            }
+            platform {
+                architecture = 'arm64'
+                os = 'linux'
+            }
+        }
+    }
+    to {
+        image = "ceskaexpedice/process-manager:${version}"
+    }
+    container {
+        appRoot = '/usr/local/tomcat/webapps/process-manager'
+        user = '0'
+    }
+}
+
