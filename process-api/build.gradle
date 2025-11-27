@@ -5,7 +5,13 @@ plugins {
 
 publishing {
 	repositories {
-		maven {
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java 
+        }
+    }	
+	maven {
 			name = "GitHubPackages"
 			url = "https://maven.pkg.github.com/ceskaexpedice/process-platform"
 			credentials {

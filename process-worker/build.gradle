@@ -4,6 +4,17 @@ plugins {
 }
 
 publishing {
+
+    publications {
+        mavenWeb(MavenPublication) { 
+		   from components.web 
+		   pom {
+			  withXml {
+				def node = asNode().appendNode('packaging', 'war')
+			}
+		}
+	}
+	
 	repositories {
 		maven {
 			name = "GitHubPackages"
