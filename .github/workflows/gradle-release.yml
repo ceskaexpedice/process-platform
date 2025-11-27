@@ -1,4 +1,4 @@
-name: Release new version of Akubra Repository
+name: Release new version of Process platform
 
 on:
   workflow_dispatch:
