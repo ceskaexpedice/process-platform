@@ -4,21 +4,22 @@ plugins {
 }
 
 publishing {
-	repositories {
 
     publications {
         mavenJava(MavenPublication) {
             from components.java 
         }
     }	
-	maven {
-			name = "GitHubPackages"
-			url = "https://maven.pkg.github.com/ceskaexpedice/process-platform"
-			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
+
+	repositories {
+		maven {
+				name = "GitHubPackages"
+				url = "https://maven.pkg.github.com/ceskaexpedice/process-platform"
+				credentials {
+					username = System.getenv("GITHUB_ACTOR")
+					password = System.getenv("GITHUB_TOKEN")
+				}
 			}
-		}
 	}
 }
 
