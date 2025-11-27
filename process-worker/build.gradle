@@ -56,6 +56,7 @@ tasks.register<Copy>("bundleProcess") {
 }
 */
 
+/*
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -65,4 +66,4 @@ publishing {
     repositories {
         mavenLocal()
     }
-}
+}*/
