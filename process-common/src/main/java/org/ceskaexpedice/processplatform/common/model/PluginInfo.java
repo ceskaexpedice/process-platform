@@ -91,4 +91,16 @@ public class PluginInfo {
     public void setProfiles(List<PluginProfile> profiles) {
         this.profiles = profiles;
     }
+
+    @Override
+    public String toString() {
+        return "PluginInfo{" +
+                "pluginId='" + pluginId + '\'' +
+                ", description='" + description + '\'' +
+                ", mainClass='" + mainClass + '\'' +
+                ", payloadFieldSpecMap=" + payloadFieldSpecMap +
+                ", scheduledProfiles=" + scheduledProfiles +
+                ", profiles=" + profiles +
+                '}';
+    }
 }

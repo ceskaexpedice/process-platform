@@ -8,35 +8,53 @@ class ProcessPluginExtension {
     String pluginName
     List<Map<String, Object>> profiles = []
 
-    String spiInterface
+
+    //String spiInterface
     String spiImplementation
 }
 
 class ProcessPlugin implements Plugin<Project> {
+
+    private static final String PROCESS_PLUGIN_SPI = "org.ceskaexpedice.processplatform.api.PluginSpi"
+
     void apply(Project project) {
+
+        if (ext.profiles.isEmpty()) {
+            println "ProcessPlugin: 'profiles' not defined. Using project-specific default profile."
+
+            def defaultProfile =                     [
+                    "profileId": "${project.name}",
+                    "description": "${project.description}",
+                    jvmArgs: ["-Xms1g","-Xmx32g"]
+            ];
+
+            ext.profiles.add(defaultProfile)
+        }
+
+        project.tasks.named("jar") {
+            manifest {
+                attributes (
+                        'Implementation-Title': project.name,
+                        'Implementation-Version': project.version,
+
+                        'Module-Group-Id': project.group,
+                        'Module-Artifact-Id': project.name,
+                        'Module-description': project.description
+                )
+            }
+        }
+
         def ext = project.extensions.create("processPlugin", ProcessPluginExtension)
 
         project.afterEvaluate {
 
             def errors = []
 
-            if (!ext.pluginName) {
-                errors << "ProcessPlugin: 'pluginName' must be defined (e.g., 'processes')."
-            }
 
-            if (ext.profiles == null || ext.profiles.isEmpty()) {
-                errors << "ProcessPlugin: 'profiles' list must be defined and cannot be empty."
-            }
-
-            // Check SPI configuration
-            if (!ext.spiInterface) {
-                errors << "ProcessPlugin: 'spiInterface' must be defined (e.g., 'org.ceskaexpedice.processplatform.api.PluginSpi')."
-            }
             if (!ext.spiImplementation) {
                 errors << "ProcessPlugin: 'spiImplementation' must be defined (e.g., 'cz.incad.kramerius.plugin.MyProcessSPI')."
             }
 
-            // If errors were found, halt the build
             if (!errors.isEmpty()) {
                 throw new org.gradle.api.GradleException("\n" +
                         "--- Process Plugin Configuration Error ---\n" +
@@ -48,8 +66,6 @@ class ProcessPlugin implements Plugin<Project> {
                 group = "build"
                 description = "Generates profile.json for process plugin"
 
-//                def outputDir = new File(project.buildDir, "generated/resources")
-//                def jsonFile = new File(outputDir, "profile.json")
 
                 def outputDir = project.layout.buildDirectory.dir("generated/resources")
                 def jsonFile = outputDir.map { it.file("profile.json") }
@@ -57,12 +73,16 @@ class ProcessPlugin implements Plugin<Project> {
                 outputs.file(jsonFile)
 
                 doLast {
-					outputDir.mkdirs()
-					def jsonContent = JsonOutput.prettyPrint(
+
+                    def outDirFile = outputDir.get().asFile
+                    outDirFile.mkdirs()
+
+                    def jsonOutFile = jsonFile.get().asFile
+                    def jsonContent = JsonOutput.prettyPrint(
                             JsonOutput.toJson(ext.profiles)
 					)
-					jsonFile.text = jsonContent
-					println "Generated profile.json at ${jsonFile}"
+                    jsonOutFile.text = jsonContent
+					println "Generated profile.json at ${jsonOutFile}"
 
                 }
             }
@@ -71,23 +91,25 @@ class ProcessPlugin implements Plugin<Project> {
                 group = "build"
                 description = "Generates META-INF/services file for process plugin SPI"
 
-//                def outputDir = new File(project.buildDir, "generated/resources/META-INF/services")
-//                def spiFile = new File(outputDir, ext.spiInterface)
 
                 def outputDir = project.layout.buildDirectory.dir("generated/resources/META-INF/services")
-                def spiFile = outputDir.map { dir -> dir.file(ext.spiInterface) }
+                def spiFile = outputDir.map { dir -> dir.file(PROCESS_PLUGIN_SPI) }
 
 
                 onlyIf {
-                    ext.spiInterface && ext.spiImplementation
+                    ext.spiImplementation
                 }
 
                 outputs.file(spiFile)
 
                 doLast {
-                    outputDir.mkdirs()
-                    spiFile.text = ext.spiImplementation.trim()
-                    println "Generated SPI file at ${spiFile} with content: ${ext.spiImplementation}"
+                    def outDirFile = outputDir.get().asFile
+                    outDirFile.mkdirs()
+
+                    def spiOutFile = spiFile.get().asFile
+                    spiOutFile.text = ext.spiImplementation.trim()
+
+                    println "Generated SPI file at ${spiOutFile} with content: ${ext.spiImplementation}"
                 }
             }
 
@@ -111,8 +133,11 @@ class ProcessPlugin implements Plugin<Project> {
                 dependsOn project.configurations.runtimeClasspath
 
                 doLast {
-                    def distDir = project.layout.buildDirectory.dir("distributions/${ext.pluginName}")
+
+                    def distDirProvider = project.layout.buildDirectory.dir("distributions/${ext.pluginName}")
+                    def distDir = distDirProvider.get().asFile
                     distDir.mkdirs()
+
 
                     def jar = project.tasks.named("jar").get().archiveFile.get().asFile
                     project.copy {
@@ -128,14 +153,6 @@ class ProcessPlugin implements Plugin<Project> {
 							into distDir
 						}
 					}
-
-                    // write JSON
-					/*
-                    def jsonFile = new File(distDir, "${ext.pluginName}.json")
-                    jsonFile.text = groovy.json.JsonOutput.prettyPrint(
-                        groovy.json.JsonOutput.toJson(ext.profiles)
-                    )*/
-
                     println "Built process plugin: ${distDir}"
                 }
             }

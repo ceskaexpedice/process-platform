@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.ceskaexpedice.processplatform'
-version = '1.0.2'
+version = '1.0.4'
 
 gradlePlugin {
     plugins {
@@ -27,4 +27,5 @@ publishing {
             url = uri("${projectDir}/docs")
         }
     }
+	
 }

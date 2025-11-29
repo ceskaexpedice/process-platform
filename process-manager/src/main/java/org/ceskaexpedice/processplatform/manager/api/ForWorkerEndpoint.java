@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.logging.Logger;
 
 /**
  * ForWorkerEndpoint
@@ -36,9 +37,12 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ForWorkerEndpoint {
 
+    public static final Logger  LOGGER = Logger.getLogger(ForWorkerEndpoint.class.getName());
+
     private final PluginService pluginService;
     private final ProcessService processService;
     private final NodeService nodeService;
+
 
     public ForWorkerEndpoint(PluginService pluginService, ProcessService processService, NodeService nodeService) {
         this.pluginService = pluginService;
@@ -56,6 +60,7 @@ public class ForWorkerEndpoint {
     @POST
     @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
+        LOGGER.info(String.format("Register payload %s", pluginInfo.toString()));
         pluginService.registerPlugin(pluginInfo);
         return APIRestUtilities.ok("Plugin [%s] registered", pluginInfo.getPluginId());
     }

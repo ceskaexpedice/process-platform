@@ -50,4 +50,12 @@ public abstract class ScheduleProcess {
     public void setPayload(Map<String, String> payload) {
         this.payload = payload;
     }
+
+    @Override
+    public String toString() {
+        return "ScheduleProcess{" +
+                "profileId='" + profileId + '\'' +
+                ", payload=" + payload +
+                '}';
+    }
 }
