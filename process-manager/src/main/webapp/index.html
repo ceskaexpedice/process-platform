@@ -1,16 +1,266 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
+<!DOCTYPE html>
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=..">
-    <script type="text/javascript">
-        window.location.href = ".."
-    </script>
-    <title>Page Redirection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Manager Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .status-running { color: #0d6efd; }
+        .status-planned { color: #ffc107; }
+        .status-finished { color: #198754; }
+        .status-error { color: #dc3545; }
+        /* Styly pro tabulku Workerů */
+        .worker-tag {
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
-<!-- Note: don't tell people to `click` the link, just tell them that it is a link. -->
-If you are not redirected automatically, follow this <a href='../../..'>link to example</a>.
+
+    <div class="container mt-5">
+        <h1 class="mb-4 text-primary">Process Manager Overview</h1>
+        <div id="alertPlaceholder"></div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-header">Celkem Workerů</div>
+                    <div class="card-body">
+                        <h2 class="card-title" id="workerCount">...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-header">Práce ve Frontě (PLANNED)</div>
+                    <div class="card-body">
+                        <h2 class="card-title" id="queuedWorkCount">...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-header">Aktivní Procesy (RUNNING)</div>
+                    <div class="card-body">
+                        <h2 class="card-title" id="runningProcessCount">...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        ## 👷 Registrované Worker Nody
+
+        <div class="card shadow mb-5">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Seznam Worker Nódů (Typ: WORKER)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID Workeru</th>
+                                <th>URL API</th>
+                                <th>Popis</th>
+                                <th>Podporované Profily (Tagy)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workerTableBody">
+                            <tr><td colspan="4" class="text-center">Načítám data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        ## ⚙️ Aktivní Procesy
+
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Aktivní a Plánované Procesy (Posledních 50 dávek)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Stav</th>
+                                <th>ID Procesu</th>
+                                <th>Worker ID</th>
+                                <th>Profil</th>
+                                <th>Vlastník</th>
+                                <th>Popis</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processesTableBody">
+                            <tr><td colspan="6" class="text-center">Načítám data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_BASE_URL = '/process-manager/api';
+
+        function showAlert(message, type = 'danger') {
+            const alertPlaceholder = document.getElementById('alertPlaceholder');
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('');
+            alertPlaceholder.prepend(wrapper);
+            setTimeout(() => {
+                const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
+                if(alert) alert.close();
+            }, 5000);
+        }
+
+        /**
+         * Získá celkový počet Worker nodů a zároveň je vypíše.
+         */
+        async function fetchWorkers() {
+            const workerTableBody = document.getElementById('workerTableBody');
+            workerTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Načítám data...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/node`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const nodes = await response.json();
+                
+                // Filtrujeme pouze nody typu 'WORKER'
+                const workerNodes = nodes.filter(node => node.type === 'WORKER');
+                document.getElementById('workerCount').textContent = workerNodes.length;
+
+                workerTableBody.innerHTML = ''; // Vyčistíme tabulku
+                
+                if (workerNodes.length === 0) {
+                    workerTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nenalezeni žádní registrovaní Workeři.</td></tr>';
+                    return;
+                }
+
+                workerNodes.forEach(worker => {
+                    const tagsHtml = worker.tags.map(tag => 
+                        `<span class="badge bg-secondary worker-tag">${tag}</span>`
+                    ).join('');
+
+                    const row = workerTableBody.insertRow();
+                    row.innerHTML = `
+                        <td><strong>${worker.nodeId}</strong></td>
+                        <td><small>${worker.url}</small></td>
+                        <td>${worker.description || '-'}</td>
+                        <td>${tagsHtml || '-'}</td>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Chyba při načítání Workerů:", error);
+                document.getElementById('workerCount').textContent = 'N/A';
+                workerTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Chyba při načítání dat o Workerech: ${error.message}</td></tr>`;
+                showAlert(`Nepodařilo se načíst seznam Workerů. Chyba: ${error.message}`);
+            }
+        }
+
+        /**
+         * Získá přehled procesů (RUNNING, PLANNED) a naplní tabulku.
+         */
+        async function fetchProcesses() {
+            const tableBody = document.getElementById('processesTableBody');
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Načítám data...</td></tr>';
+            
+            let runningCount = 0;
+            let plannedCount = 0;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/process/batch`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                tableBody.innerHTML = ''; // Vyčistíme tabulku
+
+                let allProcesses = [];
+                data.batches.forEach(batch => {
+                    batch.processes.forEach(process => {
+                        allProcesses.push(process);
+                    });
+                });
+                
+                const displayProcesses = allProcesses.slice(0, 100);
+
+                if (displayProcesses.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Žádné procesy k zobrazení.</td></tr>';
+                }
+
+                displayProcesses.forEach(process => {
+                    
+                    if (process.status === 'RUNNING') runningCount++;
+                    if (process.status === 'PLANNED') plannedCount++;
+
+                    const row = tableBody.insertRow();
+                    
+                    row.innerHTML = `
+                        <td><span class="badge rounded-pill ${getBadgeClass(process.status)}">${process.status || 'N/A'}</span></td>
+                        <td>${process.processId.substring(0, 8)}...</td>
+                        <td>${process.workerId || 'Není přiřazen'}</td>
+                        <td>${process.profileId || 'N/A'}</td>
+                        <td>${process.owner || 'N/A'}</td>
+                        <td>${process.description || '-'}</td>
+                    `;
+                });
+
+                document.getElementById('runningProcessCount').textContent = runningCount;
+                document.getElementById('queuedWorkCount').textContent = plannedCount;
+
+            } catch (error) {
+                console.error("Chyba při načítání procesů:", error);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Chyba při načítání dat o procesech: ${error.message}</td></tr>`;
+                document.getElementById('runningProcessCount').textContent = 'N/A';
+                document.getElementById('queuedWorkCount').textContent = 'N/A';
+                showAlert(`Nepodařilo se načíst seznam Procesů. Chyba: ${error.message}`);
+            }
+        }
+
+        function getBadgeClass(status) {
+            switch (status) {
+                case 'RUNNING': return 'bg-primary';
+                case 'PLANNED': return 'bg-warning text-dark';
+                case 'FINISHED': return 'bg-success';
+                case 'ERROR': return 'bg-danger';
+                default: return 'bg-secondary';
+            }
+        }
+
+        /**
+         * Inicializace dashboardu - spustí načítání dat a nastaví interval.
+         */
+        function initDashboard() {
+            fetchWorkers();
+            fetchProcesses();
+            
+            // Periodická aktualizace každých 5 sekund
+            setInterval(() => {
+                fetchWorkers();
+                fetchProcesses();
+            }, 5000); 
+        }
+
+        // Spuštění po načtení DOM
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
 
 </body>
 </html>
