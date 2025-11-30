@@ -46,9 +46,14 @@ public final class PluginMapper {
 
         String json = mapper.writeValueAsString(plugin.getPayloadFieldSpecMap());
         stmt.setString(4, json);
+        if (plugin.getScheduledProfiles() != null) {
+            Array scheduledProfilesArray = conn.createArrayOf("text", plugin.getScheduledProfiles().toArray());
+            stmt.setArray(5, scheduledProfilesArray);
+        } else {
+            Array scheduledProfilesArray = conn.createArrayOf("text", new String[0]);
+            stmt.setArray(5, scheduledProfilesArray);
 
-        Array scheduledProfilesArray = conn.createArrayOf("text", plugin.getScheduledProfiles().toArray());
-        stmt.setArray(5, scheduledProfilesArray);
+        }
     }
 
     public static PluginEntity mapPlugin(ResultSet rsPlugin) {

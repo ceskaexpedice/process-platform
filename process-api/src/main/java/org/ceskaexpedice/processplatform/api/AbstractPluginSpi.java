@@ -97,10 +97,8 @@ public abstract class AbstractPluginSpi implements PluginSpi {
 
     public Class<?> loadMainPluginClass() throws ClassNotFoundException {
         String clzName = getMainClass();
-        ClassLoader pluginClassLoader = Thread.currentThread().getContextClassLoader();
-        if (pluginClassLoader == null) {
-            pluginClassLoader = this.getClass().getClassLoader();
-        }
+        ClassLoader pluginClassLoader = this.getClass().getClassLoader();
+        LOGGER.info("Loading Main Plugin Class: " + clzName+ " with classloader "+pluginClassLoader);
         return pluginClassLoader.loadClass(clzName);
     }
 

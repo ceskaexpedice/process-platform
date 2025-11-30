@@ -30,6 +30,40 @@ import java.util.Set;
 public final class NodeMapper {
     private NodeMapper(){}
 
+    public static void mapNodeForUpdate(PreparedStatement stmt, NodeEntity nodeEntity, Connection conn) throws SQLException {
+        // 1. description
+        if (nodeEntity.getDescription() != null) {
+            stmt.setString(1, nodeEntity.getDescription());
+        } else {
+            stmt.setNull(1, java.sql.Types.VARCHAR);
+        }
+
+        // 2. type
+        if (nodeEntity.getType() != null) {
+            stmt.setString(2, nodeEntity.getType());
+        } else {
+            stmt.setNull(2, java.sql.Types.VARCHAR);
+        }
+
+        // 3. url
+        if (nodeEntity.getUrl() != null) {
+            stmt.setString(3, nodeEntity.getUrl());
+        } else {
+            stmt.setNull(3, java.sql.Types.VARCHAR);
+        }
+
+        // 4. tags Array
+        if (nodeEntity.getTags() != null && !nodeEntity.getTags().isEmpty()) {
+            Array tagsArray = conn.createArrayOf("text", nodeEntity.getTags().toArray());
+            stmt.setArray(4, tagsArray);
+        } else {
+            stmt.setNull(4, java.sql.Types.ARRAY);
+        }
+
+        // 5. WHERE node_id = ?
+        stmt.setString(5, nodeEntity.getNodeId());
+    }
+
     public static void mapNode(PreparedStatement stmt, NodeEntity nodeEntity, Connection conn) throws SQLException {
         stmt.setString(1, nodeEntity.getNodeId());
         stmt.setString(2, nodeEntity.getDescription());

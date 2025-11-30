@@ -28,12 +28,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * NodeDao
  * @author ppodsednik
  */
 public class NodeDao extends AbstractDao{
+
+    public static final Logger  LOGGER = Logger.getLogger(NodeDao.class.getName());
 
     public NodeDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
         super(dbConnectionProvider, managerConfiguration);
@@ -49,6 +52,19 @@ public class NodeDao extends AbstractDao{
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
+    }
+
+    public void updateNode(NodeEntity nodeEntity) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_node SET description = ?, type = ?, url = ?, tags = ? WHERE node_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                NodeMapper.mapNodeForUpdate(stmt, nodeEntity, connection);
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+
     }
 
     public NodeEntity getNode(String nodeId) {

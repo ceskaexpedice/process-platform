@@ -20,6 +20,7 @@ import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -33,7 +34,11 @@ public final class PluginServiceMapper {
         if(pluginEntity == null) return null;
         PluginInfo pluginInfo = new PluginInfo();
         pluginInfo.setPluginId(pluginEntity.getPluginId());
-        pluginInfo.setScheduledProfiles(pluginEntity.getScheduledProfiles());
+        if (pluginEntity.getScheduledProfiles() != null) {
+            pluginInfo.setScheduledProfiles(pluginEntity.getScheduledProfiles());
+        } else {
+            pluginInfo.setScheduledProfiles(new HashSet<>());
+        }
         pluginInfo.setDescription(pluginEntity.getDescription());
         pluginInfo.setMainClass(pluginEntity.getMainClass());
         pluginInfo.setPayloadFieldSpecMap(pluginEntity.getPayloadFieldSpecMap());
@@ -44,7 +49,11 @@ public final class PluginServiceMapper {
         if(pluginInfo == null) return null;
         PluginEntity pluginEntity = new PluginEntity();
         pluginEntity.setPluginId(pluginInfo.getPluginId());
-        pluginEntity.setScheduledProfiles(pluginInfo.getScheduledProfiles());
+        if (pluginInfo.getScheduledProfiles() != null) {
+            pluginEntity.setScheduledProfiles(pluginInfo.getScheduledProfiles());
+        } else {
+            pluginInfo.setScheduledProfiles(new HashSet<>());
+        }
         pluginEntity.setDescription(pluginInfo.getDescription());
         pluginEntity.setMainClass(pluginInfo.getMainClass());
         pluginEntity.setPayloadFieldSpecMap(pluginInfo.getPayloadFieldSpecMap());

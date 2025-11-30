@@ -91,6 +91,10 @@ public class ManagerClient {
         String url = workerConfiguration.getManagerBaseUrl() + "worker/register_plugin";
         LOGGER.info("Registering plugin at " + url);
 
+        String s = mapToJson(pluginInfo);
+        LOGGER.info(String.format("Plugin info  %s" , s));
+
+
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(mapToJson(pluginInfo), ContentType.APPLICATION_JSON);
         post.setEntity(entity);
@@ -112,6 +116,7 @@ public class ManagerClient {
         try {
             uriBuilder = new URIBuilder(workerConfiguration.getManagerBaseUrl() + "worker/next_process/" + workerConfiguration.getWorkerId());
             URI uri = uriBuilder.build();
+            LOGGER.info("Getting next scheduled process at " + uri);
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
@@ -119,12 +124,14 @@ public class ManagerClient {
         int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
+            LOGGER.info(String.format("Returning status code from process manager %d", code));
             if (code == 200) {
                 HttpEntity entity = response.getEntity();
                 String json = EntityUtils.toString(entity);
                 ScheduledProcess process = mapper.readValue(json, ScheduledProcess.class);
                 return process;
             } else if(code == 404){
+                LOGGER.warning(String.format("Not found %d", code));
                 return null;
             } else {
                 throw new RemoteNodeException("Failed to get next scheduled process", NodeType.MANAGER, statusCode);

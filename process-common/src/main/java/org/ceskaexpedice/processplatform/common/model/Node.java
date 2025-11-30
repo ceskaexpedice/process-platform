@@ -72,4 +72,15 @@ public class Node {
     public void setTags(Set<String> tags) {
         this.tags = tags;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "nodeId='" + nodeId + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", url='" + url + '\'' +
+                ", tags=" + tags +
+                '}';
+    }
 }

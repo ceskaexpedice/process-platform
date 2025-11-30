@@ -45,10 +45,14 @@ public class NodeService {
         LOGGER.info(String.format("Register node [%s]", node.getNodeId()));
         Node nodeExisting = getNode(node.getNodeId());
         if (nodeExisting != null) {
-            LOGGER.info("Node [" + node.getNodeId() + "] already registered");
+            // change registration
+
+            nodeDao.updateNode(NodeServiceMapper.mapNode(node));
+            LOGGER.info("Node [" + node.getNodeId() + "] already registered / updated");
             return;
+        } else {
+            nodeDao.createNode(NodeServiceMapper.mapNode(node));
         }
-        nodeDao.createNode(NodeServiceMapper.mapNode(node));
     }
 
     public Node getNode(String nodeId) {
