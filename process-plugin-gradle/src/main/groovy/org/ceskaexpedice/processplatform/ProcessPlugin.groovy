@@ -18,6 +18,7 @@ class ProcessPlugin implements Plugin<Project> {
     private static final String PROCESS_PLUGIN_SPI = "org.ceskaexpedice.processplatform.api.PluginSpi"
 
     void apply(Project project) {
+        def ext = project.extensions.create("processPlugin", ProcessPluginExtension)
 
         if (ext.profiles.isEmpty()) {
             println "ProcessPlugin: 'profiles' not defined. Using project-specific default profile."
@@ -30,6 +31,11 @@ class ProcessPlugin implements Plugin<Project> {
 
             ext.profiles.add(defaultProfile)
         }
+
+        if (!ext.pluginName) {
+            ext.pluginName = "${project.name}"
+        }
+
 
         project.tasks.named("jar") {
             manifest {
@@ -44,7 +50,6 @@ class ProcessPlugin implements Plugin<Project> {
             }
         }
 
-        def ext = project.extensions.create("processPlugin", ProcessPluginExtension)
 
         project.afterEvaluate {
 
