@@ -1,5 +1,6 @@
 package org.ceskaexpedice.processplatform.api;
 
+import org.ceskaexpedice.processplatform.api.annotations.IsRequired;
 import org.ceskaexpedice.processplatform.api.annotations.ParameterName;
 import org.ceskaexpedice.processplatform.api.annotations.ProcessMethod;
 import org.ceskaexpedice.processplatform.common.model.PayloadFieldSpec;
@@ -38,17 +39,22 @@ public abstract class AbstractPluginSpi implements PluginSpi {
 
 
     private String getManifestProperty(String name) {
-        Manifest manifest = getManifestFromOwningJar(this.getClass());
-        if (manifest != null) {
-            String pluginId = manifest.getMainAttributes().getValue(name);
-            if (pluginId != null) {
-                return pluginId;
-            } else {
-                LOGGER.log(Level.WARNING, String.format("Plugin with id %s not found", name));
-                return "";
+        try {
+            Class<?> aMainClass = loadMainPluginClass();
+            Manifest manifest = getManifestFromOwningJar(aMainClass);
+            if (manifest != null) {
+                String pluginId = manifest.getMainAttributes().getValue(name);
+                if (pluginId != null) {
+                    return pluginId;
+                } else {
+                    LOGGER.log(Level.WARNING, String.format("Plugin with id %s not found", name));
+                    return "";
+                }
             }
+            return "";
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        return "";
     }
 
     @Override
@@ -60,7 +66,7 @@ public abstract class AbstractPluginSpi implements PluginSpi {
 
     public static Manifest getManifestFromOwningJar(Class<?> clazz) {
         URL location = clazz.getProtectionDomain().getCodeSource().getLocation();
-
+        LOGGER.log(Level.INFO, "getManifestFromOwningJar: location={0}", location);
         if (location == null || !location.getPath().endsWith(".jar")) {
             LOGGER.log(Level.SEVERE, String.format("Cannot find Jar file for %s", clazz.getName()));
             return null;
@@ -140,6 +146,8 @@ public abstract class AbstractPluginSpi implements PluginSpi {
                 continue;
             }
 
+            boolean isRequired = parameter.isAnnotationPresent(IsRequired.class);
+
             String paramName = nameAnnotation.value();
             String paramType = parameter.getType().getName();
             PayloadFieldType type = PayloadFieldType.STRING;
@@ -150,7 +158,7 @@ public abstract class AbstractPluginSpi implements PluginSpi {
                 case "java.util.Date", "java.sql.Date" -> PayloadFieldType.DATE;
                 default -> type;
             };
-            PayloadFieldSpec spec = new PayloadFieldSpec(type, true);
+            PayloadFieldSpec spec = new PayloadFieldSpec(type, isRequired);
             specMap.put(paramName, spec);
         }
 

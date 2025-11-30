@@ -39,4 +39,12 @@ public class PayloadFieldSpec {
     public boolean isRequired() {
         return required;
     }
+
+    @Override
+    public String toString() {
+        return "PayloadFieldSpec{" +
+                "type=" + type +
+                ", required=" + required +
+                '}';
+    }
 }
