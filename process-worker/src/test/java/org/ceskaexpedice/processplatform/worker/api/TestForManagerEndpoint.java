@@ -14,6 +14,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
+import org.ceskaexpedice.processplatform.worker.WorkerState;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
@@ -53,6 +54,16 @@ public class TestForManagerEndpoint extends JerseyTest {
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.register(new ForManagerEndpoint(forManagerServiceMock));
         return resourceConfig;
+    }
+
+    @Test
+    public void testGetInfo() {
+        Response response = target("manager/info").request().get();
+        Assertions.assertEquals(200, response.getStatus());
+        String responseSt = response.readEntity(String.class);
+        JSONObject responseJson = new JSONObject(responseSt);
+        String state = responseJson.getString("state");
+        Assertions.assertEquals(WorkerState.IDLE, WorkerState.valueOf(state));
     }
 
     @Test

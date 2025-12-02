@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.worker.ProcessRegistry;
 import org.ceskaexpedice.processplatform.worker.config.ProcessConfiguration;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 
@@ -55,21 +56,32 @@ public final class PluginJvmLauncher {
             List<String> command = createCommandJVMArgs(scheduledProcess, workerConfiguration);
             ProcessBuilder pb = new ProcessBuilder(command);
             LOGGER.info(String.format("Starting process %s for plugin %s'", scheduledProcess.getProcessId(), scheduledProcess.getPluginId()));
+
             Process processR = pb.start();
+
+            // tell registry: worker is now RUNNING a process, store PID
+            ProcessRegistry.getInstance().enterRunning(processR, scheduledProcess);
+
             int exitVal = processR.waitFor();
+
             if (exitVal != 0) {
                 InputStream errorStream = processR.getErrorStream();
                 String s = IOUtils.toString(errorStream, "UTF-8");
                 LOGGER.info(s);
             }
             LOGGER.info(String.format("Return value of the exiting process [%s]:%d'", scheduledProcess.getProcessId(), exitVal));
+
+            // process finished, worker goes back to IDLE
+            ProcessRegistry.getInstance().markFinished(exitVal);
+
             return exitVal;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            // on error, ensure we don't pretend a process is still running
+            ProcessRegistry.getInstance().markIdle();
             return -1;
         }
     }
-
     private static List<String> createCommandJVMArgs(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
         Path argFile = generateJvmArgsFile(scheduledProcess, workerConfiguration);
         return List.of("java", "@" + argFile.toAbsolutePath());

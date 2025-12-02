@@ -15,6 +15,27 @@ tags:
       Fetching logs, deleting process working directories, killing running processes
 
 paths:
+  /manager/info:
+    get:
+      tags:
+        - ForManager
+      summary: General info on worker state
+      description: General info on worker state
+      operationId: info
+      responses:
+        '200':
+          description: General info on worker state
+          content:
+            application/json:
+              schema:
+                type: string
+              example: {
+                "workerStatus" : "UP",
+                "state" : "IDLE",
+                "message" : "Worker is waiting for the next process.",
+                "jvmAlive" : false
+              }
+
   /manager/{processId}/log/out:
     get:
       tags:
