@@ -49,6 +49,7 @@ import java.util.logging.Logger;
 
 /**
  * ManagerClient
+ *
  * @author ppodsednik
  */
 public class WorkerClient {
@@ -108,7 +109,7 @@ public class WorkerClient {
         URIBuilder uriBuilder;
         HttpGet get;
         try {
-            uriBuilder = new URIBuilder(getWorkerBaseUrl(processId) + "manager/" + processId + "/log/" +  suffix);
+            uriBuilder = new URIBuilder(getWorkerBaseUrl(processId) + "manager/" + processId + "/log/" + suffix);
             URI uri = uriBuilder.build();
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
@@ -122,13 +123,13 @@ public class WorkerClient {
             if (code == 200) {
                 InputStream is = response.getEntity().getContent();
                 return is;
-            } else if(code == 404){
+            } else if (code == 404) {
                 return null;
             } else {
                 throw new RemoteNodeException("Failed to get process log", NodeType.WORKER, statusCode);
             }
         } catch (IOException e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
         }
@@ -154,7 +155,26 @@ public class WorkerClient {
                 }
             }
         } catch (Exception e) {
-            throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, code, e);
+            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
+        }
+    }
+
+    public JSONObject getWorkerInfo(String processId) {
+        String url = getWorkerBaseUrl(processId) + "manager/info";
+        HttpGet get = new HttpGet(url);
+
+        int code = -1;
+        try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
+            code = response.getCode();
+            HttpEntity entity = response.getEntity();
+            String body = entity != null ? EntityUtils.toString(entity) : "";
+            if (code == 200) {
+                return new JSONObject(body);
+            } else {
+                throw new RemoteNodeException("Failed to get worker info", NodeType.WORKER, code);
+            }
+        } catch (Exception e) {
+            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
         }
     }
 

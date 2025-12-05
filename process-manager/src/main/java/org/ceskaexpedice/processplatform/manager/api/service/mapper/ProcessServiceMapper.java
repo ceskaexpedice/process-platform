@@ -24,8 +24,6 @@ import org.ceskaexpedice.processplatform.common.utils.DateUtils;
 import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 import org.json.JSONObject;
 
-import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;
-
 /**
  * ProcessServiceMapper
  * @author ppodsednik
@@ -83,7 +81,7 @@ public final class ProcessServiceMapper {
         processInfo.setDescription(processEntity.getDescription());
         processInfo.setProfileId(processEntity.getProfileId());
         processInfo.setWorkerId(processEntity.getWorkerId());
-        processInfo.setPid(processEntity.getPid());
+        processInfo.setPid((long) processEntity.getPid());
         processInfo.setPlanned(DateUtils.convert(processEntity.getPlanned()));
         processInfo.setStarted(DateUtils.convert(processEntity.getStarted()));
         processInfo.setFinished(DateUtils.convert(processEntity.getFinished()));

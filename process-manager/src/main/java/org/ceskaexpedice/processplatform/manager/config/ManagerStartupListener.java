@@ -26,6 +26,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
+import org.ceskaexpedice.processplatform.manager.gc.GCScheduler;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -62,6 +63,13 @@ public class ManagerStartupListener implements ServletContextListener {
 
         initServices(config, dbProvider);
         initDb(dbProvider);
+        runGc(config);
+    }
+
+    private void runGc(ManagerConfiguration config) {
+        ProcessService processService = (ProcessService) ctx.getAttribute(ProcessService.class.getSimpleName());
+        GCScheduler gcScheduler = new GCScheduler(processService, config);
+        gcScheduler.init();
     }
 
     private void initDb(DbConnectionProvider dbProvider) {

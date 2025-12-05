@@ -21,6 +21,7 @@ import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.common.utils.StringUtils;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
+import org.ceskaexpedice.processplatform.manager.api.service.mapper.WorkerInfoMapper;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
@@ -112,6 +113,16 @@ public class ProcessService {
     public ProcessInfo getProcess(String processId) {
         ProcessInfo processInfo = ProcessServiceMapper.mapProcessBasic(processDao.getProcess(processId));
         return processInfo;
+    }
+
+    public List<ProcessInfo> getProcesses(ProcessState processState) {
+        List<ProcessEntity> processes = processDao.getProcesses(processState.getVal());
+        List<ProcessInfo> processInfos = new ArrayList<>();
+        for (ProcessEntity processEntity : processes) {
+            ProcessInfo processInfo = ProcessServiceMapper.mapProcessBasic(processEntity);
+            processInfos.add(processInfo);
+        }
+        return processInfos;
     }
 
     public ScheduledProcess getNextScheduledProcess(String workerId) {
@@ -216,6 +227,12 @@ public class ProcessService {
     public List<String> getOwners() {
         List<String> owners = processDao.getOwners();
         return owners;
+    }
+
+    public WorkerInfo getWorkerInfo(String processId) {
+        JSONObject workerInfoJson = workerClient.getWorkerInfo(processId);
+        WorkerInfo workerInfo = WorkerInfoMapper.mapFromJson(workerInfoJson);
+        return workerInfo;
     }
 
     public int countBatchHeaders(BatchFilter batchFilter) {

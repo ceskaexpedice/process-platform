@@ -36,6 +36,7 @@ public class ManagerConfiguration {
     private static final String JDBC_URL_KEY = "JDBC_URL";
     private static final String JDBC_USER_NAME_KEY = "JDBC_USERNAME";
     private static final String JDBC_USER_PASSWORD_KEY = "JDBC_PASSWORD";
+    private static final String GC_SCHEDULER_CHECK_INTERVAL_KEY = "GC_SCHEDULER_CHECK_INTERVAL";
 
     private final Properties props = new Properties();
 
@@ -108,5 +109,13 @@ public class ManagerConfiguration {
         return get(JDBC_USER_PASSWORD_KEY);
     }
 
+    public int getGcSchedulerCheckInterval() {
+        String gcSchedulerCheckInterval = get(GC_SCHEDULER_CHECK_INTERVAL_KEY);
+        if (gcSchedulerCheckInterval != null) {
+            return Integer.parseInt(gcSchedulerCheckInterval);
+        }else {
+            return 10000;
+        }
+    }
 
 }
