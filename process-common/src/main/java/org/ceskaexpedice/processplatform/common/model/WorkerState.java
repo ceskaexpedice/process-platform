@@ -1,4 +1,4 @@
-package org.ceskaexpedice.processplatform.worker;
+package org.ceskaexpedice.processplatform.common.model;
 
 /**
  * WorkerState

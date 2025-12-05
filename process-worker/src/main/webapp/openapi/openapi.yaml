@@ -30,10 +30,24 @@ paths:
               schema:
                 type: string
               example: {
-                "workerStatus" : "UP",
-                "state" : "IDLE",
-                "message" : "Worker is waiting for the next process.",
-                "jvmAlive" : false
+                "lastProcess" : null,
+                "currentPid" : 123,
+                "lastExitCode" : 0,
+                "state" : "RUNNING",
+                "jvmAlive" : true,
+                "currentProcess" : {
+                  "jvmArgs" : [ "-Xms128m" ],
+                  "mainClass" : "com.kramerius.Import",
+                  "processId" : "1234",
+                  "payload" : {
+                    "surname" : "po",
+                    "name" : "pe"
+                  },
+                  "profileId" : "import",
+                  "pluginId" : "import",
+                  "batchId" : null,
+                  "ownerId" : null
+                }
               }
 
   /manager/{processId}/log/out:

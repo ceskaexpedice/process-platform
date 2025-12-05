@@ -14,8 +14,11 @@
  */
 package org.ceskaexpedice.processplatform.worker.api;
 
-import org.ceskaexpedice.processplatform.worker.WorkerState;
+import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.WorkerInfo;
+import org.ceskaexpedice.processplatform.common.model.WorkerState;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
+import org.ceskaexpedice.processplatform.worker.utils.WorkerInfoMapper;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.json.JSONObject;
@@ -32,7 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PLUGIN1_PROCESS_ID;
 import static org.ceskaexpedice.processplatform.worker.testutils.WorkerTestsUtils.PROCESS_PID;
@@ -65,6 +70,38 @@ public class TestForManagerEndpoint extends JerseyTest {
         String state = responseJson.getString("state");
         Assertions.assertEquals(WorkerState.IDLE, WorkerState.valueOf(state));
     }
+
+    /* TODO
+    @Test
+    public void testUff() {
+        ScheduledProcess scheduledProcess = new ScheduledProcess();
+        scheduledProcess.setProcessId(PROCESS_PID);
+        Map<String,String> payload = new HashMap<>();
+        payload.put("name", "pe");
+        payload.put("surname", "po");
+        scheduledProcess.setPayload(payload);
+        scheduledProcess.setMainClass("com.kramerius.Import");
+        scheduledProcess.setProfileId("import");
+        scheduledProcess.setPluginId("import");
+        List<String> jvmArgs = new ArrayList<>();
+        jvmArgs.add("-Xms128m");
+        scheduledProcess.setJvmArgs(jvmArgs);
+
+        WorkerInfo workerInfo = new WorkerInfo();
+        workerInfo.setLastExitCode(0);
+        workerInfo.setState(WorkerState.RUNNING);
+        //workerInfo.setLastProcess();
+        workerInfo.setJvmAlive(true);
+        workerInfo.setCurrentProcess(scheduledProcess);
+        workerInfo.setCurrentPid(123L);
+
+        JSONObject jsonObject = WorkerInfoMapper.mapToJson(workerInfo);
+        System.out.println(jsonObject.toString());
+        //WorkerInfo workerInfo1 = WorkerInfoMapper.mapFromJson(jsonObject);
+        System.out.println();
+    }
+
+     */
 
     @Test
     public void testGetOutLog() throws IOException {

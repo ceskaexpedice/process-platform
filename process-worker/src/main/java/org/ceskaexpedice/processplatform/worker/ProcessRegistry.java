@@ -1,6 +1,7 @@
 package org.ceskaexpedice.processplatform.worker;
 
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.WorkerState;
 
 /**
  * ProcessRegistry

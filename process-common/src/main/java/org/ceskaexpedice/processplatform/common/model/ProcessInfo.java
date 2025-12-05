@@ -29,7 +29,7 @@ public class ProcessInfo {
     private String description;
     private String profileId;
     private String workerId;
-    private int pid;
+    private Long pid;
     private Date planned;
     private Date started;
     private Date finished;
@@ -129,11 +129,11 @@ public class ProcessInfo {
         this.status = status;
     }
 
-    public int getPid() {
+    public Long getPid() {
         return pid;
     }
 
-    public void setPid(int pid) {
+    public void setPid(Long pid) {
         this.pid = pid;
     }
 }

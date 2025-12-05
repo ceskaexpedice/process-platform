@@ -17,9 +17,11 @@
 package org.ceskaexpedice.processplatform.worker.api;
 
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
+import org.ceskaexpedice.processplatform.common.model.WorkerInfo;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.worker.ProcessRegistry;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
+import org.ceskaexpedice.processplatform.worker.utils.WorkerInfoMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -49,31 +51,8 @@ public class ForManagerEndpoint {
     @Path("info")
     public Response getInfo() {
         ProcessRegistry reg = ProcessRegistry.getInstance();
-
-        JSONObject json = new JSONObject()
-                .put("workerStatus", "UP")
-                .put("state", reg.getState().name())
-                .put("jvmPid", reg.getCurrentPid())
-                .put("jvmAlive", reg.isCurrentAlive())
-                .put("lastExitCode", reg.getLastExitCode());
-
-        // human-readable message
-        String message = switch (reg.getState()) {
-            case RUNNING -> "Worker is executing a process.";
-            case IDLE    -> "Worker is waiting for the next process.";
-        };
-        json.put("message", message);
-
-        ScheduledProcess sp = reg.getCurrentProcess();
-        if (sp != null) {
-            json.put("currentProcess", toJson(sp));
-        }
-        ScheduledProcess last = reg.getLastProcess();
-        if (last != null) {
-            JSONObject lastJson = toJson(last);
-            lastJson.put("exitCode", reg.getLastExitCode());
-            json.put("lastProcess", lastJson);
-        }
+        WorkerInfo workerInfo = WorkerInfoMapper.mapProcessRegistry(reg);
+        JSONObject json = WorkerInfoMapper.mapToJson(workerInfo);
         return Response.ok(json.toString()).build();
     }
     @GET
@@ -149,18 +128,6 @@ public class ForManagerEndpoint {
         }
         result.put("lines", linesJson);
         return APIRestUtilities.jsonPayload(result.toString());
-    }
-
-    private JSONObject toJson(ScheduledProcess sp) {
-        return new JSONObject()
-                .put("processId", sp.getProcessId())
-                .put("profileId", sp.getProfileId())
-                .put("pluginId", sp.getPluginId())
-                .put("mainClass", sp.getMainClass())
-                .put("payload", sp.getPayload())
-                .put("jvmArgs", sp.getJvmArgs())
-                .put("batchId", sp.getBatchId())
-                .put("ownerId", sp.getOwnerId());
     }
 
 }
