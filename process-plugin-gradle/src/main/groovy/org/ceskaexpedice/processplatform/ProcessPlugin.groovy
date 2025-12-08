@@ -20,21 +20,6 @@ class ProcessPlugin implements Plugin<Project> {
     void apply(Project project) {
         def ext = project.extensions.create("processPlugin", ProcessPluginExtension)
 
-        if (ext.profiles.isEmpty()) {
-            println "ProcessPlugin: 'profiles' not defined. Using project-specific default profile."
-
-            def defaultProfile =                     [
-                    "profileId": "${project.name}",
-                    "description": "${project.description}",
-                    jvmArgs: ["-Xms1g","-Xmx32g"]
-            ];
-
-            ext.profiles.add(defaultProfile)
-        }
-
-        if (!ext.pluginName) {
-            ext.pluginName = "${project.name}"
-        }
 
 
         project.tasks.named("jar") {
@@ -55,7 +40,6 @@ class ProcessPlugin implements Plugin<Project> {
 
             def errors = []
 
-
             if (!ext.spiImplementation) {
                 errors << "ProcessPlugin: 'spiImplementation' must be defined (e.g., 'cz.incad.kramerius.plugin.MyProcessSPI')."
             }
@@ -67,7 +51,24 @@ class ProcessPlugin implements Plugin<Project> {
                         "------------------------------------------"
                 )
             }
-	        def generateProfileTask = project.tasks.register("generateProcessPluginProfile") {
+
+            if (ext.profiles.isEmpty()) {
+                println "ProcessPlugin: 'profiles' not defined. Using project-specific default profile."
+
+                def defaultProfile =                     [
+                        "profileId": "${project.name}",
+                        "description": "${project.description}",
+                        jvmArgs: ["-Xms1g","-Xmx32g"]
+                ];
+
+                ext.profiles.add(defaultProfile)
+            }
+
+            if (!ext.pluginName) {
+                ext.pluginName = "${project.name}"
+            }
+
+            def generateProfileTask = project.tasks.register("generateProcessPluginProfile") {
                 group = "build"
                 description = "Generates profile.json for process plugin"
 

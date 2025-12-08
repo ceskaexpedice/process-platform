@@ -28,10 +28,10 @@
           "name": "process-worker-plugin-gradle-1.0.4.jar",
           "url": "process-worker-plugin-gradle-1.0.4.jar",
           "size": 30326,
-          "sha512": "e41b48c67f5b5e200aba7b89a43c40cdc4b3a51d42bd92d45fc396297300fcba9b3c63ba3fa8d2666656ee0e0928e6c680f9c790269d83c719247e441956146e",
-          "sha256": "360ef8747bd561eb51e908110df2f19275a7f91e44699c0b4c957f6c21a8b7c0",
-          "sha1": "5cd6916236bbb1d2427afe9c00ed49383c84d4cf",
-          "md5": "aae4391569b8617d84e28c761637d3c5"
+          "sha512": "1ee4ac5667063fe53475588c5b07a3cf0e3f068001a371b49f0efa980bf67c039aab3291baec0da0083b1df2aed3de9fead57e83727632d4299266743a98484e",
+          "sha256": "34be18b2e9f86bb6650f02b9009c3183a5e18713353d4a444327cb9aa3f24ca7",
+          "sha1": "fbcf19fc210bba227bcc8ddc28428e95b9ba74ab",
+          "md5": "1a43126e0b508adf6a84c195c0c14075"
         }
       ]
     },
@@ -49,10 +49,10 @@
           "name": "process-worker-plugin-gradle-1.0.4.jar",
           "url": "process-worker-plugin-gradle-1.0.4.jar",
           "size": 30326,
-          "sha512": "e41b48c67f5b5e200aba7b89a43c40cdc4b3a51d42bd92d45fc396297300fcba9b3c63ba3fa8d2666656ee0e0928e6c680f9c790269d83c719247e441956146e",
-          "sha256": "360ef8747bd561eb51e908110df2f19275a7f91e44699c0b4c957f6c21a8b7c0",
-          "sha1": "5cd6916236bbb1d2427afe9c00ed49383c84d4cf",
-          "md5": "aae4391569b8617d84e28c761637d3c5"
+          "sha512": "1ee4ac5667063fe53475588c5b07a3cf0e3f068001a371b49f0efa980bf67c039aab3291baec0da0083b1df2aed3de9fead57e83727632d4299266743a98484e",
+          "sha256": "34be18b2e9f86bb6650f02b9009c3183a5e18713353d4a444327cb9aa3f24ca7",
+          "sha1": "fbcf19fc210bba227bcc8ddc28428e95b9ba74ab",
+          "md5": "1a43126e0b508adf6a84c195c0c14075"
         }
       ]
     }
