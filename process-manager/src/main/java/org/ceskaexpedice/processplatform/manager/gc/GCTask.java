@@ -1,9 +1,8 @@
 package org.ceskaexpedice.processplatform.manager.gc;
 
-import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
-import org.ceskaexpedice.processplatform.common.model.ProcessState;
-import org.ceskaexpedice.processplatform.common.model.WorkerInfo;
-import org.ceskaexpedice.processplatform.common.model.WorkerState;
+import org.ceskaexpedice.processplatform.common.RemoteNodeException;
+import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 
 import java.util.List;
@@ -20,16 +19,33 @@ public class GCTask extends TimerTask {
     private static final Logger LOGGER = java.util.logging.Logger.getLogger(GCTask.class.getName());
 
     private ProcessService processService;
+    private NodeService nodeService;
     private GCScheduler gcScheduler;
 
-    public GCTask(ProcessService processService, GCScheduler gcScheduler) {
+    public GCTask(ProcessService processService, NodeService nodeService, GCScheduler gcScheduler) {
         this.processService = processService;
         this.gcScheduler = gcScheduler;
+        this.nodeService = nodeService;
     }
 
     @Override
     public void run() {
         try {
+            // GC workers
+            /*
+            List<Node> nodes = nodeService.getNodes();
+            for (Node node : nodes) {
+                try {
+                    processService.getWorkerClient().getWorkerInfo(node);
+                } catch (RemoteNodeException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    LOGGER.log(Level.SEVERE, "Deregistering node "+node.getNodeId());
+                    nodeService.deregisterNode(node);
+                }
+            }*/
+
+
+            // GC processes
             List<ProcessInfo> processInfos = processService.getProcesses(ProcessState.RUNNING);
             for (ProcessInfo processInfo : processInfos) {
                 try {
@@ -40,7 +56,7 @@ public class GCTask extends TimerTask {
                     }
                     // fetch info from the worker server
                     WorkerInfo workerInfo = processService.getWorkerInfo(processInfo.getProcessId());
-                    if(workerInfo != null && workerInfo.getState() == WorkerState.RUNNING && workerInfo.isJvmAlive() &&
+                    if (workerInfo != null && workerInfo.getState() == WorkerState.RUNNING && workerInfo.isJvmAlive() &&
                             workerInfo.getCurrentPid() != null && workerInfo.getCurrentPid().equals(processInfo.getPid())) {
                         // ok
                         continue;
@@ -52,6 +68,9 @@ public class GCTask extends TimerTask {
                     processService.updateState(processInfo.getProcessId(), ProcessState.FAILED);
                 }
             }
+
+
+
             this.gcScheduler.scheduleDoGc();
         } catch (Throwable e) {
             this.gcScheduler.shutdown();

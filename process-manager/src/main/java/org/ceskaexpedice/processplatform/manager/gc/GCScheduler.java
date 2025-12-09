@@ -1,5 +1,6 @@
 package org.ceskaexpedice.processplatform.manager.gc;
 
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
@@ -17,11 +18,13 @@ public class GCScheduler {
     private int interval;
     private Timer timer;
     private ProcessService processService;
+    private NodeService nodeService;
     private ManagerConfiguration managerConfiguration;
 
-    public GCScheduler(ProcessService processService, ManagerConfiguration managerConfiguration) {
+    public GCScheduler(ProcessService processService, NodeService nodeService, ManagerConfiguration managerConfiguration) {
         this.processService = processService;
         this.managerConfiguration = managerConfiguration;
+        this.nodeService = nodeService;
         this.timer = new Timer(GCScheduler.class.getName() + "-thread", false);
     }
 
@@ -31,7 +34,7 @@ public class GCScheduler {
     }
 
     public void scheduleDoGc() {
-        GCTask findCandidates = new GCTask(this.processService, this);
+        GCTask findCandidates = new GCTask(this.processService,this.nodeService, this);
         this.timer.schedule(findCandidates, this.interval);
     }
 

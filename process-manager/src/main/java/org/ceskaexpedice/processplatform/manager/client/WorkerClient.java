@@ -159,10 +159,9 @@ public class WorkerClient {
         }
     }
 
-    public JSONObject getWorkerInfo(String processId) {
-        String url = getWorkerBaseUrl(processId) + "manager/info";
+    public JSONObject getWorkerInfo(Node node) {
+        String url = node.getUrl() + "manager/info";
         HttpGet get = new HttpGet(url);
-
         int code = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             code = response.getCode();
@@ -176,12 +175,43 @@ public class WorkerClient {
         } catch (Exception e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
         }
+
+    }
+
+    public JSONObject getWorkerInfo(String processId) {
+        Node workerNode = getWorker(processId);
+        if (workerNode != null) {
+            return getWorkerInfo(workerNode);
+        } else return null;
+
+//        String url = getWorkerBaseUrl(processId) + "manager/info";
+//        HttpGet get = new HttpGet(url);
+//
+//        int code = -1;
+//        try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
+//            code = response.getCode();
+//            HttpEntity entity = response.getEntity();
+//            String body = entity != null ? EntityUtils.toString(entity) : "";
+//            if (code == 200) {
+//                return new JSONObject(body);
+//            } else {
+//                throw new RemoteNodeException("Failed to get worker info", NodeType.WORKER, code);
+//            }
+//        } catch (Exception e) {
+//            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
+//        }
     }
 
     private String getWorkerBaseUrl(String processId) {
         ProcessInfo processInfo = processService.getProcess(processId);
         Node node = nodeService.getNode(processInfo.getWorkerId());
         return node.getUrl();
+    }
+
+    private Node getWorker(String processId) {
+        ProcessInfo processInfo = processService.getProcess(processId);
+        Node node = nodeService.getNode(processInfo.getWorkerId());
+        return node;
     }
 
 }

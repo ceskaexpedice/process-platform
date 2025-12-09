@@ -54,6 +54,18 @@ public class NodeDao extends AbstractDao{
         }
     }
 
+    public void deleteNode(NodeEntity nodeEntity) {
+        try (Connection connection = getConnection()) {
+            String sql = "DELETE FROM pcp_node WHERE node_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, nodeEntity.getNodeId());
+                int affectedRows = stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
     public void updateNode(NodeEntity nodeEntity) {
         try (Connection connection = getConnection()) {
             String sql = "UPDATE pcp_node SET description = ?, type = ?, url = ?, tags = ? WHERE node_id = ?";
@@ -64,7 +76,6 @@ public class NodeDao extends AbstractDao{
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
-
     }
 
     public NodeEntity getNode(String nodeId) {

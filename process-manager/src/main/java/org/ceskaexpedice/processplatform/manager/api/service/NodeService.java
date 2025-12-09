@@ -18,6 +18,8 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.NodeServiceMapper;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
@@ -41,6 +43,19 @@ public class NodeService {
         this.nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
     }
 
+    public void deregisterNode(Node node) {
+        LOGGER.info(String.format("Deregister node [%s]", node.getNodeId()));
+        Node nodeExisting = getNode(node.getNodeId());
+        if (nodeExisting != null) {
+            nodeDao.deleteNode(NodeServiceMapper.mapNode(node));
+            LOGGER.info("Node [" + node.getNodeId() + "] deleted");
+            return;
+        } else {
+            nodeDao.createNode(NodeServiceMapper.mapNode(node));
+        }
+
+    }
+
     public void registerNode(Node node) {
         LOGGER.info(String.format("Register node [%s]", node.getNodeId()));
         Node nodeExisting = getNode(node.getNodeId());
@@ -60,6 +75,7 @@ public class NodeService {
         Node node = NodeServiceMapper.mapNode(nodeEntity);
         return node;
     }
+
 
     public List<Node> getNodes() {
         List<Node> nodes = NodeServiceMapper.mapNode(nodeDao.getNodes());

@@ -68,7 +68,9 @@ public class ManagerStartupListener implements ServletContextListener {
 
     private void runGc(ManagerConfiguration config) {
         ProcessService processService = (ProcessService) ctx.getAttribute(ProcessService.class.getSimpleName());
-        GCScheduler gcScheduler = new GCScheduler(processService, config);
+        NodeService nodeService = (NodeService) ctx.getAttribute(NodeService.class.getSimpleName());
+
+        GCScheduler gcScheduler = new GCScheduler(processService,nodeService, config);
         gcScheduler.init();
     }
 
