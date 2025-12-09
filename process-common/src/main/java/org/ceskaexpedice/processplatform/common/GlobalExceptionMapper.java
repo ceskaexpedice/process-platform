@@ -32,40 +32,40 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable e) {
-        UUID id = UUID.randomUUID();
-        String msg = prepareMsg(e, id);
+        //UUID id = UUID.randomUUID();
+        String msg = prepareMsg(e);
 
         // Customize status + message for known types
         if (e instanceof BusinessLogicException) {
             BusinessLogicException be = (BusinessLogicException) e;
-            LOGGER.log(Level.WARNING, String.format("Business logic error [%s]: %s,%s", id, e.getMessage(), be.getErrorCode()));
+            LOGGER.log(Level.WARNING, String.format("Business logic error: %s,%s", e.getMessage(), be.getErrorCode()));
             if(be.getErrorCode() == ErrorCode.NOT_FOUND){
                 return buildResponse(Response.Status.NOT_FOUND, msg);
             }
             return buildResponse(Response.Status.BAD_REQUEST, msg);
         }
         if (e instanceof DataAccessException) {
-            LOGGER.log(Level.SEVERE, String.format("Database error [%s]: %s", id, e.getMessage()), e);
+            LOGGER.log(Level.SEVERE, String.format("Database error: %s",  e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
         if (e instanceof RemoteNodeException) {
-            LOGGER.log(Level.SEVERE, String.format("Remote agent call error [%s]: %s", id, e.getMessage()), e);
+            LOGGER.log(Level.SEVERE, String.format("Remote agent call error: %s", e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
         if (e instanceof ApplicationException) {
-            LOGGER.log(Level.SEVERE, String.format("Application error [%s]: %s", id, e.getMessage()), e);
+            LOGGER.log(Level.SEVERE, String.format("Application error: %s",  e.getMessage()), e);
             return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, msg);
         }
 
         // Default fallback — unexpected error
-        LOGGER.log(Level.SEVERE, String.format("Unexpected error [%s]: %s", id, e.getMessage()), e);
-        return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, "Unexpected error, contact support – id " + id);
+        LOGGER.log(Level.SEVERE, String.format("Unexpected error: %s",  e.getMessage()), e);
+        return buildResponse(Response.Status.INTERNAL_SERVER_ERROR, "Unexpected error");
     }
 
-    private String prepareMsg(Throwable e, UUID id) {
+    private String prepareMsg(Throwable e) {
         return e.getMessage() != null
-                ? String.format("%s - id %s", e.getMessage(), id)
-                : String.format("Unexpected error - id %s", id);
+                ? String.format("%s ", e.getMessage())
+                : String.format("Unexpected error");
     }
 
     private Response buildResponse(Response.Status status, String message) {

@@ -133,8 +133,14 @@ public class PluginService {
         LOGGER.info(String.format("Register plugin [%s]", pluginInfo.getPluginId()));
         PluginInfo pluginExisting = getPlugin(pluginInfo.getPluginId(), false, false);
         if (pluginExisting != null) {
-            LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] already registered");
-            return;
+            if (!pluginExisting.equals(pluginInfo)) {
+                pluginDao.updatePlugin(PluginServiceMapper.mapPlugin(pluginInfo));
+                LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] changed ");
+                return;
+            } else {
+                LOGGER.info("Plugin [" + pluginInfo.getPluginId() + "] already registered");
+                return;
+            }
         }
         pluginDao.createPlugin(PluginServiceMapper.mapPlugin(pluginInfo));
         for (PluginProfile profile : pluginInfo.getProfiles()) {

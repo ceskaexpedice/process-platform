@@ -229,12 +229,6 @@ public class ProcessService {
         return owners;
     }
 
-    //TODO: Prodiskutovat
-    public WorkerClient getWorkerClient() {
-        return workerClient;
-    }
-
-
     public WorkerInfo getWorkerInfo(String processId) {
         JSONObject workerInfoJson = workerClient.getWorkerInfo(processId);
         WorkerInfo workerInfo = WorkerInfoMapper.mapFromJson(workerInfoJson);

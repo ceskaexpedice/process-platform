@@ -93,6 +93,18 @@ public class PluginInfo {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        PluginInfo that = (PluginInfo) o;
+        return Objects.equals(pluginId, that.pluginId) && Objects.equals(description, that.description) && Objects.equals(mainClass, that.mainClass) && Objects.equals(payloadFieldSpecMap, that.payloadFieldSpecMap) && Objects.equals(scheduledProfiles, that.scheduledProfiles) && Objects.equals(profiles, that.profiles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pluginId, description, mainClass, payloadFieldSpecMap, scheduledProfiles, profiles);
+    }
+
+    @Override
     public String toString() {
         return "PluginInfo{" +
                 "pluginId='" + pluginId + '\'' +

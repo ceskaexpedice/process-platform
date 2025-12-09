@@ -57,6 +57,18 @@ public class ForWorkerEndpoint {
         return APIRestUtilities.ok("Node [%s] registered", node.getNodeId());
     }
 
+    @DELETE
+    @Path("/unregister_node/{workerId}")
+    public Response unregisterNode(@PathParam("workerId") String nodeId) {
+        Node node = nodeService.getNode(nodeId);
+        if (node != null) {
+            nodeService.deregisterNode(node);
+            return APIRestUtilities.ok("Node [%s] unregistered", node.getNodeId());
+        } else {
+            return APIRestUtilities.notFound("Node [%s] not found", nodeId);
+        }
+    }
+
     @POST
     @Path("/register_plugin")
     public Response registerPlugin(PluginInfo pluginInfo) {
@@ -105,5 +117,4 @@ public class ForWorkerEndpoint {
         processService.updateDescription(processId, description);
         return APIRestUtilities.ok("Process description [%s] used for the process [%s]", description, processId);
     }
-
 }

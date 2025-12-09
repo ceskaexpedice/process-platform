@@ -52,8 +52,23 @@ public final class PluginMapper {
         } else {
             Array scheduledProfilesArray = conn.createArrayOf("text", new String[0]);
             stmt.setArray(5, scheduledProfilesArray);
-
         }
+    }
+
+    public static void mapPluginForUpdate(PreparedStatement stmt, PluginEntity plugin, Connection conn) throws SQLException, JsonProcessingException {
+        stmt.setString(1, plugin.getDescription());
+        stmt.setString(2, plugin.getMainClass());
+
+        stmt.setString(3, mapper.writeValueAsString(plugin.getPayloadFieldSpecMap())); // JSONB
+        if (plugin.getScheduledProfiles() != null) {
+            Array scheduledProfilesArray = conn.createArrayOf("text", plugin.getScheduledProfiles().toArray());
+            stmt.setArray(4, scheduledProfilesArray);
+        } else {
+            Array scheduledProfilesArray = conn.createArrayOf("text", new String[0]);
+            stmt.setArray(4, scheduledProfilesArray);
+        }
+        stmt.setString(5, plugin.getPluginId()); // for where
+
     }
 
     public static PluginEntity mapPlugin(ResultSet rsPlugin) {

@@ -25,10 +25,7 @@ import org.ceskaexpedice.processplatform.manager.db.JDBCQueryTemplate;
 import org.ceskaexpedice.processplatform.manager.db.dao.mapper.PluginMapper;
 import org.ceskaexpedice.processplatform.manager.db.entity.PluginEntity;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 /**
@@ -87,4 +84,24 @@ public class PluginDao extends AbstractDao{
         }
     }
 
+    /**
+     * Updates an existing plugin record in the database.
+     *
+     * @param plugin The PluginEntity object containing the updated data.
+     * @throws ApplicationException If there is an error during JSON processing.
+     * @throws DataAccessException If a database access error occurs.
+     */
+    public void updatePlugin(PluginEntity plugin) {
+        try (Connection connection = getConnection()) {
+            String sql = "UPDATE pcp_plugin SET description = ?, main_class = ?, payload_field_spec_map = ?::jsonb, scheduled_profiles = ? WHERE plugin_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PluginMapper.mapPluginForUpdate(stmt, plugin, connection);
+                stmt.executeUpdate();
+            } catch (JsonProcessingException e) {
+                throw new ApplicationException(e.toString(), e);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
 }

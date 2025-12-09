@@ -19,6 +19,8 @@ package org.ceskaexpedice.processplatform.manager.api;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
+import org.ceskaexpedice.processplatform.manager.client.WorkerClientFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -49,6 +51,19 @@ public class NodeEndpoint {
         }
         return Response.ok(node).build();
     }
+
+    @GET
+    @Path("/{nodeId}/info")
+    public Response getNodeInfo(@PathParam("nodeId") String nodeId) {
+        Node node = nodeService.getNode(nodeId);
+        WorkerClient workerClient = WorkerClientFactory.foundCreated();
+        if (node == null || workerClient == null) {
+            return APIRestUtilities.notFound("Node not found: [%s]", nodeId);
+        }
+        return APIRestUtilities.jsonPayload(workerClient.getWorkerInfo(node).toString());
+    }
+
+
 
     @GET
     public Response getNodes() {

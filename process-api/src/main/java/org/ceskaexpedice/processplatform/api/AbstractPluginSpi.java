@@ -29,13 +29,13 @@ public abstract class AbstractPluginSpi implements PluginSpi {
         return pluginId;
     }
 
-    @Override
-    public Set<String> getScheduledProfiles() {
-        String defaultProfile = getManifestProperty("Module-Artifact-Id");
-        LOGGER.log(Level.INFO, "getScheduledProfiles: scheduledprofiles={0}", Set.of(defaultProfile));
-        return Set.of(defaultProfile);
-    }
-
+//    @Override
+//    public Set<String> getScheduledProfiles() {
+//        // main class annotations
+//        String defaultProfile = getManifestProperty("Module-Artifact-Id");
+//        LOGGER.log(Level.INFO, "getScheduledProfiles: scheduledprofiles={0}", Set.of(defaultProfile));
+//        return Set.of(defaultProfile);
+//    }
 
 
     private String getManifestProperty(String name) {

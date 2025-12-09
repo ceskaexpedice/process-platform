@@ -19,28 +19,23 @@ package org.ceskaexpedice.processplatform.manager.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.NodeType;
-import org.ceskaexpedice.processplatform.common.model.PluginInfo;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
 import org.json.JSONObject;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -179,7 +174,7 @@ public class WorkerClient {
     }
 
     public JSONObject getWorkerInfo(String processId) {
-        Node workerNode = getWorker(processId);
+        Node workerNode = getWorkerFromProcessId(processId);
         if (workerNode != null) {
             return getWorkerInfo(workerNode);
         } else return null;
@@ -208,7 +203,7 @@ public class WorkerClient {
         return node.getUrl();
     }
 
-    private Node getWorker(String processId) {
+    private Node getWorkerFromProcessId(String processId) {
         ProcessInfo processInfo = processService.getProcess(processId);
         Node node = nodeService.getNode(processInfo.getWorkerId());
         return node;

@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 public final class WorkerClientFactory {
 
     private static final Logger LOGGER = Logger.getLogger(WorkerClientFactory.class.getName());
+
     private static final AtomicReference<WorkerClient> INSTANCE = new AtomicReference<>();
 
     private WorkerClientFactory() {
@@ -47,4 +48,7 @@ public final class WorkerClientFactory {
         });
     }
 
+    public static WorkerClient foundCreated() {
+        return INSTANCE.get();
+    }
 }

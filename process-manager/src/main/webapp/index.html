@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Process Manager Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -21,246 +22,390 @@
 </head>
 <body>
 
-    <div class="container mt-5">
-        <h1 class="mb-4 text-primary">Process Manager Overview</h1>
-        <div id="alertPlaceholder"></div>
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary">Process Manager Overview</h1>
+    <div id="alertPlaceholder"></div>
 
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-header">Celkem Workerů</div>
-                    <div class="card-body">
-                        <h2 class="card-title" id="workerCount">...</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-warning mb-3">
-                    <div class="card-header">Práce ve Frontě (PLANNED)</div>
-                    <div class="card-body">
-                        <h2 class="card-title" id="queuedWorkCount">...</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-info mb-3">
-                    <div class="card-header">Aktivní Procesy (RUNNING)</div>
-                    <div class="card-body">
-                        <h2 class="card-title" id="runningProcessCount">...</h2>
-                    </div>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Celkem Workerů</div>
+                <div class="card-body">
+                    <h2 class="card-title" id="workerCount">...</h2>
                 </div>
             </div>
         </div>
-
-        <hr>
-
-        ## 👷 Registrované Worker Nody
-
-        <div class="card shadow mb-5">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Seznam Worker Nódů (Typ: WORKER)</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID Workeru</th>
-                                <th>URL API</th>
-                                <th>Popis</th>
-                                <th>Podporované Profily (Tagy)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="workerTableBody">
-                            <tr><td colspan="4" class="text-center">Načítám data...</td></tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Práce ve Frontě (PLANNED)</div>
+                <div class="card-body">
+                    <h2 class="card-title" id="queuedWorkCount">...</h2>
                 </div>
             </div>
         </div>
-
-        <hr>
-
-        ## ⚙️ Aktivní Procesy
-
-        <div class="card shadow">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Aktivní a Plánované Procesy (Posledních 50 dávek)</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Stav</th>
-                                <th>ID Procesu</th>
-                                <th>Worker ID</th>
-                                <th>Profil</th>
-                                <th>Vlastník</th>
-                                <th>Popis</th>
-                            </tr>
-                        </thead>
-                        <tbody id="processesTableBody">
-                            <tr><td colspan="6" class="text-center">Načítám data...</td></tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Aktivní Procesy (RUNNING)</div>
+                <div class="card-body">
+                    <h2 class="card-title" id="runningProcessCount">...</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <hr>
 
-    <script>
-        const API_BASE_URL = '/process-manager/api';
+    <h2>👷 Registrované Worker Nody</h2>
 
-        function showAlert(message, type = 'danger') {
-            const alertPlaceholder = document.getElementById('alertPlaceholder');
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = [
-                `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
-                `   <div>${message}</div>`,
-                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                '</div>'
-            ].join('');
-            alertPlaceholder.prepend(wrapper);
-            setTimeout(() => {
-                const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
-                if(alert) alert.close();
-            }, 5000);
-        }
+    <div class="card shadow mb-5">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Seznam Worker Nódů (Typ: WORKER)</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID Workeru</th>
+                        <th>URL API</th>
+                        <th>Popis</th>
+                        <th>Podporované Profily (Tagy)</th>
+                        <th>Akce</th>
+                    </tr>
+                    </thead>
+                    <tbody id="workerTableBody">
+                    <tr><td colspan="5" class="text-center">Načítám data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-        /**
-         * Získá celkový počet Worker nodů a zároveň je vypíše.
-         */
-        async function fetchWorkers() {
-            const workerTableBody = document.getElementById('workerTableBody');
-            workerTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Načítám data...</td></tr>';
+    <hr>
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/node`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const nodes = await response.json();
-                
-                // Filtrujeme pouze nody typu 'WORKER'
-                const workerNodes = nodes.filter(node => node.type === 'WORKER');
-                document.getElementById('workerCount').textContent = workerNodes.length;
+    <h2>⚙️ Aktivní Procesy</h2>
 
-                workerTableBody.innerHTML = ''; // Vyčistíme tabulku
-                
-                if (workerNodes.length === 0) {
-                    workerTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nenalezeni žádní registrovaní Workeři.</td></tr>';
-                    return;
-                }
+    <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Aktivní a Plánované Procesy (Posledních 50 dávek)</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Stav</th>
+                        <th>ID Procesu</th>
+                        <th>Worker ID</th>
+                        <th>Profil</th>
+                        <th>Vlastník</th>
+                        <th>Popis</th>
+                    </tr>
+                    </thead>
+                    <tbody id="processesTableBody">
+                    <tr><td colspan="6" class="text-center">Načítám data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-                workerNodes.forEach(worker => {
-                    const tagsHtml = worker.tags.map(tag => 
-                        `<span class="badge bg-secondary worker-tag">${tag}</span>`
-                    ).join('');
+<div class="modal fade" id="workerInfoModal" tabindex="-1" aria-labelledby="workerInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="workerInfoModalLabel">Informace o Workeru: <span id="infoWorkerId"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="workerInfoContent">Načítám informace...</pre>
+            </div>
+            <div class="modal-footer">
+                <div id="modalActions" class="me-auto">
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavřít</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    const row = workerTableBody.insertRow();
-                    row.innerHTML = `
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const API_BASE_URL = '/process-manager/api';
+
+    function showAlert(message, type = 'danger') {
+        const alertPlaceholder = document.getElementById('alertPlaceholder');
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+        alertPlaceholder.prepend(wrapper);
+        setTimeout(() => {
+            const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
+            if(alert) alert.close();
+        }, 5000);
+    }
+
+    /**
+     * Získá celkový počet Worker nodů a zároveň je vypíše.
+     */
+    async function fetchWorkers() {
+        const workerTableBody = document.getElementById('workerTableBody');
+        workerTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Načítám data...</td></tr>';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/node`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const nodes = await response.json();
+
+            const workerNodes = nodes.filter(node => node.type === 'WORKER');
+            document.getElementById('workerCount').textContent = workerNodes.length;
+
+            workerTableBody.innerHTML = '';
+
+            if (workerNodes.length === 0) {
+                workerTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Nenalezeni žádní registrovaní Workeři.</td></tr>';
+                return;
+            }
+
+            workerNodes.forEach(worker => {
+
+                const sortedTags = [...worker.tags];
+                sortedTags.sort();
+
+                const tagsHtml = sortedTags.map(tag =>
+                    `<span class="badge bg-secondary worker-tag">${tag}</span>`
+                ).join('');
+
+                const row = workerTableBody.insertRow();
+                row.innerHTML = `
                         <td><strong>${worker.nodeId}</strong></td>
                         <td><small>${worker.url}</small></td>
                         <td>${worker.description || '-'}</td>
                         <td>${tagsHtml || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info text-white" onclick="showWorkerInfo('${worker.nodeId}')" title="Zobrazit aktuální stav">
+                                <i class="bi bi-info-circle-fill"></i> Stav
+                            </button>
+                        </td>
                     `;
-                });
+            });
 
-            } catch (error) {
-                console.error("Chyba při načítání Workerů:", error);
-                document.getElementById('workerCount').textContent = 'N/A';
-                workerTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Chyba při načítání dat o Workerech: ${error.message}</td></tr>`;
-                showAlert(`Nepodařilo se načíst seznam Workerů. Chyba: ${error.message}`);
+        } catch (error) {
+            console.error("Chyba při načítání Workerů:", error);
+            document.getElementById('workerCount').textContent = 'N/A';
+            workerTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Chyba při načítání dat o Workerech: ${error.message}</td></tr>`;
+            showAlert(`Nepodařilo se načíst seznam Workerů. Chyba: ${error.message}`);
+        }
+    }
+
+    /**
+     * Získá aktuální informace o workeru a zobrazí je v modalu.
+     * V případě chyby zobrazí tlačítko pro deregistraci.
+     * @param {string} nodeId ID workeru.
+     */
+    async function showWorkerInfo(nodeId) {
+        const modal = new bootstrap.Modal(document.getElementById('workerInfoModal'));
+        const workerInfoContent = document.getElementById('workerInfoContent');
+        const infoWorkerId = document.getElementById('infoWorkerId');
+        const modalActions = document.getElementById('modalActions');
+
+        infoWorkerId.textContent = nodeId;
+        workerInfoContent.textContent = 'Načítám informace...';
+        modalActions.innerHTML = ''; // Vyčistit akce
+        modal.show();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/node/${nodeId}/info`);
+            let errorOccurred = false;
+
+            if (response.status === 404) {
+                const errorMessage = `Worker s ID '${nodeId}' nebyl nalezen (404). Je pravděpodobně off-line nebo byl smazán.`;
+                workerInfoContent.textContent = errorMessage;
+                errorOccurred = true;
             }
+
+            if (!response.ok && response.status !== 404) {
+                const errorMessage = `HTTP chyba! Status: ${response.status}. Worker pravděpodobně neodpovídá.`;
+                workerInfoContent.textContent = errorMessage;
+                errorOccurred = true;
+                // Není potřeba throw, chybu zpracujeme níže
+            }
+
+            if (errorOccurred) {
+                // Přidání tlačítka Deregistrace v případě chyby
+                modalActions.innerHTML = `
+                        <button class="btn btn-danger" onclick="deregisterNode('${nodeId}')">
+                            <i class="bi bi-x-octagon-fill"></i> Deregistrovat Nód
+                        </button>
+                    `;
+            } else {
+                const info = await response.json();
+                // Pěkné formátování JSONu pro zobrazení
+                workerInfoContent.textContent = JSON.stringify(info, null, 2);
+            }
+
+        } catch (error) {
+            console.error(`Chyba sítě/API při načítání info pro worker ${nodeId}:`, error);
+            workerInfoContent.textContent = `Chyba sítě/API: Nepodařilo se připojit k ${nodeId}. ${error.message}`;
+
+            // Přidání tlačítka Deregistrace v případě chyby sítě/fetch
+            modalActions.innerHTML = `
+                    <button class="btn btn-danger" onclick="deregisterNode('${nodeId}')">
+                        <i class="bi bi-x-octagon-fill"></i> Deregistrovat Nód
+                    </button>
+                `;
+            showAlert(`Chyba: Nepodařilo se získat info pro worker ${nodeId}.`, 'warning');
+        }
+    }
+
+    /**
+     * Provede deregistraci Worker Nodu voláním nového endpointu DELETE /worker/unregister_node/{workerId}.
+     * @param {string} nodeId ID workeru, který má být deregistrován.
+     */
+    async function deregisterNode(nodeId) {
+        if (!confirm(`Opravdu chcete deregistrovat Worker Nód s ID: ${nodeId}? Tato akce jej odstraní ze seznamu registrovaných workerů.`)) {
+            return;
         }
 
-        /**
-         * Získá přehled procesů (RUNNING, PLANNED) a naplní tabulku.
-         */
-        async function fetchProcesses() {
-            const tableBody = document.getElementById('processesTableBody');
-            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Načítám data...</td></tr>';
-            
-            let runningCount = 0;
-            let plannedCount = 0;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('workerInfoModal'));
+        if (modal) modal.hide(); // Skrýt modal, abychom ukázali alert na hlavní stránce
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/process/batch`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                
-                tableBody.innerHTML = ''; // Vyčistíme tabulku
+        try {
+            const endpoint = `${API_BASE_URL}/worker/unregister_node/${nodeId}`;
 
-                let allProcesses = [];
-                data.batches.forEach(batch => {
-                    batch.processes.forEach(process => {
-                        allProcesses.push(process);
-                    });
-                });
-                
-                const displayProcesses = allProcesses.slice(0, 100);
+            const response = await fetch(endpoint, {
+                method: 'DELETE'
+            });
 
-                if (displayProcesses.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Žádné procesy k zobrazení.</td></tr>';
+            if (!response.ok) {
+                let errorDetails = response.statusText;
+                try {
+                    const jsonResponse = await response.json();
+                    if (jsonResponse.message) {
+                        errorDetails = jsonResponse.message;
+                    }
+                } catch (e) {
+                    // Ignorovat, pokud odpověď není JSON
                 }
+                throw new Error(`HTTP error! Status: ${response.status}. Detaily: ${errorDetails}`);
+            }
 
-                displayProcesses.forEach(process => {
-                    
-                    if (process.status === 'RUNNING') runningCount++;
-                    if (process.status === 'PLANNED') plannedCount++;
+            const result = await response.json();
 
-                    const row = tableBody.insertRow();
-                    
-                    row.innerHTML = `
+            showAlert(`Worker Nód ${nodeId} byl úspěšně deregistrován. Zpráva: ${result.message || 'OK'}`, 'success');
+
+        } catch (error) {
+            console.error("Chyba při deregistraci workeru:", error);
+            showAlert(`Deregistrace Workeru ${nodeId} selhala. Chyba: ${error.message}`, 'danger');
+        } finally {
+            // Vynutit okamžitou aktualizaci tabulky
+            setTimeout(() => {
+                fetchWorkers();
+                fetchProcesses();
+            }, 1000);
+        }
+    }
+
+
+    /**
+     * Získá přehled procesů (RUNNING, PLANNED) a naplní tabulku.
+     */
+    async function fetchProcesses() {
+        const tableBody = document.getElementById('processesTableBody');
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Načítám data...</td></tr>';
+
+        let runningCount = 0;
+        let plannedCount = 0;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/process/batch?limit=50`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+
+            tableBody.innerHTML = ''; // Vyčistíme tabulku
+
+            let allProcesses = [];
+            data.batches.forEach(batch => {
+                batch.processes.forEach(process => {
+                    // Přidáme proces do seznamu, pokud má stav, který nás zajímá (RUNNING, PLANNED)
+                    if (process.status === 'RUNNING' || process.status === 'PLANNED') {
+                        allProcesses.push(process);
+                    }
+                });
+            });
+
+            allProcesses.sort((a, b) => {
+                if (a.status === 'RUNNING' && b.status !== 'RUNNING') return -1;
+                if (a.status !== 'RUNNING' && b.status === 'RUNNING') return 1;
+                return 0;
+            });
+
+            if (allProcesses.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Žádné aktivní nebo plánované procesy k zobrazení.</td></tr>';
+            }
+
+            allProcesses.forEach(process => {
+
+                if (process.status === 'RUNNING') runningCount++;
+                if (process.status === 'PLANNED') plannedCount++;
+
+                const row = tableBody.insertRow();
+
+                row.innerHTML = `
                         <td><span class="badge rounded-pill ${getBadgeClass(process.status)}">${process.status || 'N/A'}</span></td>
-                        <td>${process.processId.substring(0, 8)}...</td>
+                        <td><code title="${process.processId}">${process.processId.substring(0, 8)}...</code></td>
                         <td>${process.workerId || 'Není přiřazen'}</td>
                         <td>${process.profileId || 'N/A'}</td>
                         <td>${process.owner || 'N/A'}</td>
                         <td>${process.description || '-'}</td>
                     `;
-                });
+            });
 
-                document.getElementById('runningProcessCount').textContent = runningCount;
-                document.getElementById('queuedWorkCount').textContent = plannedCount;
+            document.getElementById('runningProcessCount').textContent = runningCount;
+            document.getElementById('queuedWorkCount').textContent = plannedCount;
 
-            } catch (error) {
-                console.error("Chyba při načítání procesů:", error);
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Chyba při načítání dat o procesech: ${error.message}</td></tr>`;
-                document.getElementById('runningProcessCount').textContent = 'N/A';
-                document.getElementById('queuedWorkCount').textContent = 'N/A';
-                showAlert(`Nepodařilo se načíst seznam Procesů. Chyba: ${error.message}`);
-            }
+        } catch (error) {
+            console.error("Chyba při načítání procesů:", error);
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Chyba při načítání dat o procesech: ${error.message}</td></tr>`;
+            document.getElementById('runningProcessCount').textContent = 'N/A';
+            document.getElementById('queuedWorkCount').textContent = 'N/A';
+            showAlert(`Nepodařilo se načíst seznam Procesů. Chyba: ${error.message}`);
         }
+    }
 
-        function getBadgeClass(status) {
-            switch (status) {
-                case 'RUNNING': return 'bg-primary';
-                case 'PLANNED': return 'bg-warning text-dark';
-                case 'FINISHED': return 'bg-success';
-                case 'ERROR': return 'bg-danger';
-                default: return 'bg-secondary';
-            }
+    function getBadgeClass(status) {
+        switch (status) {
+            case 'RUNNING': return 'bg-primary';
+            case 'PLANNED': return 'bg-warning text-dark';
+            case 'FINISHED': return 'bg-success';
+            case 'ERROR': return 'bg-danger';
+            default: return 'bg-secondary';
         }
+    }
 
-        /**
-         * Inicializace dashboardu - spustí načítání dat a nastaví interval.
-         */
-        function initDashboard() {
+    /**
+     * Inicializace dashboardu - spustí načítání dat a nastaví interval.
+     */
+    function initDashboard() {
+        fetchWorkers();
+        fetchProcesses();
+
+        // Periodická aktualizace každých 5 sekund
+        setInterval(() => {
             fetchWorkers();
             fetchProcesses();
-            
-            // Periodická aktualizace každých 5 sekund
-            setInterval(() => {
-                fetchWorkers();
-                fetchProcesses();
-            }, 5000); 
-        }
+        }, 5000);
+    }
 
-        // Spuštění po načtení DOM
-        document.addEventListener('DOMContentLoaded', initDashboard);
-    </script>
+    // Spuštění po načtení DOM
+    document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
 
 </body>
 </html>

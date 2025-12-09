@@ -66,6 +66,32 @@ paths:
         '400':
           description: Bad Request
 
+  /worker/unregister_node/{workerId}:
+    delete:
+      tags:
+        - ForWorker
+      summary: Unregister worker
+      description: Unregister worker
+      parameters:
+        - name: workerId
+          in: path
+          required: true
+          description: Unregistered worker id
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: Unregister worker
+          content:
+            application/json:
+              schema:
+                type: string
+              example: { "message": "Worker [worker] unregistered" }
+        '400':
+          description: Bad Request
+
+
   /worker/register_plugin:
     post:
       tags:
@@ -307,6 +333,40 @@ paths:
         - Nodes
       summary: Returns the specified node
       description: Returns the specified node
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          description: Node id
+          schema:
+            type: string
+          example: curatorWorker
+      responses:
+        '200':
+          description: JSON representation of the node
+          content:
+            application/json:
+              schema:
+                type: string
+                example: {
+                  "nodeId": "curatorWorker",
+                  "description": "Worker [curatorWorker]",
+                  "type": "WORKER",
+                  "url": "http://localhost:8089/process-worker/api/",
+                  "tags": [
+                    "testPlugin2",
+                    "testPlugin1-small",
+                    "testPlugin1-big"
+                  ]
+                }
+        '404':
+          description: The specified node des not exist
+  /node/{nodeId}/info:
+    get:
+      tags:
+        - Nodes
+      summary:  Returns information from given node (if node is alive)
+      description: Returns information from given node
       parameters:
         - name: nodeId
           in: path
