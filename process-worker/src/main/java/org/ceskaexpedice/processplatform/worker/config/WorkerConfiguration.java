@@ -101,12 +101,12 @@ public class WorkerConfiguration {
 
     // ---------- effective configuration
 
-    public int getWorkerLoopSleepSecs() {
+    public double getWorkerLoopSleepSecs() {
         String sleepSecKey = get(WORKER_LOOP_SLEEP_SEC_KEY);
         if (sleepSecKey != null) {
-            return Integer.parseInt(sleepSecKey);
+            return Double.parseDouble(sleepSecKey);
         }else {
-            return 10;
+            return 1;
         }
     }
 

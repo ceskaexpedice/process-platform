@@ -84,7 +84,9 @@ public class ProcessEndpoint {
     ) {
         int offset = processService.getBatchOffset(offsetStr);
         int limit = processService.getBatchLimit(limitStr);
-        BatchFilter batchFilter = processService.createBatchFilter(owner, from, to, state);
+        //public BatchFilter createBatchFilter(String owner, String processState, String from, String to) {
+
+        BatchFilter batchFilter = processService.createBatchFilter(owner,state, from, to);
         int totalSize = processService.countBatchHeaders(batchFilter);
         JSONObject result = new JSONObject();
         result.put("offset", offset);

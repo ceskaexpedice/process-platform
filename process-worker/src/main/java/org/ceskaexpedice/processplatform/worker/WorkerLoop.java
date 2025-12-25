@@ -63,10 +63,11 @@ class WorkerLoop {
                         }
 
                     } else {
-                        int sleepSec = workerConfiguration.getWorkerLoopSleepSecs();
+                        double sleepSec = workerConfiguration.getWorkerLoopSleepSecs();
                         ProcessRegistry.getInstance().markIdle();
                         LOGGER.info("No process from the manager. Sleeping " + sleepSec + " seconds...");
-                        Thread.sleep(sleepSec * 1000L);
+                        double v = sleepSec * 1000L;
+                        Thread.sleep(Math.round(v));
                     }
 
                 } catch (InterruptedException e) {
