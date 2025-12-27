@@ -17,6 +17,7 @@
 package org.ceskaexpedice.processplatform.common.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * BatchFilter
@@ -27,9 +28,17 @@ public class BatchFilter {
     private LocalDateTime from;
     private LocalDateTime to;
     private ProcessState processState;
+    private List<String> workers;
+    public BatchFilter() {
+    }
 
     public boolean isEmpty() {
-        return owner == null && from == null && to == null && processState == null;
+
+        return owner == null &&
+                from == null &&
+                to == null &&
+                processState == null &&
+                (workers == null || workers.isEmpty());
     }
 
     public String getOwner() {
@@ -58,6 +67,14 @@ public class BatchFilter {
 
     public ProcessState getProcessState() {
         return processState;
+    }
+
+    public List<String> getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(List<String> workers) {
+        this.workers = workers;
     }
 
     public void setProcessState(ProcessState processState) {

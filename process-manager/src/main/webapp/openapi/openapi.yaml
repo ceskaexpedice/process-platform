@@ -725,6 +725,12 @@ paths:
           description: Filter by state
           schema:
             type: string
+        - name: workers
+          in: query
+          required: false
+          description: Workers delimited by comma
+          schema:
+            type: string
       responses:
         '200':
           description: List of batches

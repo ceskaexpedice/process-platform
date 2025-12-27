@@ -80,13 +80,14 @@ public class ProcessEndpoint {
             @QueryParam("owner") String owner,
             @QueryParam("from") String from,
             @QueryParam("to") String to,
-            @QueryParam("state") String state
+            @QueryParam("state") String state,
+            @QueryParam("workers") String delimitedWorkers
     ) {
         int offset = processService.getBatchOffset(offsetStr);
         int limit = processService.getBatchLimit(limitStr);
         //public BatchFilter createBatchFilter(String owner, String processState, String from, String to) {
 
-        BatchFilter batchFilter = processService.createBatchFilter(owner,state, from, to);
+        BatchFilter batchFilter = processService.createBatchFilter(owner,state, from, to, delimitedWorkers);
         int totalSize = processService.countBatchHeaders(batchFilter);
         JSONObject result = new JSONObject();
         result.put("offset", offset);

@@ -309,7 +309,8 @@ public class ProcessService {
         return limit;
     }
 
-    public BatchFilter createBatchFilter(String owner, String processState, String from, String to) {
+    public BatchFilter createBatchFilter(String owner, String processState, String from, String to ,String workersDelimited) {
+
         BatchFilter filter = new BatchFilter();
         if (StringUtils.isAnyString(owner)) {
             filter.setOwner(owner);
@@ -326,6 +327,10 @@ public class ProcessService {
             } catch (IllegalArgumentException e) {
                 throw new BusinessLogicException(e.toString(), ErrorCode.INVALID_INPUT);
             }
+        }
+        if (StringUtils.isAnyString(workersDelimited)) {
+            List<String> list = Arrays.stream(workersDelimited.split(",")).toList();
+            filter.setWorkers(list);
         }
         if (filter.isEmpty()) {
             return null;

@@ -123,6 +123,9 @@ public class JDBCQueryTemplate<T> {
         } else if (object instanceof Long) {
             pstm.setLong(i, (Long) object);
             return i;
+        } else  if (object instanceof java.sql.Array) {
+            pstm.setArray(i, (java.sql.Array) object);
+            return i;
         } else if (object.getClass().isArray()) {
             int length = Array.getLength(object);
             for (int j = 0; j < length; j++) {

@@ -75,16 +75,19 @@ public class ProcessDao extends AbstractDao{
     }
 
     public List<ProcessEntity> getBatchHeaders(BatchFilter batchFilter, int offset, int limit) {
-        QueryAndParams qp = buildBatchHeadersFilterQuery(batchFilter);
-
-        String sql = qp.sql.replace("/*SELECT_PART*/", "b.*") +
-                "ORDER BY b.planned DESC\nLIMIT ? OFFSET ?";
-
-        List<Object> params = new ArrayList<>(qp.params);
-        params.add(limit);
-        params.add(offset);
 
         try (Connection connection = getConnection()) {
+
+            QueryAndParams qp = buildBatchHeadersFilterQuery(batchFilter);
+
+            String sql = qp.sql.replace("/*SELECT_PART*/", "b.*") +
+                    "ORDER BY b.planned DESC\nLIMIT ? OFFSET ?";
+
+            List<Object> params = new ArrayList<>(qp.params);
+            params.add(limit);
+            params.add(offset);
+
+
             return new JDBCQueryTemplate<ProcessEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
@@ -98,11 +101,12 @@ public class ProcessDao extends AbstractDao{
     }
 
     public int countBatchHeaders(BatchFilter batchFilter) {
-        QueryAndParams qp = buildBatchHeadersFilterQuery(batchFilter);
-
-        String sql = qp.sql.replace("/*SELECT_PART*/", "COUNT(*)");
 
         try (Connection connection = getConnection()) {
+
+            QueryAndParams qp = buildBatchHeadersFilterQuery( batchFilter);
+            String sql = qp.sql.replace("/*SELECT_PART*/", "COUNT(*)");
+
             return new JDBCQueryTemplate<Integer>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<Integer> returnsList) throws SQLException {
@@ -293,7 +297,7 @@ public class ProcessDao extends AbstractDao{
         }
     }
 
-    private QueryAndParams buildBatchHeadersFilterQuery(BatchFilter batchFilter) {
+    private QueryAndParams buildBatchHeadersFilterQuery( BatchFilter batchFilter) {
         if(batchFilter == null) {
             batchFilter = new BatchFilter();
         };
@@ -301,23 +305,23 @@ public class ProcessDao extends AbstractDao{
         List<Object> params = new ArrayList<>();
 
         boolean filterByState = batchFilter.getProcessState() != null;
+        List<String> workerFilter = batchFilter.getWorkers();
+        boolean filterByWorker = workerFilter != null && !workerFilter.isEmpty();
 
         // Step 1: WITH clause only if needed
-        if (filterByState) {
+        if (filterByState || filterByWorker) {
             sql.append("""
-            WITH batch_states AS (
+            WITH batch_info AS (
                 SELECT
-                    b.process_id AS main_process_id,
-                    MAX(p.status) AS aggregated_state
-                FROM pcp_process b
-                JOIN pcp_process p
-                  ON p.batch_id = b.process_id
-                WHERE b.process_id = b.batch_id
-                GROUP BY b.process_id
+                    p.batch_id AS main_process_id,
+                    MAX(p.status) AS aggregated_state,
+                    array_agg(DISTINCT p.worker_id) AS workers_list
+                FROM pcp_process p
+                GROUP BY p.batch_id
             )
             SELECT /*SELECT_PART*/
             FROM pcp_process b
-            JOIN batch_states bs ON bs.main_process_id = b.process_id
+            JOIN batch_info bs ON bs.main_process_id = b.process_id
             """);
         } else {
             sql.append("SELECT /*SELECT_PART*/ FROM pcp_process b\n");
@@ -343,6 +347,14 @@ public class ProcessDao extends AbstractDao{
             sql.append("  AND bs.aggregated_state = ?\n");
             params.add(batchFilter.getProcessState().getVal()); // assuming enum -> int
         }
+
+
+        if (filterByWorker) {
+            sql.append("  AND bs.workers_list::text[] && string_to_array(?, ',')::text[]\n");
+            String joinedWorkers = String.join(",", batchFilter.getWorkers());
+            params.add(joinedWorkers);
+        }
+
 
         QueryAndParams result = new QueryAndParams();
         result.sql = sql.toString();
