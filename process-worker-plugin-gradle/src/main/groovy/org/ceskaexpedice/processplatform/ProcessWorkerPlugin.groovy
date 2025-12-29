@@ -10,6 +10,7 @@ class ProcessWorkerExtension {
 	String warArtifact
     List<Project> plugins = []
 	String warName = "worker.war"
+    boolean autoShareLibraries = false
 }
 
 class ProcessWorkerPlugin implements Plugin<Project> {
@@ -39,15 +40,32 @@ class ProcessWorkerPlugin implements Plugin<Project> {
             def outputDir = new File(project.buildDir, "worker")
             def webappsDir = new File(outputDir, "webapps")
             def pluginsDir = new File(outputDir, "lib/plugins")
+            def sharedJarNames = [] as Set
 
 			def warConfig = project.configurations.create("workerWar")
 			project.dependencies.add(warConfig.name, warDependency)
 
 
+            if (ext.autoShareLibraries) {
+                def allPluginJars = []
+                ext.plugins.each { pluginProject ->
+                    def pluginExt = pluginProject.extensions.findByName("processPlugin")
+                    def pluginDistDir = new File(pluginProject.buildDir, "distributions/${pluginExt.pluginName}")
+                    if (pluginDistDir.exists()) {
+                        allPluginJars.addAll(project.fileTree(dir: pluginDistDir, include: "**/*.jar").files)
+                    }
+                }
+                sharedJarNames = allPluginJars.groupBy { it.name }
+                        .findAll { it.value.size() > 1 }
+                        .keySet()
+
+            }
+            println "Auto-detected shared libraries: ${sharedJarNames}"
+
             // Build task
             def buildWorkerTask = project.tasks.register("buildWorker") {
                 group = "build"
-                description = "Assembles worker with WAR and selected plugins"
+                description = "Assembles worker with WAR and selected plugins; autoShareLibraries:"+ext.autoShareLibraries
 
 				if (ext.warProject) {
 					// Pokud je nastaven Project, závislost je na úloze 'war' tohoto projektu
@@ -94,6 +112,30 @@ class ProcessWorkerPlugin implements Plugin<Project> {
                         from project.zipTree(warFile)
                         into tempWarDir
                     }
+
+                    if (!sharedJarNames.isEmpty()) {
+                        File webInfLib = new File(tempWarDir, "WEB-INF/lib")
+                        webInfLib.mkdirs()
+
+                        sharedJarNames.each { jarName ->
+                            def sourceJar = null
+                            for (pluginProject in ext.plugins) {
+                                def pluginExt = pluginProject.extensions.findByName("processPlugin")
+                                def distDirName = pluginExt?.pluginName ?: pluginProject.name
+                                def tree = project.fileTree(dir: "${pluginProject.buildDir}/distributions/${distDirName}", include: "**/$jarName")
+                                if (!tree.isEmpty()) {
+                                    sourceJar = tree.first()
+                                    break
+                                }
+//                                def found = project.fileTree(dir: "${pluginProject.buildDir}/distributions/${pluginProject.name}", include: "**/$jarName").first()
+//                                if (found) { sourceJar = found; break }
+                            }
+                            if (sourceJar) {
+                                project.copy { from sourceJar; into webInfLib }
+                            }
+                        }
+                    }
+
                     File workerProps = new File(tempWarDir, "WEB-INF/classes/worker.properties")
                     if (!workerProps.exists()) {
                         throw new GradleException("worker.properties not found inside WAR at ${workerProps}")
@@ -135,6 +177,9 @@ class ProcessWorkerPlugin implements Plugin<Project> {
                         project.copy {
                             from pluginDistDir
                             into targetDir
+                            if (ext.autoShareLibraries) {
+                                exclude { details -> sharedJarNames.contains(details.file.name) }
+                            }
                         }
                         println "Copied plugin '${pluginName}' to ${targetDir}"
                     }

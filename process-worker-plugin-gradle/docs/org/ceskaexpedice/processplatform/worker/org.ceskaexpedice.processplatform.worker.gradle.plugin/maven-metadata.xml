@@ -3,12 +3,13 @@
   <groupId>org.ceskaexpedice.processplatform.worker</groupId>
   <artifactId>org.ceskaexpedice.processplatform.worker.gradle.plugin</artifactId>
   <versioning>
-    <latest>1.0.4</latest>
-    <release>1.0.4</release>
+    <latest>1.0.5</latest>
+    <release>1.0.5</release>
     <versions>
       <version>1.0.3</version>
       <version>1.0.4</version>
+      <version>1.0.5</version>
     </versions>
-    <lastUpdated>20251129134553</lastUpdated>
+    <lastUpdated>20251228121454</lastUpdated>
   </versioning>
 </metadata>
