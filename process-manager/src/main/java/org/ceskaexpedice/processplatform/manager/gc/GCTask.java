@@ -1,9 +1,8 @@
 package org.ceskaexpedice.processplatform.manager.gc;
 
-import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 
 import java.util.List;
 import java.util.TimerTask;

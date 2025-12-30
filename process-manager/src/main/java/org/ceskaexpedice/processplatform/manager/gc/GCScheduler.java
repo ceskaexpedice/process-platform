@@ -1,7 +1,7 @@
 package org.ceskaexpedice.processplatform.manager.gc;
 
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
 import java.util.Timer;
