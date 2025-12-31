@@ -45,6 +45,7 @@ public final class ManagerTestsUtils {
 
     public static final String PROFILE1_ID = "testPlugin1-big";
     public static final String PROFILE2_ID = "testPlugin1-small";
+    public static final String PROFILE3_ID = "testPlugin2";
     public static final String PROFILE_NEW_ID = "newProfileId";
 
     private ManagerTestsUtils() {}

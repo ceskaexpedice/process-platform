@@ -20,7 +20,7 @@ import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.json.JSONObject;
 
 import javax.ws.rs.*;

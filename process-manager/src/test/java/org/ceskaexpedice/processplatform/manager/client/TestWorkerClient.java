@@ -17,7 +17,7 @@ package org.ceskaexpedice.processplatform.manager.client;
 import org.ceskaexpedice.processplatform.common.model.Node;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.testutils.ManagerTestsUtils;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;

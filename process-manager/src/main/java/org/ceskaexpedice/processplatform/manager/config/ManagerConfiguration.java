@@ -37,6 +37,7 @@ public class ManagerConfiguration {
     private static final String JDBC_USER_NAME_KEY = "JDBC_USERNAME";
     private static final String JDBC_USER_PASSWORD_KEY = "JDBC_PASSWORD";
     private static final String GC_SCHEDULER_CHECK_INTERVAL_KEY = "GC_SCHEDULER_CHECK_INTERVAL";
+    private static final String NEXT_SCHEDULED_PROCESS_STRATEGY_KEY = "NEXT_SCHEDULED_PROCESS_STRATEGY";
 
     private final Properties props = new Properties();
 
@@ -115,6 +116,15 @@ public class ManagerConfiguration {
             return Integer.parseInt(gcSchedulerCheckInterval);
         }else {
             return 10000;
+        }
+    }
+
+    public NextScheduledProcessStrategyType getNextScheduledProcessStrategyType() {
+        String value = get(NEXT_SCHEDULED_PROCESS_STRATEGY_KEY);
+        if(value != null) {
+            return NextScheduledProcessStrategyType.valueOf(value);
+        }else{
+            return NextScheduledProcessStrategyType.BATCH_AFFINITY;
         }
     }
 

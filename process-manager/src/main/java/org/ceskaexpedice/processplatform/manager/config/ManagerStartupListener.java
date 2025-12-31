@@ -21,11 +21,16 @@ import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.DataAccessException;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.BatchAffinityStrategy;
+import org.ceskaexpedice.processplatform.manager.api.service.process.NextScheduledProcessStrategy;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.TagMatchingOnlyStrategy;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
 import org.ceskaexpedice.processplatform.manager.db.DbUtils;
 import org.ceskaexpedice.processplatform.manager.db.JDBCUpdateTemplate;
+import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.ProcessDao;
 import org.ceskaexpedice.processplatform.manager.gc.GCScheduler;
 
 import javax.servlet.ServletContext;
@@ -85,7 +90,12 @@ public class ManagerStartupListener implements ServletContextListener {
         NodeService nodeService = new NodeService(config, dbProvider);
         PluginService pluginService = new PluginService(config, dbProvider);
         ProfileService profileService = new ProfileService(config, dbProvider);
-        ProcessService processService = new ProcessService(config, dbProvider, pluginService, nodeService);
+
+        NodeDao nodeDao = new NodeDao(dbProvider, config);
+        ProcessDao processDao = new ProcessDao(dbProvider, config);
+        NextScheduledProcessStrategy nextScheduledProcessStrategy = createNextScheduledProcessStrategy(config, nodeDao, processDao);
+
+        ProcessService processService = new ProcessService(config, dbProvider, pluginService, nodeService, nextScheduledProcessStrategy);
 
         ctx.setAttribute(NodeService.class.getSimpleName(), nodeService);
         ctx.setAttribute(PluginService.class.getSimpleName(), pluginService);
@@ -108,6 +118,18 @@ public class ManagerStartupListener implements ServletContextListener {
             throw new DataAccessException(e.getMessage(), e);
         } catch (IOException e) {
             throw new ApplicationException(e.getMessage(), e);
+        }
+    }
+
+    private static NextScheduledProcessStrategy createNextScheduledProcessStrategy(ManagerConfiguration config,
+                                                                                   NodeDao nodeDao,ProcessDao processDao) {
+        NextScheduledProcessStrategyType type = config.getNextScheduledProcessStrategyType();
+        switch (type) {
+            case TAG_MATCHING_ONLY:
+                return new TagMatchingOnlyStrategy(nodeDao);
+            case BATCH_AFFINITY:
+            default:
+                return new BatchAffinityStrategy(nodeDao, processDao);
         }
     }
 

@@ -16,8 +16,13 @@ package org.ceskaexpedice.processplatform.manager.api.service;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.*;
+import org.ceskaexpedice.processplatform.manager.api.service.process.BatchAffinityStrategy;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.TagMatchingOnlyStrategy;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.processplatform.manager.db.DbConnectionProvider;
+import org.ceskaexpedice.processplatform.manager.db.dao.NodeDao;
+import org.ceskaexpedice.processplatform.manager.db.dao.ProcessDao;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,15 +44,19 @@ public class TestProcessService_integration {
     private static ProcessService processService;
     private static NodeService nodeService;
     private static DbConnectionProvider dbConnectionProvider;
+    private static ManagerConfiguration managerConfiguration;
+    private static PluginService pluginService;
 
     @BeforeAll
     static void beforeAll() {
         testsProperties = IntegrationTestsUtils.loadProperties();
-        ManagerConfiguration managerConfiguration = new ManagerConfiguration(testsProperties);
+        managerConfiguration = new ManagerConfiguration(testsProperties);
         dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
-        PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
-        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService);
+        pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
         nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
+        NodeDao nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
+        processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService,
+                new TagMatchingOnlyStrategy(nodeDao));
     }
 
     @BeforeEach
@@ -107,7 +116,7 @@ public class TestProcessService_integration {
     }
 
     @Test
-    public void testGetNextScheduledProcess() {
+    public void testGetNextScheduledProcess_tagMatching() {
         Node node = new Node();
         node.setNodeId(NODE_WORKER1_ID);
         node.setType(NodeType.WORKER);
@@ -124,6 +133,50 @@ public class TestProcessService_integration {
         ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(NODE_WORKER1_ID);
         Assertions.assertNotNull(nextScheduledProcess);
         Assertions.assertEquals(2, nextScheduledProcess.getJvmArgs().size());
+        ProcessInfo processInfo = processService.getProcess(nextScheduledProcess.getProcessId());
+        Assertions.assertEquals(NODE_WORKER1_ID, processInfo.getWorkerId());
+        Assertions.assertEquals(ProcessState.NOT_RUNNING, processInfo.getStatus());
+    }
+
+    @Test
+    public void testGetNextScheduledProcess_batchAffinity() {
+        NodeDao nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
+        ProcessDao processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
+        ProcessService processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService,
+                new BatchAffinityStrategy(nodeDao, processDao));
+
+        Node node = new Node();
+        node.setNodeId(NODE_WORKER1_ID);
+        node.setType(NodeType.WORKER);
+        Set<String> tags = new HashSet<>();
+        tags.add(PROFILE1_ID);
+        tags.add(PROFILE3_ID);
+        node.setTags(tags);
+        nodeService.registerNode(node);
+
+        // schedule main process 1
+        Map<String, String> payload = new HashMap<>();
+        payload.put("name", "Pe");
+        payload.put("surname", "Po");
+        ScheduleMainProcess scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        processService.scheduleMainProcess(scheduleMainProcess);
+        // schedule main process 2
+        payload = new HashMap<>();
+        payload.put("name", "Pa");
+        payload.put("surname", "St");
+        scheduleMainProcess = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
+        String mainProcess2Id = processService.scheduleMainProcess(scheduleMainProcess);
+        // schedule subprocess to main process 2
+        payload = new HashMap<>();
+        ScheduleSubProcess scheduleSubProcess = new ScheduleSubProcess(PROFILE3_ID, payload);
+        scheduleSubProcess.setBatchId(mainProcess2Id);
+        processService.scheduleSubProcess(scheduleSubProcess);
+        processService.updateState(mainProcess2Id, ProcessState.FINISHED);
+
+        ScheduledProcess nextScheduledProcess = processService.getNextScheduledProcess(NODE_WORKER1_ID);
+
+        Assertions.assertNotNull(nextScheduledProcess);
+        Assertions.assertEquals(1, nextScheduledProcess.getJvmArgs().size());
         ProcessInfo processInfo = processService.getProcess(nextScheduledProcess.getProcessId());
         Assertions.assertEquals(NODE_WORKER1_ID, processInfo.getWorkerId());
         Assertions.assertEquals(ProcessState.NOT_RUNNING, processInfo.getStatus());

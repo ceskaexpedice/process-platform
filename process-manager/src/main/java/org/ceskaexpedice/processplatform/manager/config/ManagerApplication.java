@@ -20,7 +20,7 @@ import org.ceskaexpedice.processplatform.common.GlobalExceptionMapper;
 import org.ceskaexpedice.processplatform.manager.api.*;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 
