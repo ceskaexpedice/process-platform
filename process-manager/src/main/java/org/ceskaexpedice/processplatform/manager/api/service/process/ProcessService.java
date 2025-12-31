@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ceskaexpedice.processplatform.manager.api.service;
+package org.ceskaexpedice.processplatform.manager.api.service.process;
 
 import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.model.*;
 import org.ceskaexpedice.processplatform.common.utils.StringUtils;
+import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
+import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.WorkerInfoMapper;
 import org.ceskaexpedice.processplatform.manager.client.WorkerClient;
@@ -44,6 +46,7 @@ import static org.ceskaexpedice.processplatform.common.utils.DateUtils.parseLoca
 
 /**
  * ProcessService
+ *
  * @author ppodsednik
  */
 public class ProcessService {
@@ -58,14 +61,17 @@ public class ProcessService {
     private final PluginDao pluginDao;
     private final PluginService pluginService;
     private final WorkerClient workerClient;
+    private final NextScheduledProcessStrategy nextScheduledProcessStrategy;
 
-    public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider, PluginService pluginService, NodeService nodeService) {
+    public ProcessService(ManagerConfiguration managerConfiguration, DbConnectionProvider dbConnectionProvider, PluginService pluginService,
+                          NodeService nodeService, NextScheduledProcessStrategy nextScheduledProcessStrategy) {
         this.managerConfiguration = managerConfiguration;
         this.processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
         this.nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
         this.profileDao = new ProfileDao(dbConnectionProvider, managerConfiguration);
         this.pluginDao = new PluginDao(dbConnectionProvider, managerConfiguration);
         this.pluginService = pluginService;
+        this.nextScheduledProcessStrategy = nextScheduledProcessStrategy;
         this.workerClient = WorkerClientFactory.createWorkerClient(this, nodeService);
     }
 
@@ -125,6 +131,7 @@ public class ProcessService {
         return processInfos;
     }
 
+    /* //////////////////////////////////////
     public ScheduledProcess getNextScheduledProcess(String workerId) {
         List<ProcessEntity> processes = processDao.getProcesses(ProcessState.PLANNED.getVal());
         ScheduledProcess scheduledProcess = null;
@@ -138,6 +145,26 @@ public class ProcessService {
         if (scheduledProcess == null) {
             return null;
         }
+        PluginProfileEntity profile = profileDao.getProfile(scheduledProcess.getProfileId());
+        PluginEntity plugin = pluginDao.getPlugin(profile.getPluginId());
+        scheduledProcess.setJvmArgs(profile.getJvmArgs());
+        scheduledProcess.setPluginId(profile.getPluginId());
+        scheduledProcess.setMainClass(plugin.getMainClass());
+        processDao.updateWorkerId(scheduledProcess.getProcessId(), workerId);
+        processDao.updateState(scheduledProcess.getProcessId(), ProcessState.NOT_RUNNING);
+        return scheduledProcess;
+    }
+
+     */
+
+    public ScheduledProcess getNextScheduledProcess(String workerId) {
+        List<ProcessEntity> processes = processDao.getProcesses(ProcessState.PLANNED.getVal());
+        Optional<ProcessEntity> selected = nextScheduledProcessStrategy.selectNext(workerId, processes);
+        if (selected.isEmpty()) {
+            return null;
+        }
+        ProcessEntity processEntity = selected.get();
+        ScheduledProcess scheduledProcess = ProcessServiceMapper.mapProcess(processEntity);
         PluginProfileEntity profile = profileDao.getProfile(scheduledProcess.getProfileId());
         PluginEntity plugin = pluginDao.getPlugin(profile.getPluginId());
         scheduledProcess.setJvmArgs(profile.getJvmArgs());
@@ -187,7 +214,7 @@ public class ProcessService {
 
     public int deleteBatch(String mainProcessId) {
         Batch batch = getBatch(mainProcessId);
-        if(!ProcessState.isBatchStateDeletable(batch.getStatus())) {
+        if (!ProcessState.isBatchStateDeletable(batch.getStatus())) {
             throw new BusinessLogicException(String.format("Cannot delete batch [%s] with state [%s]", mainProcessId, batch.getStatus().name()),
                     ErrorCode.INVALID_STATE);
         }
@@ -198,13 +225,13 @@ public class ProcessService {
 
     public int killBatch(String mainProcessId) {
         Batch batch = getBatch(mainProcessId);
-        if(!ProcessState.isBatchStateKillable(batch.getStatus())) {
+        if (!ProcessState.isBatchStateKillable(batch.getStatus())) {
             throw new BusinessLogicException(String.format("Cannot kill batch [%s] with state [%s]", mainProcessId, batch.getStatus().name()),
                     ErrorCode.INVALID_STATE);
         }
         int counter = 0;
-        for(ProcessInfo processInfo: batch.getProcesses()) {
-            if(processInfo.getPid() != 0 && processInfo.getStatus() == ProcessState.RUNNING){
+        for (ProcessInfo processInfo : batch.getProcesses()) {
+            if (processInfo.getPid() != 0 && processInfo.getStatus() == ProcessState.RUNNING) {
                 workerClient.killProcessJvm(processInfo.getProcessId(), String.valueOf(processInfo.getPid()));
                 counter++;
             }
@@ -219,7 +246,7 @@ public class ProcessService {
     }
 
     public void deleteBatchWorkerDirs(Batch batch) {
-        for(ProcessInfo processInfo: batch.getProcesses()) {
+        for (ProcessInfo processInfo : batch.getProcesses()) {
             workerClient.deleteProcessWorkerDir(processInfo.getProcessId());
         }
     }
@@ -254,9 +281,9 @@ public class ProcessService {
         if (!updated) {
             throw new BusinessLogicException("Process with id [" + processId + "] not found", ErrorCode.NOT_FOUND);
         }
-        if(processState == ProcessState.RUNNING) {
+        if (processState == ProcessState.RUNNING) {
             processDao.updateStarted(processId);
-        }else if(ProcessState.completedState(processState)) {
+        } else if (ProcessState.completedState(processState)) {
             processDao.updateFinished(processId);
         }
     }
@@ -309,7 +336,7 @@ public class ProcessService {
         return limit;
     }
 
-    public BatchFilter createBatchFilter(String owner, String processState, String from, String to ,String workersDelimited) {
+    public BatchFilter createBatchFilter(String owner, String processState, String from, String to, String workersDelimited) {
 
         BatchFilter filter = new BatchFilter();
         if (StringUtils.isAnyString(owner)) {

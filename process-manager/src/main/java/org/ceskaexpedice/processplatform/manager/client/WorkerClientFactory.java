@@ -19,7 +19,7 @@ package org.ceskaexpedice.processplatform.manager.client;
 
 
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;

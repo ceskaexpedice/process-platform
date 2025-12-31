@@ -67,8 +67,31 @@ public class ProcessDao extends AbstractDao{
                     returnsList.add(processEntity);
                     return true;
                 }
-            }.executeQuery("select " + "*" + " from pcp_process p  where status = ?", processState);
+            }.executeQuery("select " + "*" + " from pcp_process p  where status = ? order by planned", processState);
             return processEntities;
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public boolean existsAnotherProcessInBatch(String batchId, String processId) {
+        try (Connection connection = getConnection()) {
+            List<Boolean> result = new JDBCQueryTemplate<Boolean>(connection) {
+                        @Override
+                        public boolean handleRow(ResultSet rs, List<Boolean> returnsList) {
+                            // If we got a row, it means such a process exists
+                            returnsList.add(Boolean.TRUE);
+                            return false; // stop after first row
+                        }
+                    }.executeQuery(
+                            "select 1 " +
+                                    "from pcp_process " +
+                                    "where batch_id = ? " +
+                                    "  and process_id <> ?",
+                            batchId,
+                            processId
+                    );
+            return !result.isEmpty();
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }

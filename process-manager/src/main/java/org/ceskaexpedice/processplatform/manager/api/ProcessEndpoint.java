@@ -16,14 +16,13 @@
  */
 package org.ceskaexpedice.processplatform.manager.api;
 
-import org.ceskaexpedice.processplatform.common.BusinessLogicException;
 import org.ceskaexpedice.processplatform.common.model.Batch;
 import org.ceskaexpedice.processplatform.common.model.BatchFilter;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.common.utils.APIRestUtilities;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.processplatform.manager.api.service.mapper.ProcessServiceMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,8 +33,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.InputStream;
 import java.util.List;
-
-import static org.ceskaexpedice.processplatform.common.utils.DateUtils.toFormattedStringOrNull;
 
 /**
  * ProcessEndpoint

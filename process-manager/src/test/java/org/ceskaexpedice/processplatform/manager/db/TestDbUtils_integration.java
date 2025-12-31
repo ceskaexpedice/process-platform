@@ -18,7 +18,7 @@ import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.common.model.ScheduleMainProcess;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.PluginService;
-import org.ceskaexpedice.processplatform.manager.api.service.ProcessService;
+import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.ceskaexpedice.testutils.IntegrationTestsUtils;
 import org.junit.jupiter.api.*;
@@ -83,7 +83,7 @@ public class TestDbUtils_integration {
         DbConnectionProvider dbConnectionProvider = new DbConnectionProvider(managerConfiguration);
         PluginService pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
         NodeService nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
-        ProcessService processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService);
+        ProcessService processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService, null);
 
         Map<String, String> payload = new HashMap<>();
         payload.put("name", "Pe");
