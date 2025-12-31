@@ -11,6 +11,9 @@ class ProcessPluginExtension {
 
     //String spiInterface
     String spiImplementation
+
+    List<String> excludeDependencies = []
+
 }
 
 class ProcessPlugin implements Plugin<Project> {
@@ -153,11 +156,28 @@ class ProcessPlugin implements Plugin<Project> {
 
 
                     // copy dependencies
-					project.configurations.runtimeClasspath.files.each { file ->
-						project.copy {
-							from file
-							into distDir
-						}
+					//project.configurations.runtimeClasspath.files.each { file ->
+                    project.configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+
+                        def id = artifact.moduleVersion.id
+                        def groupName = id.group
+                        def artifactName = id.name
+                        def fullName = "${groupName}:${artifactName}"
+
+                        boolean isExcluded = ext.excludeDependencies.any { ex ->
+                            groupName.startsWith(ex) || fullName.contains(ex)
+                        }
+
+
+                        if (!isExcluded) {
+                            project.copy {
+                                from artifact.file
+                                into distDir
+                            }
+                        } else {
+                            println "ProcessPlugin: Excluding ${fullName} from distribution."
+                        }
+
 					}
                     println "Built process plugin: ${distDir}"
                 }
