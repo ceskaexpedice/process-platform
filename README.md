@@ -1,1 +1,1 @@
-Dokumentace je zde: https://github.com/ceskaexpedice/process-platform  
+Dokumentace je zde: https://github.com/ceskaexpedice/process-platform/wiki  
