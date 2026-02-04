@@ -158,6 +158,7 @@ public class ProcessService {
      */
 
     public synchronized ScheduledProcess getNextScheduledProcess(String workerId) {
+        LOGGER.info("synchronized getNextScheduledProcess for the worker [" + workerId + "]");
         List<ProcessEntity> processes = processDao.getProcesses(ProcessState.PLANNED.getVal());
         Optional<ProcessEntity> selected = nextScheduledProcessStrategy.selectNext(workerId, processes);
         if (selected.isEmpty()) {
