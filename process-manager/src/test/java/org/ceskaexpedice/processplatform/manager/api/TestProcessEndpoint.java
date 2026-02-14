@@ -107,6 +107,34 @@ public class TestProcessEndpoint extends JerseyTest {
     }
 
     @Test
+    public void testGetBatch() {
+        Batch batch = new Batch();
+        batch.setMainProcessId(PROCESS1_ID);
+        batch.setStatus(ProcessState.WARNING);
+        ProcessInfo processInfo1 = new ProcessInfo();
+        processInfo1.setPlanned(new Date());
+        processInfo1.setProcessId(PROCESS1_ID);
+        processInfo1.setBatchId(PROCESS1_ID);
+        processInfo1.setStatus(ProcessState.FINISHED);
+        batch.getProcesses().add(processInfo1);
+        ProcessInfo processInfo2 = new ProcessInfo();
+        processInfo2.setProcessId(PROCESS2_ID);
+        processInfo2.setBatchId(PROCESS1_ID);
+        processInfo2.setStatus(ProcessState.WARNING);
+        batch.getProcesses().add(processInfo2);
+
+        when(processServiceMock.getBatch(eq(PROCESS1_ID))).thenReturn(batch);
+
+        Response response = target("process/batch/" + PROCESS1_ID).request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Assertions.assertEquals(200, response.getStatus());
+        String json = response.readEntity(String.class);
+        JSONObject jsonObject = new JSONObject(json);
+        Assertions.assertEquals(PROCESS1_ID, jsonObject.getString("mainProcessId"));
+
+        verify(processServiceMock, times(1)).getBatch(eq(PROCESS1_ID));
+    }
+
+    @Test
     public void testGetBatches() {
         List<Batch> batches = new ArrayList<>();
         Batch batch1 = new Batch();
@@ -138,7 +166,7 @@ public class TestProcessEndpoint extends JerseyTest {
         when(processServiceMock.countBatchHeaders(any())).thenReturn(2);
         when(processServiceMock.getBatches(any(), eq(0), eq(10))).thenReturn(batches);
 
-        Response response = target("process/batch").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
+        Response response = target("process/batches").request().accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assertions.assertEquals(200, response.getStatus());
         String json = response.readEntity(String.class);
         JSONObject jsonObject = new JSONObject(json);
