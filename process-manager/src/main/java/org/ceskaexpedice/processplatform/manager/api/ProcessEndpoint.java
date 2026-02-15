@@ -69,7 +69,16 @@ public class ProcessEndpoint {
     }
 
     @GET
-    @Path("batch")
+    @Path("batch/{mainProcessId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBatch(@PathParam("mainProcessId") String mainProcessId) {
+        Batch batch = processService.getBatch(mainProcessId);
+        JSONObject batchJson = ProcessServiceMapper.mapBatchToJson(batch);
+        return APIRestUtilities.jsonPayload(batchJson.toString());
+    }
+
+    @GET
+    @Path("batches")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBatches(
             @QueryParam("offset") String offsetStr,
