@@ -70,10 +70,31 @@ public class WorkerMain {
 
     private void registerNode(List<PluginInfo> pluginsList) {
         LOGGER.info(String.format("Register node [%s]", workerConfiguration.getWorkerId()));
-        Set<String> tags = new HashSet<>();
+        // Supported profiles from plugins
+        Set<String> supportedProfiles = new HashSet<>();
         for (PluginInfo pluginInfo : pluginsList) {
-            for (PluginProfile pluginProfile: pluginInfo.getProfiles()){
-                tags.add(pluginProfile.getProfileId());
+            for (PluginProfile pluginProfile : pluginInfo.getProfiles()) {
+                supportedProfiles.add(pluginProfile.getProfileId());
+            }
+        }
+        // Configured subset
+        Set<String> configuredSubset = workerConfiguration.getProfilesSubset();
+        Set<String> tags;
+        if (configuredSubset.isEmpty()) {
+            // No filtering configured → use all supported
+            tags = supportedProfiles;
+        } else {
+            tags = new HashSet<>();
+            for (String profile : configuredSubset) {
+                if (supportedProfiles.contains(profile)) {
+                    tags.add(profile);
+                } else {
+                    LOGGER.warning(String.format(
+                            "Profile [%s] configured in %s is not supported by this worker",
+                            profile,
+                            WorkerConfiguration.PROFILES_SUBSET_KEY
+                    ));
+                }
             }
         }
         Node node = new Node();
@@ -82,7 +103,6 @@ public class WorkerMain {
         node.setType(NodeType.WORKER);
         node.setUrl(workerConfiguration.getWorkerBaseUrl());
         node.setTags(tags);
-
         managerClient.registerNode(node);
     }
 

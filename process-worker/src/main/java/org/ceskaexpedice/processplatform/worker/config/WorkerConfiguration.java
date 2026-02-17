@@ -18,10 +18,8 @@ package org.ceskaexpedice.processplatform.worker.config;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.ceskaexpedice.processplatform.worker.utils.Utils.parseSimpleJson;
 
@@ -41,6 +39,7 @@ public class WorkerConfiguration {
     private static final String MANAGER_BASE_URL_KEY = "MANAGER_BASE_URL";
     private static final String WORKER_BASE_URL_KEY = "WORKER_BASE_URL";
     private static final String WORKER_ID_KEY = "WORKER_ID";
+    public static final String PROFILES_SUBSET_KEY = "PROFILES_SUBSET";
 
     private final Properties props = new Properties();
 
@@ -139,6 +138,17 @@ public class WorkerConfiguration {
             return managerUrl.endsWith("/") ? managerUrl : managerUrl + "/";
         }
         return "http://localhost:8080/";
+    }
+
+    public Set<String> getProfilesSubset() {
+        String subsetValue = get(WorkerConfiguration.PROFILES_SUBSET_KEY);
+        if (subsetValue == null || subsetValue.isBlank()) {
+            return Collections.emptySet();
+        }
+        return Arrays.stream(subsetValue.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     public void setManagerBaseUrl(String  managerBaseUrl) {
