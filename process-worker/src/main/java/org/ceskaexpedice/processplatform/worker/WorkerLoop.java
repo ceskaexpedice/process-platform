@@ -70,8 +70,10 @@ class WorkerLoop {
                         ProcessRegistry.getInstance().markIdle();
 
                         long currentTime = System.currentTimeMillis();
-                        if (currentTime - lastIdleLogTime >= printSec) {
-                            LOGGER.info("No process from the manager. Worker is alive, polling every " + sleepSec + "s...");
+                        double elapsedSec = (currentTime - lastIdleLogTime) / 1000.0;
+                        if (elapsedSec >= printSec) {
+                            LOGGER.info(String.format("Elapsed: %.2fs. Configured print interval: %.2fs", elapsedSec, printSec));
+                            LOGGER.info("No process from the manager. Worker is alive, polling every: " + sleepSec + "s...");
                             lastIdleLogTime = currentTime;
                         }
 
