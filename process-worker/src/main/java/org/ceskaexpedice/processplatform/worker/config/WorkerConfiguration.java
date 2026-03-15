@@ -34,6 +34,7 @@ public class WorkerConfiguration {
     private static final String TOMCAT_HOME = System.getProperty("catalina.home");
 
     private static final String WORKER_LOOP_SLEEP_SEC_KEY = "WORKER_LOOP_SLEEP_SECS";
+    private static final String WORKER_LOOP_PRINT_SEC_KEY = "WORKER_LOOP_PRINT_SECS";
     private static final String PLUGIN_PATH_KEY = "PLUGIN_PATH";
     private static final String STARTER_CLASSPATH_KEY = "STARTER_CLASSPATH";
     private static final String MANAGER_BASE_URL_KEY = "MANAGER_BASE_URL";
@@ -107,6 +108,16 @@ public class WorkerConfiguration {
         }else {
             return 1;
         }
+    }
+
+    public double  getWorkerLoopPrintSecs() {
+        String sleepSecKey = get(WORKER_LOOP_PRINT_SEC_KEY);
+        if (sleepSecKey != null) {
+            return Double.parseDouble(sleepSecKey);
+        }else {
+            return 10;
+        }
+
     }
 
     public void setWorkerLoopSleepSecs(int  sleepSec) {

@@ -37,6 +37,7 @@ class WorkerLoop {
     private final ManagerClient managerClient;
     private final WorkerConfiguration workerConfiguration;
     private volatile boolean running = true;
+    private long lastIdleLogTime = 0;
 
     WorkerLoop(WorkerConfiguration workerConfiguration, ManagerClient managerClient) {
         this.managerClient = managerClient;
@@ -64,10 +65,18 @@ class WorkerLoop {
 
                     } else {
                         double sleepSec = workerConfiguration.getWorkerLoopSleepSecs();
+                        double printSec = workerConfiguration.getWorkerLoopPrintSecs();
+
                         ProcessRegistry.getInstance().markIdle();
-                        LOGGER.info("No process from the manager. Sleeping " + sleepSec + " seconds...");
-                        double v = sleepSec * 1000L;
-                        Thread.sleep(Math.round(v));
+
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastIdleLogTime >= printSec) {
+                            LOGGER.info("No process from the manager. Worker is alive, polling every " + sleepSec + "s...");
+                            lastIdleLogTime = currentTime;
+                        }
+
+                        long sleepMillis = Math.round(sleepSec * 1000L);
+                        Thread.sleep(sleepMillis);
                     }
 
                 } catch (InterruptedException e) {
