@@ -116,7 +116,7 @@ public class ManagerClient {
         try {
             uriBuilder = new URIBuilder(workerConfiguration.getManagerBaseUrl() + "worker/next_process/" + workerConfiguration.getWorkerId());
             URI uri = uriBuilder.build();
-            LOGGER.info("Getting next scheduled process at " + uri);
+            LOGGER.fine("Getting next scheduled process at " + uri);
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
@@ -124,14 +124,14 @@ public class ManagerClient {
         int statusCode = -1;
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
-            LOGGER.info(String.format("Returning status code from process manager %d", code));
+            LOGGER.fine(String.format("Returning status code from process manager %d", code));
             if (code == 200) {
                 HttpEntity entity = response.getEntity();
                 String json = EntityUtils.toString(entity);
                 ScheduledProcess process = mapper.readValue(json, ScheduledProcess.class);
                 return process;
             } else if(code == 404){
-                LOGGER.warning(String.format("Not found %d", code));
+                //LOGGER.warning(String.format("Not found %d", code));
                 return null;
             } else {
                 throw new RemoteNodeException("Failed to get next scheduled process", NodeType.MANAGER, statusCode);
