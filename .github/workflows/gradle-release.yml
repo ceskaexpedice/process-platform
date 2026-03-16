@@ -50,9 +50,21 @@ jobs:
         username: ${{secrets.DOCKERHUB_USERNAME}}
         password: ${{secrets.DOCKERHUB_TOKEN}}  
 
+
+    - name: Get project version from Gradle
+      env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+          USERNAME: ${{ secrets.USER }}
+          TOKEN: ${{ secrets.PAS }}
+      run: |
+        echo "DOCKER_USER=$DOCKER_USER" 
+        echo "DOCKER_PASS=$DOCKER_PASS"
     
     - name: Build with Gradle
-      run: ./gradlew build publish jib -Djib.to.auth.username=$DOCKER_USER -Djib.to.auth.password=$DOCKER_PASS
+      run: ./gradlew build jib -Djib.to.auth.username=$DOCKER_USER -Djib.to.auth.password=$DOCKER_PASS
       env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
