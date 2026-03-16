@@ -64,7 +64,7 @@ jobs:
         echo "DOCKER_PASS=$DOCKER_PASS"
     
     - name: Build with Gradle
-      run: ./gradlew build jib -Djib.to.auth.username=$DOCKER_USER -Djib.to.auth.password=$DOCKER_PASS
+      run: ./gradlew build publish  -Djib.to.auth.username=$DOCKER_USER -Djib.to.auth.password=$DOCKER_PASS
       env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
