@@ -21,7 +21,7 @@ import org.ceskaexpedice.processplatform.worker.api.ForManagerEndpoint;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * WorkerApplication

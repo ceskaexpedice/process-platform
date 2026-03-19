@@ -19,9 +19,9 @@ package org.ceskaexpedice.processplatform.worker.config;
 import org.ceskaexpedice.processplatform.worker.WorkerMain;
 import org.ceskaexpedice.processplatform.worker.api.service.ForManagerService;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

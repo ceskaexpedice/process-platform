@@ -24,7 +24,7 @@ import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessServ
 import org.ceskaexpedice.processplatform.manager.api.service.ProfileService;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * ManagerApplication
