@@ -16,6 +16,7 @@
  */
 package org.ceskaexpedice.processplatform.worker.plugin.executor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ceskaexpedice.processplatform.api.context.PluginContext;
 import org.ceskaexpedice.processplatform.api.context.PluginContextHolder;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
@@ -150,7 +151,7 @@ public class PluginStarter implements PluginContext {
     }
 
     private static void runPlugin(ProcessConfiguration processConfig, WorkerConfiguration workerConfig)
-            throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+            throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, JsonProcessingException {
         Map<String, String> pluginPayload = getPluginPayload(processConfig);
         String pluginId = processConfig.get(PLUGIN_ID_KEY);
         String mainClass = processConfig.get(MAIN_CLASS_KEY);
