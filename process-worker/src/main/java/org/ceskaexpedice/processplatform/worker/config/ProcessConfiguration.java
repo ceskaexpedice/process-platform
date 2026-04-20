@@ -16,6 +16,10 @@
  */
 package org.ceskaexpedice.processplatform.worker.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -85,10 +89,11 @@ public class ProcessConfiguration {
         return props.getProperty(key, defaultValue);
     }
 
-    public static Map<String, String> getPluginPayload(ProcessConfiguration processConfig) {
+    public static Map<String, String> getPluginPayload(ProcessConfiguration processConfig) throws JsonProcessingException {
         String payloadBase64 = processConfig.get(PLUGIN_PAYLOAD_BASE64_KEY);
         String payloadJson = new String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8);
-        Map<String, String> pluginPayload = parseSimpleJson(payloadJson);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> pluginPayload = mapper.readValue(payloadJson, new TypeReference<Map<String, String>>() {});
         return pluginPayload;
     }
 
