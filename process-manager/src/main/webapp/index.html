@@ -283,7 +283,7 @@
         let planned = 0;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/process/batch?limit=50`);
+            const response = await fetch(`${API_BASE_URL}/process/batches?limit=50`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
 
