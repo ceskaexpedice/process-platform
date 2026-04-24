@@ -5,6 +5,8 @@ plugins {
 subprojects {
     apply plugin: 'java'
 
+    ext.jerseyversion = '3.1.5'
+    ext.servletapiversion ='6.1.0'
 
     repositories {
         mavenCentral()

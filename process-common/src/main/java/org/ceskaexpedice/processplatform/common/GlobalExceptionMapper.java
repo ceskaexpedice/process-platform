@@ -16,9 +16,8 @@
  */
 package org.ceskaexpedice.processplatform.common;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import java.util.UUID;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
