@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 /**
@@ -114,7 +115,8 @@ public class ForWorkerEndpoint {
     @PUT
     @Path("/description/{processId}")
     public Response updateProcessDescription(@PathParam("processId") String processId, @QueryParam("description") String description) {
-        processService.updateDescription(processId, description);
+        String decodedDescription = java.net.URLDecoder.decode(description, StandardCharsets.UTF_8);
+        processService.updateDescription(processId, decodedDescription);
         return APIRestUtilities.ok("Process description [%s] used for the process [%s]", description, processId);
     }
 }
