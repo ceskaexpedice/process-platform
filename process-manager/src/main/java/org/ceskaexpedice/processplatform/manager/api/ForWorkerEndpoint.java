@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 /**
