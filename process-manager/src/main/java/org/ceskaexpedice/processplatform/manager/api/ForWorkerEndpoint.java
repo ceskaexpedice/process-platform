@@ -114,7 +114,8 @@ public class ForWorkerEndpoint {
     @PUT
     @Path("/description/{processId}")
     public Response updateProcessDescription(@PathParam("processId") String processId, @QueryParam("description") String description) {
-        processService.updateDescription(processId, description);
+        String decodedDescription = java.net.URLDecoder.decode(description, StandardCharsets.UTF_8);
+        processService.updateDescription(processId, decodedDescription);
         return APIRestUtilities.ok("Process description [%s] used for the process [%s]", description, processId);
     }
 }
