@@ -50,7 +50,8 @@ test {
 
 jib {
     from {
-        image = 'tomcat:9.0.87-jdk21-temurin-jammy'
+        //image = 'tomcat:9.0.87-jdk21-temurin-jammy' //tomcat 9.0 is needed for Jakarta EE 9 (JAX-RS 2.x) - servlet API at javax.servlet.*
+        image = 'tomcat:10.1-jdk21-temurin-jammy' //tomcat 10.1 is needed for Jakarta EE 10 (JAX-RS 3.x) - servlet API at jakarta.servlet.*
 		platforms {
             platform {
                 architecture = 'amd64'
