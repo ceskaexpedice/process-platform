@@ -28,6 +28,7 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.pool.PoolStats;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
@@ -46,6 +47,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,6 +60,8 @@ public class WorkerClient {
     private static final Logger LOGGER = Logger.getLogger(WorkerClient.class.getName());
 
     private final CloseableHttpClient closeableHttpClient;
+    private final PoolingHttpClientConnectionManager poolConnectionManager;
+    private final WorkerClientConfiguration configuration;
     private final ObjectMapper mapper = new ObjectMapper();
     private final ProcessService processService;
     private final NodeService nodeService;
@@ -67,17 +71,20 @@ public class WorkerClient {
     }
 
     WorkerClient(ProcessService processService, NodeService nodeService, ManagerConfiguration managerConfiguration) {
-        PoolingHttpClientConnectionManager poolConnectionManager = new PoolingHttpClientConnectionManager();
-        poolConnectionManager.setMaxTotal(managerConfiguration.getHttpClientMaxConnections());
-        poolConnectionManager.setDefaultMaxPerRoute(managerConfiguration.getHttpClientMaxConnectionsPerRoute());
+        this.configuration = WorkerClientConfiguration.from(managerConfiguration);
+        LOGGER.info("Initializing WorkerClient with " + configuration);
+
+        this.poolConnectionManager = new PoolingHttpClientConnectionManager();
+        poolConnectionManager.setMaxTotal(configuration.getMaxConnections());
+        poolConnectionManager.setDefaultMaxPerRoute(configuration.getMaxConnectionsPerRoute());
         poolConnectionManager.setDefaultConnectionConfig(ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientConnectTimeoutMs()))
-                .setSocketTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientSocketTimeoutMs()))
-                .setValidateAfterInactivity(TimeValue.ofMilliseconds(managerConfiguration.getHttpClientValidateAfterInactivityMs()))
+                .setConnectTimeout(Timeout.ofMilliseconds(configuration.getConnectTimeoutMs()))
+                .setSocketTimeout(Timeout.ofMilliseconds(configuration.getSocketTimeoutMs()))
+                .setValidateAfterInactivity(TimeValue.ofMilliseconds(configuration.getValidateAfterInactivityMs()))
                 .build());
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientConnectionRequestTimeoutMs()))
-                .setResponseTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientResponseTimeoutMs()))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(configuration.getConnectionRequestTimeoutMs()))
+                .setResponseTimeout(Timeout.ofMilliseconds(configuration.getResponseTimeoutMs()))
                 .build();
         this.closeableHttpClient = HttpClients.custom()
                 .setConnectionManager(poolConnectionManager)
@@ -85,10 +92,11 @@ public class WorkerClient {
                 .disableCookieManagement()
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections()
-                .evictIdleConnections(TimeValue.ofMilliseconds(managerConfiguration.getHttpClientEvictIdleConnectionsMs()))
+                .evictIdleConnections(TimeValue.ofMilliseconds(configuration.getEvictIdleConnectionsMs()))
                 .build();
         this.processService = processService;
         this.nodeService = nodeService;
+        logPoolStats("initialized");
     }
 
     public void deleteProcessWorkerDir(String processId) {
@@ -96,6 +104,7 @@ public class WorkerClient {
         LOGGER.info("Delete process working dir at " + url);
         HttpDelete httpDelete = new HttpDelete(url);
         int statusCode = -1;
+        logPoolStats("before DELETE " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpDelete)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
@@ -103,6 +112,8 @@ public class WorkerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
+        } finally {
+            logPoolStats("after DELETE " + url + ", status=" + statusCode);
         }
     }
 
@@ -111,6 +122,7 @@ public class WorkerClient {
         LOGGER.info("Kill worker JVM process at " + url);
         HttpDelete httpDelete = new HttpDelete(url);
         int statusCode = -1;
+        logPoolStats("before DELETE " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpDelete)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 404) {
@@ -118,6 +130,8 @@ public class WorkerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
+        } finally {
+            logPoolStats("after DELETE " + url + ", status=" + statusCode);
         }
     }
 
@@ -134,12 +148,18 @@ public class WorkerClient {
         }
         int statusCode = -1;
         try {
-            LOGGER.info(String.format("Getting process log for processId: [%s]; url: [%s] ", processId, get.getUri().toString()));
+            String requestUri = get.getUri().toString();
+            LOGGER.info(String.format("Getting process log for processId: [%s]; url: [%s] ", processId, requestUri));
+            logPoolStats("before GET " + requestUri);
             CloseableHttpResponse response = closeableHttpClient.execute(get);
             int code = response.getCode();
+            statusCode = code;
             if (code == 200) {
                 InputStream is = response.getEntity().getContent();
-                return new ResponseClosingInputStream(is, response);
+                int streamStatusCode = statusCode;
+                logPoolStats("stream opened GET " + requestUri + ", status=" + streamStatusCode);
+                return new ResponseClosingInputStream(is, response,
+                        () -> logPoolStats("stream closed GET " + requestUri + ", status=" + streamStatusCode));
             } else if (code == 404) {
                 response.close();
                 return null;
@@ -151,6 +171,8 @@ public class WorkerClient {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, statusCode, e);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
+        } finally {
+            logPoolStats("after GET process log, status=" + statusCode);
         }
     }
 
@@ -163,6 +185,7 @@ public class WorkerClient {
             if (limit != null) uriBuilder.addParameter("limit", limit);
 
             HttpGet get = new HttpGet(uriBuilder.build());
+            logPoolStats("before GET " + get.getUri().toString());
             try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
                 code = response.getCode();
                 HttpEntity entity = response.getEntity();
@@ -175,6 +198,8 @@ public class WorkerClient {
             }
         } catch (Exception e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
+        } finally {
+            logPoolStats("after GET process log lines, status=" + code);
         }
     }
 
@@ -182,6 +207,7 @@ public class WorkerClient {
         String url = node.getUrl() + "manager/info";
         HttpGet get = new HttpGet(url);
         int code = -1;
+        logPoolStats("before GET " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             code = response.getCode();
             HttpEntity entity = response.getEntity();
@@ -193,6 +219,8 @@ public class WorkerClient {
             }
         } catch (Exception e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
+        } finally {
+            logPoolStats("after GET " + url + ", status=" + code);
         }
 
     }
@@ -221,6 +249,13 @@ public class WorkerClient {
 //        }
     }
 
+    public JSONObject getPoolStats() {
+        JSONObject result = new JSONObject();
+        result.put("configuration", configuration.toJson());
+        result.put("total", poolStatsToJson(poolConnectionManager.getTotalStats()));
+        return result;
+    }
+
     private String getWorkerBaseUrl(String processId) {
         ProcessInfo processInfo = processService.getProcess(processId);
         Node node = nodeService.getNode(processInfo.getWorkerId());
@@ -233,13 +268,39 @@ public class WorkerClient {
         return node;
     }
 
+    private void logPoolStats(String event) {
+        if (!LOGGER.isLoggable(Level.FINE)) {
+            return;
+        }
+        PoolStats totalStats = poolConnectionManager.getTotalStats();
+        LOGGER.fine(String.format(
+                "WorkerClient pool [%s]: leased=%d, pending=%d, available=%d, max=%d",
+                event,
+                totalStats.getLeased(),
+                totalStats.getPending(),
+                totalStats.getAvailable(),
+                totalStats.getMax()
+        ));
+    }
+
+    private JSONObject poolStatsToJson(PoolStats stats) {
+        JSONObject json = new JSONObject();
+        json.put("leased", stats.getLeased());
+        json.put("pending", stats.getPending());
+        json.put("available", stats.getAvailable());
+        json.put("max", stats.getMax());
+        return json;
+    }
+
     private static final class ResponseClosingInputStream extends FilterInputStream {
 
         private final CloseableHttpResponse response;
+        private final Runnable closeCallback;
 
-        private ResponseClosingInputStream(InputStream in, CloseableHttpResponse response) {
+        private ResponseClosingInputStream(InputStream in, CloseableHttpResponse response, Runnable closeCallback) {
             super(in);
             this.response = response;
+            this.closeCallback = closeCallback;
         }
 
         @Override
@@ -248,6 +309,7 @@ public class WorkerClient {
                 super.close();
             } finally {
                 response.close();
+                closeCallback.run();
             }
         }
     }

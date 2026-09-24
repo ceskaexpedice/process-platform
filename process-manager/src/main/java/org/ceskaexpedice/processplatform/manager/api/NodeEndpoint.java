@@ -53,6 +53,16 @@ public class NodeEndpoint {
     }
 
     @GET
+    @Path("/worker-client/pool")
+    public Response getWorkerClientPoolStats() {
+        WorkerClient workerClient = WorkerClientFactory.foundCreated();
+        if (workerClient == null) {
+            return APIRestUtilities.notFound("WorkerClient not initialized");
+        }
+        return APIRestUtilities.jsonPayload(workerClient.getPoolStats().toString());
+    }
+
+    @GET
     @Path("/{nodeId}/info")
     public Response getNodeInfo(@PathParam("nodeId") String nodeId) {
         Node node = nodeService.getNode(nodeId);

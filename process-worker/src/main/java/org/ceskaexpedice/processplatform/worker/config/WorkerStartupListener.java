@@ -53,12 +53,13 @@ public class WorkerStartupListener implements ServletContextListener {
         }
         WorkerConfiguration config = new WorkerConfiguration(fileProps);
         setStarterClasspath(config);
-        ForManagerService forManagerService = new ForManagerService(config);
-        ctx.setAttribute(ForManagerService.class.getSimpleName(), forManagerService);
 
         WorkerMain workerMain = new WorkerMain();
         workerMain.initialize(config);
         ctx.setAttribute(WorkerMain.class.getSimpleName(), workerMain);
+
+        ForManagerService forManagerService = new ForManagerService(config, workerMain.getManagerClient());
+        ctx.setAttribute(ForManagerService.class.getSimpleName(), forManagerService);
     }
 
     @Override

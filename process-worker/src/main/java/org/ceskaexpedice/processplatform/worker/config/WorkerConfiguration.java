@@ -199,31 +199,31 @@ public class WorkerConfiguration {
     }
 
     public int getHttpClientMaxConnections() {
-        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_KEY, 20);
+        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_KEY, 4);
     }
 
     public int getHttpClientMaxConnectionsPerRoute() {
-        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_KEY, 10);
+        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_KEY, 4);
     }
 
     public long getHttpClientConnectTimeoutMs() {
-        return getLong(HTTP_CLIENT_CONNECT_TIMEOUT_MS_KEY, 10000);
+        return getLong(HTTP_CLIENT_CONNECT_TIMEOUT_MS_KEY, 2000);
     }
 
     public long getHttpClientSocketTimeoutMs() {
-        return getLong(HTTP_CLIENT_SOCKET_TIMEOUT_MS_KEY, 60000);
+        return getLong(HTTP_CLIENT_SOCKET_TIMEOUT_MS_KEY, 10000);
     }
 
     public long getHttpClientConnectionRequestTimeoutMs() {
-        return getLong(HTTP_CLIENT_CONNECTION_REQUEST_TIMEOUT_MS_KEY, 10000);
+        return getLong(HTTP_CLIENT_CONNECTION_REQUEST_TIMEOUT_MS_KEY, 1000);
     }
 
     public long getHttpClientResponseTimeoutMs() {
-        return getLong(HTTP_CLIENT_RESPONSE_TIMEOUT_MS_KEY, 60000);
+        return getLong(HTTP_CLIENT_RESPONSE_TIMEOUT_MS_KEY, 10000);
     }
 
     public long getHttpClientValidateAfterInactivityMs() {
-        return getLong(HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY_MS_KEY, 10000);
+        return getLong(HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY_MS_KEY, 5000);
     }
 
     public long getHttpClientEvictIdleConnectionsMs() {

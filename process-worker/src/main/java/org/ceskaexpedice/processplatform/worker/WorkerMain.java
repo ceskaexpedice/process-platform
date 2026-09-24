@@ -117,5 +117,8 @@ public class WorkerMain {
         workerLoop.stop();
     }
 
+    public ManagerClient getManagerClient() {
+        return managerClient;
+    }
 
 }

@@ -57,6 +57,55 @@
         </div>
     </div>
 
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">ManagerClient Connection Pool</h5>
+            <small id="managerClientPoolUpdated">Loading...</small>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="text-muted small">Leased</div>
+                        <div class="fs-3 fw-bold" id="managerPoolLeased">...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="text-muted small">Available</div>
+                        <div class="fs-3 fw-bold" id="managerPoolAvailable">...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="text-muted small">Pending</div>
+                        <div class="fs-3 fw-bold" id="managerPoolPending">...</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="text-muted small">Max</div>
+                        <div class="fs-3 fw-bold" id="managerPoolMax">...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                    <tr>
+                        <th>Setting</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody id="managerClientConfigBody">
+                    <tr><td colspan="2" class="text-center">Loading configuration...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <hr>
 
     <h2 class="mb-3">⚙️ Active Task Details</h2>
@@ -159,6 +208,48 @@ Waiting for process start and logs...
         }
     }
 
+    async function fetchManagerClientPoolStats() {
+        const configBody = document.getElementById('managerClientConfigBody');
+
+        try {
+            const response = await fetch(`${WORKER_API_BASE_PATH}/manager-client/pool`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+            const stats = data.total || {};
+            const config = data.configuration || {};
+
+            document.getElementById('managerPoolLeased').textContent = stats.leased ?? 'N/A';
+            document.getElementById('managerPoolAvailable').textContent = stats.available ?? 'N/A';
+            document.getElementById('managerPoolPending').textContent = stats.pending ?? 'N/A';
+            document.getElementById('managerPoolMax').textContent = stats.max ?? 'N/A';
+            document.getElementById('managerClientPoolUpdated').textContent =
+                new Date().toLocaleTimeString();
+
+            configBody.innerHTML = '';
+            Object.entries(config).forEach(([key, value]) => {
+                configBody.insertRow().innerHTML = `
+                    <td><code>${key}</code></td>
+                    <td>${value}</td>
+                `;
+            });
+
+            if (Object.keys(config).length === 0) {
+                configBody.innerHTML =
+                    '<tr><td colspan="2" class="text-center">No configuration available.</td></tr>';
+            }
+        } catch (error) {
+            document.getElementById('managerPoolLeased').textContent = 'N/A';
+            document.getElementById('managerPoolAvailable').textContent = 'N/A';
+            document.getElementById('managerPoolPending').textContent = 'N/A';
+            document.getElementById('managerPoolMax').textContent = 'N/A';
+            document.getElementById('managerClientPoolUpdated').textContent = 'Unavailable';
+            configBody.innerHTML =
+                `<tr><td colspan="2" class="text-center text-danger">
+                    Failed to load ManagerClient pool stats: ${error.message}
+                </td></tr>`;
+        }
+    }
+
     function updateDashboard(data) {
         const card = document.getElementById('workerStateCard');
         card.className = `card text-white ${getStatusColor(data.state)} mb-3`;
@@ -233,7 +324,11 @@ Waiting for process start and logs...
 
     // Initial load and polling
     fetchWorkerInfo();
-    setInterval(fetchWorkerInfo, 3000);
+    fetchManagerClientPoolStats();
+    setInterval(() => {
+        fetchWorkerInfo();
+        fetchManagerClientPoolStats();
+    }, 3000);
 </script>
 </body>
 </html>

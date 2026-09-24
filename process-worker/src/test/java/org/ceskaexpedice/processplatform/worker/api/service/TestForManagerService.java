@@ -121,7 +121,7 @@ public class TestForManagerService {
 
         long logSize = forManagerService.getProcessLogSize(PLUGIN1_PROCESS_ID, false);
         List<String> logLines = forManagerService.getProcessLogLines(PLUGIN1_PROCESS_ID, false, 0, logSize);
-        assertEquals(13, logLines.size());
+        assertEquals(17, logLines.size());
 
         logSize = forManagerService.getProcessLogSize(PLUGIN1_PROCESS_ID, true);
         logLines = forManagerService.getProcessLogLines(PLUGIN1_PROCESS_ID, true, 0, logSize);

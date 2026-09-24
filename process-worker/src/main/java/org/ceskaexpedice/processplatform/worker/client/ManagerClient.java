@@ -33,6 +33,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.pool.PoolStats;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
@@ -45,7 +46,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONObject;
 
 /**
  * ManagerClient
@@ -57,20 +60,25 @@ public class ManagerClient {
 
     private final WorkerConfiguration workerConfiguration;
     private final CloseableHttpClient closeableHttpClient;
+    private final PoolingHttpClientConnectionManager poolConnectionManager;
+    private final ManagerClientConfiguration configuration;
     private ObjectMapper mapper = new ObjectMapper();
 
     ManagerClient(WorkerConfiguration workerConfiguration) {
-        PoolingHttpClientConnectionManager poolConnectionManager = new PoolingHttpClientConnectionManager();
-        poolConnectionManager.setMaxTotal(workerConfiguration.getHttpClientMaxConnections());
-        poolConnectionManager.setDefaultMaxPerRoute(workerConfiguration.getHttpClientMaxConnectionsPerRoute());
+        this.configuration = ManagerClientConfiguration.from(workerConfiguration);
+        LOGGER.info("Initializing ManagerClient with " + configuration);
+
+        this.poolConnectionManager = new PoolingHttpClientConnectionManager();
+        poolConnectionManager.setMaxTotal(configuration.getMaxConnections());
+        poolConnectionManager.setDefaultMaxPerRoute(configuration.getMaxConnectionsPerRoute());
         poolConnectionManager.setDefaultConnectionConfig(ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientConnectTimeoutMs()))
-                .setSocketTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientSocketTimeoutMs()))
-                .setValidateAfterInactivity(TimeValue.ofMilliseconds(workerConfiguration.getHttpClientValidateAfterInactivityMs()))
+                .setConnectTimeout(Timeout.ofMilliseconds(configuration.getConnectTimeoutMs()))
+                .setSocketTimeout(Timeout.ofMilliseconds(configuration.getSocketTimeoutMs()))
+                .setValidateAfterInactivity(TimeValue.ofMilliseconds(configuration.getValidateAfterInactivityMs()))
                 .build());
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientConnectionRequestTimeoutMs()))
-                .setResponseTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientResponseTimeoutMs()))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(configuration.getConnectionRequestTimeoutMs()))
+                .setResponseTimeout(Timeout.ofMilliseconds(configuration.getResponseTimeoutMs()))
                 .build();
         this.closeableHttpClient = HttpClients.custom()
                 .setConnectionManager(poolConnectionManager)
@@ -78,9 +86,10 @@ public class ManagerClient {
                 .disableCookieManagement()
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections()
-                .evictIdleConnections(TimeValue.ofMilliseconds(workerConfiguration.getHttpClientEvictIdleConnectionsMs()))
+                .evictIdleConnections(TimeValue.ofMilliseconds(configuration.getEvictIdleConnectionsMs()))
                 .build();
         this.workerConfiguration = workerConfiguration;
+        logPoolStats("initialized");
     }
 
     public void registerNode(Node node) {
@@ -92,6 +101,7 @@ public class ManagerClient {
         post.setEntity(entity);
 
         int statusCode = -1;
+        logPoolStats("before POST " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
@@ -99,6 +109,8 @@ public class ManagerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after POST " + url + ", status=" + statusCode);
         }
     }
 
@@ -115,6 +127,7 @@ public class ManagerClient {
         post.setEntity(entity);
 
         int statusCode = -1;
+        logPoolStats("before POST " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
@@ -122,23 +135,28 @@ public class ManagerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after POST " + url + ", status=" + statusCode);
         }
     }
 
     public ScheduledProcess getNextScheduledProcess() {
         URIBuilder uriBuilder;
         HttpGet get;
+        URI uri;
         try {
             uriBuilder = new URIBuilder(workerConfiguration.getManagerBaseUrl() + "worker/next_process/" + workerConfiguration.getWorkerId());
-            URI uri = uriBuilder.build();
+            uri = uriBuilder.build();
             LOGGER.fine("Getting next scheduled process at " + uri);
             get = new HttpGet(uri);
         } catch (URISyntaxException e) {
             throw new ApplicationException(e.toString(), e);
         }
         int statusCode = -1;
+        logPoolStats("before GET " + uri);
         try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
             int code = response.getCode();
+            statusCode = code;
             LOGGER.fine(String.format("Returning status code from process manager %d", code));
             if (code == 200) {
                 HttpEntity entity = response.getEntity();
@@ -153,6 +171,8 @@ public class ManagerClient {
             }
         } catch (IOException | ParseException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after GET next scheduled process, status=" + statusCode);
         }
     }
 
@@ -164,6 +184,7 @@ public class ManagerClient {
         post.setEntity(entity);
 
         int statusCode = -1;
+        logPoolStats("before POST " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(post)) {
             statusCode = response.getCode();
             if (statusCode != 200 && statusCode != 204) {
@@ -171,6 +192,8 @@ public class ManagerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after POST " + url + ", status=" + statusCode);
         }
     }
 
@@ -180,6 +203,7 @@ public class ManagerClient {
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;
+        logPoolStats("before PUT " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
@@ -187,6 +211,8 @@ public class ManagerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after PUT " + url + ", status=" + statusCode);
         }
     }
 
@@ -204,6 +230,7 @@ public class ManagerClient {
             HttpPut httpPut = new HttpPut(url);
 
             int statusCode = -1;
+            logPoolStats("before PUT " + url);
             try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
                 statusCode = response.getCode();
                 if (statusCode != 200) {
@@ -211,6 +238,8 @@ public class ManagerClient {
                 }
             } catch (IOException e) {
                 throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+            } finally {
+                logPoolStats("after PUT " + url + ", status=" + statusCode);
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to encode URL", e);
@@ -223,6 +252,7 @@ public class ManagerClient {
         HttpPut httpPut = new HttpPut(url);
 
         int statusCode = -1;
+        logPoolStats("before PUT " + url);
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpPut)) {
             statusCode = response.getCode();
             if (statusCode != 200) {
@@ -230,7 +260,16 @@ public class ManagerClient {
             }
         } catch (IOException e) {
             throw new RemoteNodeException(e.getMessage(), NodeType.MANAGER, statusCode, e);
+        } finally {
+            logPoolStats("after PUT " + url + ", status=" + statusCode);
         }
+    }
+
+    public JSONObject getPoolStats() {
+        JSONObject result = new JSONObject();
+        result.put("configuration", configuration.toJson());
+        result.put("total", poolStatsToJson(poolConnectionManager.getTotalStats()));
+        return result;
     }
 
     private String mapToJson(Object to){
@@ -241,6 +280,30 @@ public class ManagerClient {
         } catch (JsonProcessingException e) {
             throw new ApplicationException(e.toString(), e);
         }
+    }
+
+    private void logPoolStats(String event) {
+        if (!LOGGER.isLoggable(Level.FINE)) {
+            return;
+        }
+        PoolStats totalStats = poolConnectionManager.getTotalStats();
+        LOGGER.fine(String.format(
+                "ManagerClient pool [%s]: leased=%d, pending=%d, available=%d, max=%d",
+                event,
+                totalStats.getLeased(),
+                totalStats.getPending(),
+                totalStats.getAvailable(),
+                totalStats.getMax()
+        ));
+    }
+
+    private JSONObject poolStatsToJson(PoolStats stats) {
+        JSONObject json = new JSONObject();
+        json.put("leased", stats.getLeased());
+        json.put("pending", stats.getPending());
+        json.put("available", stats.getAvailable());
+        json.put("max", stats.getMax());
+        return json;
     }
 
 }

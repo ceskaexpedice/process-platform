@@ -22,6 +22,7 @@ import org.ceskaexpedice.processplatform.common.ErrorCode;
 import org.ceskaexpedice.processplatform.common.utils.StringUtils;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandler;
 import org.ceskaexpedice.processplatform.worker.api.service.os.OSHandlerFactory;
+import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
 import org.ceskaexpedice.processplatform.worker.utils.ProcessDirUtils;
 import org.json.JSONArray;
@@ -40,9 +41,15 @@ public class ForManagerService {
     private static final Integer GET_LOGS_DEFAULT_OFFSET = 0;
     private static final Integer GET_LOGS_DEFAULT_LIMIT = 10;
     private final WorkerConfiguration workerConfiguration;
+    private final ManagerClient managerClient;
 
     public ForManagerService(WorkerConfiguration workerConfiguration) {
+        this(workerConfiguration, null);
+    }
+
+    public ForManagerService(WorkerConfiguration workerConfiguration, ManagerClient managerClient) {
         this.workerConfiguration = workerConfiguration;
+        this.managerClient = managerClient;
     }
 
     public InputStream getProcessLog(String processId, boolean err) {
@@ -120,6 +127,17 @@ public class ForManagerService {
         }
         processAlive = osHandler.isProcessAlive();
         return !processAlive;
+    }
+
+    public JSONObject getManagerClientPoolStats() {
+        if (managerClient == null) {
+            JSONObject result = new JSONObject();
+            result.put("initialized", false);
+            return result;
+        }
+        JSONObject result = managerClient.getPoolStats();
+        result.put("initialized", true);
+        return result;
     }
 
 }

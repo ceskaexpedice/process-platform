@@ -46,6 +46,7 @@ public final class WorkerClientFactory {
                 WorkerClient workerClient = new WorkerClient(processService, nodeService, managerConfiguration);
                 return workerClient;
             }
+            LOGGER.fine("Reusing existing WorkerClient; WorkerClientConfiguration is applied only when the client is created");
             return existingInstance;
         });
     }

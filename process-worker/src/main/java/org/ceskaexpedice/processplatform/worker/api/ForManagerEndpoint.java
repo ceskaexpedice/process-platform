@@ -55,6 +55,13 @@ public class ForManagerEndpoint {
         JSONObject json = WorkerInfoMapper.mapToJson(workerInfo);
         return Response.ok(json.toString()).build();
     }
+
+    @GET
+    @Path("manager-client/pool")
+    public Response getManagerClientPoolStats() {
+        return APIRestUtilities.jsonPayload(forManagerService.getManagerClientPoolStats().toString());
+    }
+
     @GET
     @Path("{processId}/log/out")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
