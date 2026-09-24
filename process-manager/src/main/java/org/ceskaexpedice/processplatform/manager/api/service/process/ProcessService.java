@@ -72,7 +72,7 @@ public class ProcessService {
         this.pluginDao = new PluginDao(dbConnectionProvider, managerConfiguration);
         this.pluginService = pluginService;
         this.nextScheduledProcessStrategy = nextScheduledProcessStrategy;
-        this.workerClient = WorkerClientFactory.createWorkerClient(this, nodeService);
+        this.workerClient = WorkerClientFactory.createWorkerClient(this, nodeService, managerConfiguration);
     }
 
     public String scheduleMainProcess(ScheduleMainProcess scheduleMainProcess) {

@@ -40,27 +40,9 @@ class ProcessWorkerPlugin implements Plugin<Project> {
             def outputDir = new File(project.buildDir, "worker")
             def webappsDir = new File(outputDir, "webapps")
             def pluginsDir = new File(outputDir, "lib/plugins")
-            def sharedJarNames = [] as Set
 
 			def warConfig = project.configurations.create("workerWar")
 			project.dependencies.add(warConfig.name, warDependency)
-
-
-            if (ext.autoShareLibraries) {
-                def allPluginJars = []
-                ext.plugins.each { pluginProject ->
-                    def pluginExt = pluginProject.extensions.findByName("processPlugin")
-                    def pluginDistDir = new File(pluginProject.buildDir, "distributions/${pluginExt.pluginName}")
-                    if (pluginDistDir.exists()) {
-                        allPluginJars.addAll(project.fileTree(dir: pluginDistDir, include: "**/*.jar").files)
-                    }
-                }
-                sharedJarNames = allPluginJars.groupBy { it.name }
-                        .findAll { it.value.size() > 1 }
-                        .keySet()
-
-            }
-            println "Auto-detected shared libraries: ${sharedJarNames}"
 
             // Build task
             def buildWorkerTask = project.tasks.register("buildWorker") {
@@ -86,6 +68,8 @@ class ProcessWorkerPlugin implements Plugin<Project> {
 
                 doLast {
                     println "Assembling worker '${ext.workerName}'..."
+                    def sharedJarNames = ext.autoShareLibraries ? detectSharedJarNames(project, ext) : ([] as Set)
+                    println "Auto-detected shared libraries: ${sharedJarNames}"
 
                     // Copy WAR
                     //def warFile = ext.warProject.tasks.named("war").get().archiveFile.get().asFile
@@ -108,6 +92,7 @@ class ProcessWorkerPlugin implements Plugin<Project> {
 
                     // ---- UPDATE worker.properties in the WAR ----
                     File tempWarDir = new File(project.buildDir, "tmp/worker-war")
+                    project.delete(tempWarDir)
                     project.copy {
                         from project.zipTree(warFile)
                         into tempWarDir
@@ -193,5 +178,25 @@ class ProcessWorkerPlugin implements Plugin<Project> {
                 dependsOn buildWorkerTask
             }
         }
+    }
+
+    private static Set<String> detectSharedJarNames(Project project, ProcessWorkerExtension ext) {
+        def allPluginJars = []
+        ext.plugins.each { pluginProject ->
+            def pluginExt = pluginProject.extensions.findByName("processPlugin")
+            def pluginName = pluginExt?.pluginName
+            if (!pluginName) {
+                throw new GradleException("Plugin ${pluginProject.path} does not define processPlugin.pluginName")
+            }
+
+            def pluginDistDir = new File(pluginProject.buildDir, "distributions/${pluginName}")
+            if (pluginDistDir.exists()) {
+                allPluginJars.addAll(project.fileTree(dir: pluginDistDir, include: "**/*.jar").files)
+            }
+        }
+
+        return allPluginJars.groupBy { it.name }
+                .findAll { it.value.size() > 1 }
+                .keySet()
     }
 }

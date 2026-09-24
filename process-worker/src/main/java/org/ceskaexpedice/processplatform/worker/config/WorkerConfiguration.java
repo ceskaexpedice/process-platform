@@ -40,6 +40,14 @@ public class WorkerConfiguration {
     private static final String MANAGER_BASE_URL_KEY = "MANAGER_BASE_URL";
     private static final String WORKER_BASE_URL_KEY = "WORKER_BASE_URL";
     private static final String WORKER_ID_KEY = "WORKER_ID";
+    private static final String HTTP_CLIENT_MAX_CONNECTIONS_KEY = "HTTP_CLIENT_MAX_CONNECTIONS";
+    private static final String HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_KEY = "HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE";
+    private static final String HTTP_CLIENT_CONNECT_TIMEOUT_MS_KEY = "HTTP_CLIENT_CONNECT_TIMEOUT_MS";
+    private static final String HTTP_CLIENT_SOCKET_TIMEOUT_MS_KEY = "HTTP_CLIENT_SOCKET_TIMEOUT_MS";
+    private static final String HTTP_CLIENT_CONNECTION_REQUEST_TIMEOUT_MS_KEY = "HTTP_CLIENT_CONNECTION_REQUEST_TIMEOUT_MS";
+    private static final String HTTP_CLIENT_RESPONSE_TIMEOUT_MS_KEY = "HTTP_CLIENT_RESPONSE_TIMEOUT_MS";
+    private static final String HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY_MS_KEY = "HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY_MS";
+    private static final String HTTP_CLIENT_EVICT_IDLE_CONNECTIONS_MS_KEY = "HTTP_CLIENT_EVICT_IDLE_CONNECTIONS_MS";
     public static final String PROFILES_SUBSET_KEY = "PROFILES_SUBSET";
 
     private final Properties props = new Properties();
@@ -190,12 +198,54 @@ public class WorkerConfiguration {
         set(WORKER_ID_KEY, workerId);
     }
 
+    public int getHttpClientMaxConnections() {
+        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_KEY, 20);
+    }
+
+    public int getHttpClientMaxConnectionsPerRoute() {
+        return getInt(HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_KEY, 10);
+    }
+
+    public long getHttpClientConnectTimeoutMs() {
+        return getLong(HTTP_CLIENT_CONNECT_TIMEOUT_MS_KEY, 10000);
+    }
+
+    public long getHttpClientSocketTimeoutMs() {
+        return getLong(HTTP_CLIENT_SOCKET_TIMEOUT_MS_KEY, 60000);
+    }
+
+    public long getHttpClientConnectionRequestTimeoutMs() {
+        return getLong(HTTP_CLIENT_CONNECTION_REQUEST_TIMEOUT_MS_KEY, 10000);
+    }
+
+    public long getHttpClientResponseTimeoutMs() {
+        return getLong(HTTP_CLIENT_RESPONSE_TIMEOUT_MS_KEY, 60000);
+    }
+
+    public long getHttpClientValidateAfterInactivityMs() {
+        return getLong(HTTP_CLIENT_VALIDATE_AFTER_INACTIVITY_MS_KEY, 10000);
+    }
+
+    public long getHttpClientEvictIdleConnectionsMs() {
+        return getLong(HTTP_CLIENT_EVICT_IDLE_CONNECTIONS_MS_KEY, 30000);
+    }
+
     public static WorkerConfiguration decodeWorkerConfig() {
         String workerConfigBase64 = System.getProperty(WORKER_CONFIG_BASE_64);
         String workerConfigJson = new String(Base64.getDecoder().decode(workerConfigBase64), StandardCharsets.UTF_8);
         Map<String, String> workerProps = parseSimpleJson(workerConfigJson);
         WorkerConfiguration workerConfig = new WorkerConfiguration(workerProps);
         return workerConfig;
+    }
+
+    private int getInt(String key, int defaultValue) {
+        String value = get(key);
+        return value != null ? Integer.parseInt(value) : defaultValue;
+    }
+
+    private long getLong(String key, long defaultValue) {
+        String value = get(key);
+        return value != null ? Long.parseLong(value) : defaultValue;
     }
 
 }

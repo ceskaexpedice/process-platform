@@ -19,6 +19,7 @@ package org.ceskaexpedice.processplatform.manager.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -27,6 +28,8 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.Node;
@@ -34,12 +37,15 @@ import org.ceskaexpedice.processplatform.common.model.NodeType;
 import org.ceskaexpedice.processplatform.common.model.ProcessInfo;
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 import org.json.JSONObject;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 /**
@@ -57,13 +63,29 @@ public class WorkerClient {
     private final NodeService nodeService;
 
     WorkerClient(ProcessService processService, NodeService nodeService) {
+        this(processService, nodeService, new ManagerConfiguration(Collections.emptyMap()));
+    }
+
+    WorkerClient(ProcessService processService, NodeService nodeService, ManagerConfiguration managerConfiguration) {
         PoolingHttpClientConnectionManager poolConnectionManager = new PoolingHttpClientConnectionManager();
-        RequestConfig requestConfig = RequestConfig.custom().build();
+        poolConnectionManager.setMaxTotal(managerConfiguration.getHttpClientMaxConnections());
+        poolConnectionManager.setDefaultMaxPerRoute(managerConfiguration.getHttpClientMaxConnectionsPerRoute());
+        poolConnectionManager.setDefaultConnectionConfig(ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientConnectTimeoutMs()))
+                .setSocketTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientSocketTimeoutMs()))
+                .setValidateAfterInactivity(TimeValue.ofMilliseconds(managerConfiguration.getHttpClientValidateAfterInactivityMs()))
+                .build());
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientConnectionRequestTimeoutMs()))
+                .setResponseTimeout(Timeout.ofMilliseconds(managerConfiguration.getHttpClientResponseTimeoutMs()))
+                .build();
         this.closeableHttpClient = HttpClients.custom()
                 .setConnectionManager(poolConnectionManager)
                 .disableAuthCaching()
                 .disableCookieManagement()
                 .setDefaultRequestConfig(requestConfig)
+                .evictExpiredConnections()
+                .evictIdleConnections(TimeValue.ofMilliseconds(managerConfiguration.getHttpClientEvictIdleConnectionsMs()))
                 .build();
         this.processService = processService;
         this.nodeService = nodeService;
@@ -117,10 +139,12 @@ public class WorkerClient {
             int code = response.getCode();
             if (code == 200) {
                 InputStream is = response.getEntity().getContent();
-                return is;
+                return new ResponseClosingInputStream(is, response);
             } else if (code == 404) {
+                response.close();
                 return null;
             } else {
+                response.close();
                 throw new RemoteNodeException("Failed to get process log", NodeType.WORKER, statusCode);
             }
         } catch (IOException e) {
@@ -207,6 +231,25 @@ public class WorkerClient {
         ProcessInfo processInfo = processService.getProcess(processId);
         Node node = nodeService.getNode(processInfo.getWorkerId());
         return node;
+    }
+
+    private static final class ResponseClosingInputStream extends FilterInputStream {
+
+        private final CloseableHttpResponse response;
+
+        private ResponseClosingInputStream(InputStream in, CloseableHttpResponse response) {
+            super(in);
+            this.response = response;
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                super.close();
+            } finally {
+                response.close();
+            }
+        }
     }
 
 }

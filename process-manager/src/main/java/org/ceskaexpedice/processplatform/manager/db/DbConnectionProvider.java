@@ -28,6 +28,12 @@ public class DbConnectionProvider {
         ds.setJdbcUrl(config.getJdbcUrl());
         ds.setUsername(config.getJdbcUsername());
         ds.setPassword(config.getJdbcPassword());
+        ds.setMaximumPoolSize(config.getJdbcPoolMaxSize());
+        ds.setConnectionTimeout(config.getJdbcPoolConnectionTimeoutMs());
+        ds.setValidationTimeout(config.getJdbcPoolValidationTimeoutMs());
+        ds.setIdleTimeout(config.getJdbcPoolIdleTimeoutMs());
+        ds.setMaxLifetime(config.getJdbcPoolMaxLifetimeMs());
+        ds.setKeepaliveTime(config.getJdbcPoolKeepaliveTimeMs());
         return ds;
     }
 

@@ -20,6 +20,7 @@ package org.ceskaexpedice.processplatform.manager.client;
 
 import org.ceskaexpedice.processplatform.manager.api.service.NodeService;
 import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessService;
+import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
@@ -37,11 +38,12 @@ public final class WorkerClientFactory {
     private WorkerClientFactory() {
     }
 
-    public static WorkerClient createWorkerClient(ProcessService processService, NodeService nodeService) {
+    public static WorkerClient createWorkerClient(ProcessService processService, NodeService nodeService,
+                                                  ManagerConfiguration managerConfiguration) {
         return INSTANCE.updateAndGet(existingInstance -> {
             if (existingInstance == null) {
                 LOGGER.info("Creating new WorkerClient");
-                WorkerClient workerClient = new WorkerClient(processService, nodeService);
+                WorkerClient workerClient = new WorkerClient(processService, nodeService, managerConfiguration);
                 return workerClient;
             }
             return existingInstance;

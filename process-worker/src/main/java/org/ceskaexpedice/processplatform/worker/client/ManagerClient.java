@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -32,6 +33,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.ceskaexpedice.processplatform.common.ApplicationException;
 import org.ceskaexpedice.processplatform.common.RemoteNodeException;
 import org.ceskaexpedice.processplatform.common.model.*;
@@ -58,12 +61,24 @@ public class ManagerClient {
 
     ManagerClient(WorkerConfiguration workerConfiguration) {
         PoolingHttpClientConnectionManager poolConnectionManager = new PoolingHttpClientConnectionManager();
-        RequestConfig requestConfig = RequestConfig.custom().build();
+        poolConnectionManager.setMaxTotal(workerConfiguration.getHttpClientMaxConnections());
+        poolConnectionManager.setDefaultMaxPerRoute(workerConfiguration.getHttpClientMaxConnectionsPerRoute());
+        poolConnectionManager.setDefaultConnectionConfig(ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientConnectTimeoutMs()))
+                .setSocketTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientSocketTimeoutMs()))
+                .setValidateAfterInactivity(TimeValue.ofMilliseconds(workerConfiguration.getHttpClientValidateAfterInactivityMs()))
+                .build());
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientConnectionRequestTimeoutMs()))
+                .setResponseTimeout(Timeout.ofMilliseconds(workerConfiguration.getHttpClientResponseTimeoutMs()))
+                .build();
         this.closeableHttpClient = HttpClients.custom()
                 .setConnectionManager(poolConnectionManager)
                 .disableAuthCaching()
                 .disableCookieManagement()
                 .setDefaultRequestConfig(requestConfig)
+                .evictExpiredConnections()
+                .evictIdleConnections(TimeValue.ofMilliseconds(workerConfiguration.getHttpClientEvictIdleConnectionsMs()))
                 .build();
         this.workerConfiguration = workerConfiguration;
     }
