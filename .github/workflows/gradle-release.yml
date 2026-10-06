@@ -31,12 +31,22 @@ jobs:
       run: cat build.gradle
 
 
-    - name: Get project version from Gradle
+    - name: Set version environment variables
       run: |
-        VERSION=$(./gradlew printVersion -q --console=plain)
+        # Vytahne pouze radek obsahujici cisla a tecky (napr. 1.0.0 nebo 1.0.0-SNAPSHOT)
+        RAW_VERSION=$(./gradlew printVersion -q --console=plain 2>/dev/null)
+        VERSION=$(echo "$RAW_VERSION" | grep -E '^[0-9]+(\.[0-9]+)*' | head -n 1 | tr -d '\r')
+        
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "TAG_NAME=v$VERSION" >> $GITHUB_ENV
-        echo "RELEASE_NAME=Release v$VERSION" >> $GITHUB_ENV          
+        echo "RELEASE_NAME=Release v$VERSION" >> $GITHUB_ENV
+
+    #- name: Get project version from Gradle
+    #  run: |
+    #    VERSION=$(./gradlew printVersion -q --console=plain)
+    #    echo "VERSION=$VERSION" >> $GITHUB_ENV
+    #    echo "TAG_NAME=v$VERSION" >> $GITHUB_ENV
+    #    echo "RELEASE_NAME=Release v$VERSION" >> $GITHUB_ENV          
 
     # Docker image 
     - name: Set up QEMU
