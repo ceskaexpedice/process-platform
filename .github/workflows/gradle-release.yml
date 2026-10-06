@@ -33,7 +33,7 @@ jobs:
 
     - name: Get project version from Gradle
       run: |
-        VERSION=$(./gradlew printVersion -q)
+        VERSION=$(./gradlew printVersion -q --console=plain)
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "TAG_NAME=v$VERSION" >> $GITHUB_ENV
         echo "RELEASE_NAME=Release v$VERSION" >> $GITHUB_ENV          
