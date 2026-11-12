@@ -126,7 +126,7 @@ public class ManagerStartupListener implements ServletContextListener {
         NextScheduledProcessStrategyType type = config.getNextScheduledProcessStrategyType();
         switch (type) {
             case TAG_MATCHING_ONLY:
-                return new TagMatchingOnlyStrategy(nodeDao);
+                return new TagMatchingOnlyStrategy(nodeDao, processDao);
             case BATCH_AFFINITY:
             default:
                 return new BatchAffinityStrategy(nodeDao, processDao);

@@ -29,17 +29,17 @@ import org.ceskaexpedice.processplatform.manager.db.entity.ProcessEntity;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * ProcessDao
+ *
  * @author ppodsednik
  */
-public class ProcessDao extends AbstractDao{
+public class ProcessDao extends AbstractDao {
 
     public ProcessDao(DbConnectionProvider dbConnectionProvider, ManagerConfiguration managerConfiguration) {
-        super(dbConnectionProvider,managerConfiguration);
+        super(dbConnectionProvider, managerConfiguration);
     }
 
     public ProcessEntity getProcess(String processId) {
@@ -74,43 +74,84 @@ public class ProcessDao extends AbstractDao{
         }
     }
 
-    public boolean existsAnotherProcessInBatch(String batchId, String processId) {
+    public Optional<ProcessEntity> findNextByTags(Set<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return Optional.empty();
+        }
+        String placeholders = String.join(",", Collections.nCopies(tags.size(), "?"));
+        String sql =
+                "select * " +
+                        "from pcp_process p " +
+                        "where p.status = ? " +
+                        "  and p.profile_id in (" + placeholders + ") " +
+                        "order by p.planned " +
+                        "limit 1";
+        List<Object> params = new ArrayList<>();
+        params.add(ProcessState.PLANNED.getVal());
+        params.addAll(tags);
         try (Connection connection = getConnection()) {
-            List<Boolean> result = new JDBCQueryTemplate<Boolean>(connection) {
-                        @Override
-                        public boolean handleRow(ResultSet rs, List<Boolean> returnsList) {
-                            // If we got a row, it means such a process exists
-                            returnsList.add(Boolean.TRUE);
-                            return false; // stop after first row
-                        }
-                    }.executeQuery(
-                            "select 1 " +
-                                    "from pcp_process " +
-                                    "where batch_id = ? " +
-                                    "  and process_id <> ?",
-                            batchId,
-                            processId
-                    );
-            return !result.isEmpty();
+            List<ProcessEntity> result = new JDBCQueryTemplate<ProcessEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
+                    returnsList.add(ProcessMapper.mapProcess(rs));
+                    return false; // Stačí nám první nalezený proces
+                }
+            }.executeQuery(sql, params.toArray());
+            return result.isEmpty()
+                    ? Optional.empty()
+                    : Optional.of(result.get(0));
+        } catch (SQLException e) {
+            throw new DataAccessException(e.toString(), e);
+        }
+    }
+
+    public Optional<ProcessEntity> findNextWithBatchAffinity(Set<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return Optional.empty();
+        }
+        String placeholders = String.join(",", Collections.nCopies(tags.size(), "?"));
+        String sql =
+                "select * " +
+                        "from pcp_process p " +
+                        "where p.status = ? " +
+                        "  and p.profile_id in (" + placeholders + ") " +
+                        "order by " +
+                        "  case when exists ( " +
+                        "      select 1 " +
+                        "      from pcp_process other " +
+                        "      where other.batch_id = p.batch_id " +
+                        "        and other.process_id <> p.process_id " +
+                        "  ) then 0 else 1 end, " +
+                        "  p.planned " +
+                        "limit 1";
+
+        List<Object> params = new ArrayList<>();
+        params.add(ProcessState.PLANNED.getVal());
+        params.addAll(tags);
+        try (Connection connection = getConnection()) {
+            List<ProcessEntity> result = new JDBCQueryTemplate<ProcessEntity>(connection) {
+                @Override
+                public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
+                    returnsList.add(ProcessMapper.mapProcess(rs));
+                    return false;
+                }
+            }.executeQuery(sql, params.toArray());
+            return result.isEmpty()
+                    ? Optional.empty()
+                    : Optional.of(result.get(0));
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
     }
 
     public List<ProcessEntity> getBatchHeaders(BatchFilter batchFilter, int offset, int limit) {
-
         try (Connection connection = getConnection()) {
-
             QueryAndParams qp = buildBatchHeadersFilterQuery(batchFilter);
-
             String sql = qp.sql.replace("/*SELECT_PART*/", "b.*") +
                     "ORDER BY b.planned DESC\nLIMIT ? OFFSET ?";
-
             List<Object> params = new ArrayList<>(qp.params);
             params.add(limit);
             params.add(offset);
-
-
             return new JDBCQueryTemplate<ProcessEntity>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<ProcessEntity> returnsList) {
@@ -124,20 +165,16 @@ public class ProcessDao extends AbstractDao{
     }
 
     public int countBatchHeaders(BatchFilter batchFilter) {
-
         try (Connection connection = getConnection()) {
-
-            QueryAndParams qp = buildBatchHeadersFilterQuery( batchFilter);
+            QueryAndParams qp = buildBatchHeadersFilterQuery(batchFilter);
             String sql = qp.sql.replace("/*SELECT_PART*/", "COUNT(*)");
-
             return new JDBCQueryTemplate<Integer>(connection) {
                 @Override
                 public boolean handleRow(ResultSet rs, List<Integer> returnsList) throws SQLException {
                     returnsList.add(rs.getInt(1));
                     return false; // only one row
                 }
-            }.executeQuery(sql, qp.params.toArray())
-                    .get(0);
+            }.executeQuery(sql, qp.params.toArray()).get(0);
         } catch (SQLException e) {
             throw new DataAccessException(e.toString(), e);
         }
@@ -320,10 +357,11 @@ public class ProcessDao extends AbstractDao{
         }
     }
 
-    private QueryAndParams buildBatchHeadersFilterQuery( BatchFilter batchFilter) {
-        if(batchFilter == null) {
+    private QueryAndParams buildBatchHeadersFilterQuery(BatchFilter batchFilter) {
+        if (batchFilter == null) {
             batchFilter = new BatchFilter();
-        };
+        }
+        ;
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
 
@@ -334,18 +372,18 @@ public class ProcessDao extends AbstractDao{
         // Step 1: WITH clause only if needed
         if (filterByState || filterByWorker) {
             sql.append("""
-            WITH batch_info AS (
-                SELECT
-                    p.batch_id AS main_process_id,
-                    MAX(p.status) AS aggregated_state,
-                    array_agg(DISTINCT p.worker_id) AS workers_list
-                FROM pcp_process p
-                GROUP BY p.batch_id
-            )
-            SELECT /*SELECT_PART*/
-            FROM pcp_process b
-            JOIN batch_info bs ON bs.main_process_id = b.process_id
-            """);
+                    WITH batch_info AS (
+                        SELECT
+                            p.batch_id AS main_process_id,
+                            MAX(p.status) AS aggregated_state,
+                            array_agg(DISTINCT p.worker_id) AS workers_list
+                        FROM pcp_process p
+                        GROUP BY p.batch_id
+                    )
+                    SELECT /*SELECT_PART*/
+                    FROM pcp_process b
+                    JOIN batch_info bs ON bs.main_process_id = b.process_id
+                    """);
         } else {
             sql.append("SELECT /*SELECT_PART*/ FROM pcp_process b\n");
         }

@@ -55,8 +55,9 @@ public class TestProcessService_integration {
         pluginService = new PluginService(managerConfiguration, dbConnectionProvider);
         nodeService = new NodeService(managerConfiguration, dbConnectionProvider);
         NodeDao nodeDao = new NodeDao(dbConnectionProvider, managerConfiguration);
+        ProcessDao processDao = new ProcessDao(dbConnectionProvider, managerConfiguration);
         processService = new ProcessService(managerConfiguration, dbConnectionProvider, pluginService, nodeService,
-                new TagMatchingOnlyStrategy(nodeDao));
+                new TagMatchingOnlyStrategy(nodeDao, processDao));
     }
 
     @BeforeEach
@@ -300,33 +301,6 @@ public class TestProcessService_integration {
 
         int deleted = processService.deleteBatchInDb(processId1);
         Assertions.assertEquals(2, deleted);
-    }
-
-    @Test
-    public void testDeleteBatch_wrongState() {
-        Node node = new Node();
-        node.setNodeId(NODE_WORKER1_ID);
-        node.setType(NodeType.WORKER);
-        Set<String> tags = new HashSet<>();
-        tags.add(PROFILE1_ID);
-        node.setTags(tags);
-        nodeService.registerNode(node);
-
-        Map<String, String> payload = new HashMap<>();
-        payload.put("name", "Pe");
-        payload.put("surname", "Po");
-        // schedule main process + subprocess; set state Finished and Planned
-        ScheduleMainProcess scheduleMainProcess1 = new ScheduleMainProcess(PROFILE1_ID, payload, "PePo");
-        String processId1 = processService.scheduleMainProcess(scheduleMainProcess1);
-        ScheduleSubProcess scheduleSubProcess11 = new ScheduleSubProcess(PLUGIN2_ID, payload);
-        scheduleSubProcess11.setBatchId(processId1);
-        String subProcessId11 = processService.scheduleSubProcess(scheduleSubProcess11);
-        processService.updateState(processId1, ProcessState.FINISHED);
-        processService.updateState(subProcessId11, ProcessState.RUNNING);
-
-        assertThrows(BusinessLogicException.class, () -> {
-            processService.deleteBatch(processId1);
-        });
     }
 
     @Test

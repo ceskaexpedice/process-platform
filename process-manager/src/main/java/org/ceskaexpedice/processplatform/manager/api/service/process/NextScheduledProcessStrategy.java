@@ -11,6 +11,6 @@ import java.util.Optional;
  */
 public interface NextScheduledProcessStrategy {
 
-    Optional<ProcessEntity> selectNext(String workerId, List<ProcessEntity> plannedProcesses);
+    Optional<ProcessEntity> selectNext(String workerId);
 
 }
