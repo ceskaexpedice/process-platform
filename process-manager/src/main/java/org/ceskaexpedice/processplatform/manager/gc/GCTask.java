@@ -67,13 +67,10 @@ public class GCTask extends TimerTask {
                     processService.updateState(processInfo.getProcessId(), ProcessState.FAILED);
                 }
             }
-
-
-
-            this.gcScheduler.scheduleDoGc();
         } catch (Throwable e) {
-            this.gcScheduler.shutdown();
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }finally {
+            this.gcScheduler.scheduleDoGc();
         }
     }
 }

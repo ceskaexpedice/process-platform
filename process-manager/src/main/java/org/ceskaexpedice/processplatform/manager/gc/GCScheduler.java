@@ -34,8 +34,8 @@ public class GCScheduler {
     }
 
     public void scheduleDoGc() {
-        GCTask findCandidates = new GCTask(this.processService,this.nodeService, this);
-        this.timer.schedule(findCandidates, this.interval);
+        GCTask gcTask = new GCTask(this.processService,this.nodeService, this);
+        this.timer.schedule(gcTask, this.interval);
     }
 
     public void shutdown() {
