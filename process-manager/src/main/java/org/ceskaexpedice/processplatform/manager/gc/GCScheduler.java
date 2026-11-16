@@ -5,10 +5,13 @@ import org.ceskaexpedice.processplatform.manager.api.service.process.ProcessServ
 import org.ceskaexpedice.processplatform.manager.config.ManagerConfiguration;
 
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 /**
  * GCScheduler
+ *
  * @author ppodsednik
  */
 public class GCScheduler {
@@ -20,6 +23,7 @@ public class GCScheduler {
     private ProcessService processService;
     private NodeService nodeService;
     private ManagerConfiguration managerConfiguration;
+    private final ConcurrentMap<String, Long> workerUnreachableSince = new ConcurrentHashMap<>();
 
     public GCScheduler(ProcessService processService, NodeService nodeService, ManagerConfiguration managerConfiguration) {
         this.processService = processService;
@@ -34,12 +38,16 @@ public class GCScheduler {
     }
 
     public void scheduleDoGc() {
-        GCTask gcTask = new GCTask(this.processService,this.nodeService, this);
+        GCTask gcTask = new GCTask(this.processService, this.nodeService, this);
         this.timer.schedule(gcTask, this.interval);
     }
 
     public void shutdown() {
         LOGGER.info("Cancelling gcScheduler");
         this.timer.cancel();
+    }
+
+    public ConcurrentMap<String, Long> getWorkerUnreachableSince() {
+        return workerUnreachableSince;
     }
 }
