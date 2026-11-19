@@ -230,23 +230,6 @@ public class WorkerClient {
         if (workerNode != null) {
             return getWorkerInfo(workerNode);
         } else return null;
-
-//        String url = getWorkerBaseUrl(processId) + "manager/info";
-//        HttpGet get = new HttpGet(url);
-//
-//        int code = -1;
-//        try (CloseableHttpResponse response = closeableHttpClient.execute(get)) {
-//            code = response.getCode();
-//            HttpEntity entity = response.getEntity();
-//            String body = entity != null ? EntityUtils.toString(entity) : "";
-//            if (code == 200) {
-//                return new JSONObject(body);
-//            } else {
-//                throw new RemoteNodeException("Failed to get worker info", NodeType.WORKER, code);
-//            }
-//        } catch (Exception e) {
-//            throw new RemoteNodeException(e.getMessage(), NodeType.WORKER, code, e);
-//        }
     }
 
     public JSONObject getPoolStats() {

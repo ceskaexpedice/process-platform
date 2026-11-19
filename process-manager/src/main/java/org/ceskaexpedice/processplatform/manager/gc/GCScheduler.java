@@ -24,6 +24,8 @@ public class GCScheduler {
     private NodeService nodeService;
     private ManagerConfiguration managerConfiguration;
     private final ConcurrentMap<String, Long> workerUnreachableSince = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Integer> notRunningFailures = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Long> notRunningWorkerUnreachableSince =            new ConcurrentHashMap<>();
 
     public GCScheduler(ProcessService processService, NodeService nodeService, ManagerConfiguration managerConfiguration) {
         this.processService = processService;
@@ -49,5 +51,13 @@ public class GCScheduler {
 
     public ConcurrentMap<String, Long> getWorkerUnreachableSince() {
         return workerUnreachableSince;
+    }
+
+    public ConcurrentMap<String, Integer> getNotRunningFailures() {
+        return notRunningFailures;
+    }
+
+    public ConcurrentMap<String, Long> getNotRunningWorkerUnreachableSince() {
+        return notRunningWorkerUnreachableSince;
     }
 }

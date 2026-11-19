@@ -18,6 +18,7 @@ package org.ceskaexpedice.processplatform.worker;
 
 
 import org.ceskaexpedice.processplatform.common.ApplicationException;
+import org.ceskaexpedice.processplatform.common.model.ProcessState;
 import org.ceskaexpedice.processplatform.common.model.ScheduledProcess;
 import org.ceskaexpedice.processplatform.worker.client.ManagerClient;
 import org.ceskaexpedice.processplatform.worker.config.WorkerConfiguration;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 
 /**
  * WorkerLoop
+ *
  * @author ppodsednik
  */
 class WorkerLoop {
@@ -49,20 +51,30 @@ class WorkerLoop {
             while (running) {
                 try {
                     Optional<ScheduledProcess> taskOpt = pollManagerForTask();
-
                     if (taskOpt.isPresent()) {
                         ScheduledProcess scheduledProcess = taskOpt.get();
-
+                        int exitCode = -1;
+                        boolean launchFailed = false;
                         try {
-                            int exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
+                            exitCode = PluginJvmLauncher.launchJvm(scheduledProcess, workerConfiguration);
                             if (exitCode != 0) {
-                                throw new ApplicationException("Failed to launch JVM, exit code: " + exitCode);
+                                launchFailed = true;
+                                LOGGER.severe("Plugin JVM failed for process " + scheduledProcess.getProcessId()
+                                        + ", exit code: " + exitCode);
                             }
                         } catch (Exception e) {
-                            LOGGER.severe("Error during task execution: " + e.getMessage());
-                            // Optionally: retry, skip, or escalate
+                            launchFailed = true;
+                            LOGGER.log(Level.SEVERE, "Error during task execution: "
+                                    + scheduledProcess.getProcessId(), e);
                         }
-
+                        if (launchFailed) {
+                            try {
+                                managerClient.updateProcessState(scheduledProcess.getProcessId(), ProcessState.FAILED);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "Failed to update process state to FAILED: "
+                                        + scheduledProcess.getProcessId(), e);
+                            }
+                        }
                     } else {
                         double sleepSec = workerConfiguration.getWorkerLoopSleepSecs();
                         double printSec = workerConfiguration.getWorkerLoopPrintSecs();
