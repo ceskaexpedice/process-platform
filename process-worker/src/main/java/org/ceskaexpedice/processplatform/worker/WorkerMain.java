@@ -54,9 +54,13 @@ public class WorkerMain {
         if (pluginsList.isEmpty()) {
             throw new ApplicationException("No plugins found");
         }
-        registerNode(pluginsList);
-        registerPlugins(pluginsList);
-        this.workerLoop = new WorkerLoop(workerConfiguration, managerClient);
+        Node node = createNode(pluginsList);
+        this.workerLoop = new WorkerLoop(
+                workerConfiguration,
+                managerClient,
+                node,
+                pluginsList
+        );
         workerLoop.start();
         LOGGER.info("Initialized");
     }
@@ -68,8 +72,8 @@ public class WorkerMain {
         return pluginsList;
     }
 
-    private void registerNode(List<PluginInfo> pluginsList) {
-        LOGGER.info(String.format("Register node [%s]", workerConfiguration.getWorkerId()));
+    private Node createNode(List<PluginInfo> pluginsList) {
+        LOGGER.info(String.format("Prepare node [%s]", workerConfiguration.getWorkerId()));
         // Supported profiles from plugins
         Set<String> supportedProfiles = new HashSet<>();
         for (PluginInfo pluginInfo : pluginsList) {
@@ -103,18 +107,13 @@ public class WorkerMain {
         node.setType(NodeType.WORKER);
         node.setUrl(workerConfiguration.getWorkerBaseUrl());
         node.setTags(tags);
-        managerClient.registerNode(node);
-    }
-
-    private void registerPlugins(List<PluginInfo> pluginsList) {
-        for (PluginInfo pluginInfo : pluginsList) {
-            LOGGER.info("Register plugin: " + pluginInfo.getPluginId());
-            managerClient.registerPlugin(pluginInfo);
-        }
+        return node;
     }
 
     public void shutdown() {
-        workerLoop.stop();
+        if (workerLoop != null) {
+            workerLoop.stop();
+        }
     }
 
     public ManagerClient getManagerClient() {
