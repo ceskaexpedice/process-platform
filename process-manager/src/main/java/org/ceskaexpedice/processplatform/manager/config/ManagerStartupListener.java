@@ -50,6 +50,7 @@ public class ManagerStartupListener implements ServletContextListener {
     private static Logger LOGGER = Logger.getLogger(ManagerStartupListener.class.getName());
     private static ServletContext ctx;
     private DbConnectionProvider dbProvider;
+    private GCScheduler gcScheduler;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -75,7 +76,7 @@ public class ManagerStartupListener implements ServletContextListener {
         ProcessService processService = (ProcessService) ctx.getAttribute(ProcessService.class.getSimpleName());
         NodeService nodeService = (NodeService) ctx.getAttribute(NodeService.class.getSimpleName());
 
-        GCScheduler gcScheduler = new GCScheduler(processService,nodeService, config);
+        gcScheduler = new GCScheduler(processService,nodeService, config);
         gcScheduler.init();
     }
 
@@ -126,7 +127,7 @@ public class ManagerStartupListener implements ServletContextListener {
         NextScheduledProcessStrategyType type = config.getNextScheduledProcessStrategyType();
         switch (type) {
             case TAG_MATCHING_ONLY:
-                return new TagMatchingOnlyStrategy(nodeDao);
+                return new TagMatchingOnlyStrategy(nodeDao, processDao);
             case BATCH_AFFINITY:
             default:
                 return new BatchAffinityStrategy(nodeDao, processDao);
@@ -139,6 +140,11 @@ public class ManagerStartupListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        dbProvider.close();
+        if(dbProvider != null){
+            dbProvider.close();
+        }
+        if(gcScheduler != null){
+            gcScheduler.shutdown();
+        }
     }
 }

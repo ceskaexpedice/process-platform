@@ -82,6 +82,7 @@ public final class PluginJvmLauncher {
             return -1;
         }
     }
+
     private static List<String> createCommandJVMArgs(ScheduledProcess scheduledProcess, WorkerConfiguration workerConfiguration) throws IOException {
         Path argFile = generateJvmArgsFile(scheduledProcess, workerConfiguration);
         return List.of("java", "@" + argFile.toAbsolutePath());
